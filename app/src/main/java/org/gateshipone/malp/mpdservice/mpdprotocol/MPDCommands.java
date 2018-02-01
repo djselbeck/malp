@@ -293,4 +293,8 @@ public class MPDCommands {
     }
 
     public static final String MPD_COMMAND_SHUFFLE_PLAYLIST = "shuffle";
+
+    public static String MPD_COMMAND_GET_ALBUMART(String url, int offset) {
+        return "albumart \"" + url + "\" " + String.valueOf(offset);
+    }
 }
