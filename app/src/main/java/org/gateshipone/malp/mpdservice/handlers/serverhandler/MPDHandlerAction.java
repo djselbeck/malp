@@ -54,6 +54,7 @@ public class MPDHandlerAction {
         ACTION_GET_SAVED_PLAYLISTS,
         ACTION_GET_FILES,
         ACTION_GET_OUTPUTS,
+        ACTION_GET_ALBUM_ART,
         ACTION_ADD_ARTIST_ALBUM,
         ACTION_ADD_ARTIST,
         ACTION_ADD_PATH,
