@@ -38,51 +38,71 @@ public class MPDTrack extends MPDFileEntry implements MPDGenericItem, Parcelable
     /**
      * Title of the song
      */
+    @NonNull
     private String pTrackTitle;
 
     /**
      * Artist of the song
      */
+    @NonNull
     private String pTrackArtist;
 
     /**
      * Associated album of the song
      */
+    @NonNull
     private String pTrackAlbum;
 
     /**
      * The artist of the album of this song. E.g. Various Artists for compilations
      */
+    @NonNull
     private String pTrackAlbumArtist;
+
+    /**
+     * ArtistSort field, can be optionally be used as sort order
+     */
+    private String pTrackArtistSort;
+
+    /**
+     * AlbumArtistSort field, can be optionally be used as sort order
+     */
+    private String pTrackAlbumArtistSort;
 
     /**
      * Track "Name" unspecified tag, could be shown if trackTitle is not set
      */
+    @NonNull
     private String pTrackName;
 
     /**
      * The date of the song
      */
+    @NonNull
     private String pDate;
 
     /**
      * MusicBrainz ID for the artist
      */
+    @NonNull
     private String pTrackArtistMBID;
 
     /**
      * MusicBrainz ID for the song itself
      */
+    @NonNull
     private String pTrackMBID;
 
     /**
      * MusicBrainz ID for the album of the song
      */
+    @NonNull
     private String pTrackAlbumMBID;
 
     /**
      * MusicBrainz ID for the album artist
      */
+    @NonNull
     private String pTrackAlbumArtistMBID;
 
     /**
@@ -132,13 +152,15 @@ public class MPDTrack extends MPDFileEntry implements MPDGenericItem, Parcelable
      *
      * @param path The path of the file. This should never change.
      */
-    public MPDTrack(String path) {
+    public MPDTrack(@NonNull String path) {
         super(path);
         pTrackTitle = "";
 
         pTrackArtist = "";
+        pTrackArtistSort = "";
         pTrackAlbum = "";
         pTrackAlbumArtist = "";
+        pTrackAlbumArtistSort = "";
         pTrackName = "";
 
         pDate = "";
@@ -153,119 +175,177 @@ public class MPDTrack extends MPDFileEntry implements MPDGenericItem, Parcelable
         pImageFetching = false;
     }
 
-    /**
-     * Create a MPDTrack from a parcel
-     *
-     * @param in Parcel to deserialize
-     */
+
     protected MPDTrack(Parcel in) {
-        super(in.readString());
-
-        /**
-         * Deserialize all properties. Check with serialization method. BOTH NEED TO BE EQUIVALENT
-         */
         pTrackTitle = in.readString();
-        pTrackAlbum = in.readString();
         pTrackArtist = in.readString();
+        pTrackAlbum = in.readString();
         pTrackAlbumArtist = in.readString();
+        pTrackArtistSort = in.readString();
+        pTrackAlbumArtistSort = in.readString();
         pTrackName = in.readString();
-
         pDate = in.readString();
-
+        pTrackArtistMBID = in.readString();
         pTrackMBID = in.readString();
         pTrackAlbumMBID = in.readString();
-        pTrackArtistMBID = in.readString();
         pTrackAlbumArtistMBID = in.readString();
-
         pLength = in.readInt();
         pTrackNumber = in.readInt();
         pAlbumTrackCount = in.readInt();
         pDiscNumber = in.readInt();
         pAlbumDiscCount = in.readInt();
-
         pSongPosition = in.readInt();
         pSongID = in.readInt();
-        pImageFetching = in.readInt() == 1;
+        pImageFetching = in.readByte() != 0;
     }
+
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(pTrackTitle);
+        dest.writeString(pTrackArtist);
+        dest.writeString(pTrackAlbum);
+        dest.writeString(pTrackAlbumArtist);
+        dest.writeString(pTrackArtistSort);
+        dest.writeString(pTrackAlbumArtistSort);
+        dest.writeString(pTrackName);
+        dest.writeString(pDate);
+        dest.writeString(pTrackArtistMBID);
+        dest.writeString(pTrackMBID);
+        dest.writeString(pTrackAlbumMBID);
+        dest.writeString(pTrackAlbumArtistMBID);
+        dest.writeInt(pLength);
+        dest.writeInt(pTrackNumber);
+        dest.writeInt(pAlbumTrackCount);
+        dest.writeInt(pDiscNumber);
+        dest.writeInt(pAlbumDiscCount);
+        dest.writeInt(pSongPosition);
+        dest.writeInt(pSongID);
+        dest.writeByte((byte) (pImageFetching ? 1 : 0));
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    public static final Creator<MPDTrack> CREATOR = new Creator<MPDTrack>() {
+        @Override
+        public MPDTrack createFromParcel(Parcel in) {
+            return new MPDTrack(in);
+        }
+
+        @Override
+        public MPDTrack[] newArray(int size) {
+            return new MPDTrack[size];
+        }
+    };
+
+    @NonNull
 
     public String getTrackTitle() {
         return pTrackTitle;
     }
 
-    public void setTrackTitle(String pTrackTitle) {
+    public void setTrackTitle(@NonNull String pTrackTitle) {
         this.pTrackTitle = pTrackTitle;
     }
 
-
+    @NonNull
     public String getTrackArtist() {
         return pTrackArtist;
     }
 
-    public void setTrackArtist(String pTrackArtist) {
+    public void setTrackArtist(@NonNull String pTrackArtist) {
         this.pTrackArtist = pTrackArtist;
     }
 
+    public void setTrackArtistSort(@NonNull String artistSort) {
+        pTrackArtistSort = artistSort;
+    }
+
+    @NonNull
+    public String getTrackArtistSort() {
+        return pTrackArtistSort;
+    }
+
+    public void setTrackAlbumArtistSort(String albumArtistSort) {
+        pTrackAlbumArtistSort = albumArtistSort;
+    }
+
+    public String getTrackAlbumArtistSort() {
+        return pTrackAlbumArtistSort;
+    }
+
+    @NonNull
     public String getTrackAlbum() {
         return pTrackAlbum;
     }
 
-    public void setTrackAlbum(String pTrackAlbum) {
+    public void setTrackAlbum(@NonNull String pTrackAlbum) {
         this.pTrackAlbum = pTrackAlbum;
     }
 
+    @NonNull
     public String getTrackAlbumArtist() {
         return pTrackAlbumArtist;
     }
 
-    public void setTrackAlbumArtist(String pTrackAlbumArtist) {
+    public void setTrackAlbumArtist(@NonNull String pTrackAlbumArtist) {
         this.pTrackAlbumArtist = pTrackAlbumArtist;
     }
 
+    @NonNull
     public String getTrackName() {
         return pTrackName;
     }
 
-    public void setTrackName(String name) {
+    public void setTrackName(@NonNull String name) {
         pTrackName = name;
     }
 
+    @NonNull
     public String getDate() {
         return pDate;
     }
 
-    public void setDate(String pDate) {
+    public void setDate(@NonNull String pDate) {
         this.pDate = pDate;
     }
 
+    @NonNull
     public String getTrackArtistMBID() {
         return pTrackArtistMBID;
     }
 
-    public void setTrackArtistMBID(String pTrackArtistMBID) {
+    public void setTrackArtistMBID(@NonNull String pTrackArtistMBID) {
         this.pTrackArtistMBID = pTrackArtistMBID;
     }
 
+    @NonNull
     public String getTrackAlbumArtistMBID() {
         return pTrackAlbumArtistMBID;
     }
 
-    public void setTrackAlbumArtistMBID(String pTrackArtistMBID) {
+    public void setTrackAlbumArtistMBID(@NonNull String pTrackArtistMBID) {
         this.pTrackAlbumArtistMBID = pTrackArtistMBID;
     }
 
+    @NonNull
     public String getTrackMBID() {
         return pTrackMBID;
     }
 
-    public void setTrackMBID(String pTrackMBID) {
+    public void setTrackMBID(@NonNull String pTrackMBID) {
         this.pTrackMBID = pTrackMBID;
     }
 
+    @NonNull
     public String getTrackAlbumMBID() {
         return pTrackAlbumMBID;
     }
 
-    public void setTrackAlbumMBID(String pTrackAlbumMBID) {
+    public void setTrackAlbumMBID(@NonNull String pTrackAlbumMBID) {
         this.pTrackAlbumMBID = pTrackAlbumMBID;
     }
 
@@ -336,6 +416,7 @@ public class MPDTrack extends MPDFileEntry implements MPDGenericItem, Parcelable
     /**
      * Returns either the track title, name or filename depending on which is set.
      */
+    @NonNull
     public String getVisibleTitle() {
         if (!pTrackTitle.isEmpty()) {
             return pTrackTitle;
@@ -350,79 +431,12 @@ public class MPDTrack extends MPDFileEntry implements MPDGenericItem, Parcelable
      * @return String that is used for section based scrolling
      */
     @Override
+    @NonNull
     public String getSectionTitle() {
         return pTrackTitle.equals("") ? mPath : pTrackTitle;
     }
 
 
-    /**
-     * Describes if it is a special parcel type (no)
-     *
-     * @return 0
-     */
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    /**
-     * Static creator class to create MPDTrack objects from parcels.
-     */
-    public static final Creator<MPDTrack> CREATOR = new Creator<MPDTrack>() {
-        /**
-         * Create a new MPDTrack with parcel creator.
-         * @param in Parcel to use for creating the MPDTrack object
-         * @return The deserialized MPDTrack object
-         */
-        @Override
-        public MPDTrack createFromParcel(Parcel in) {
-            return new MPDTrack(in);
-        }
-
-        /**
-         * Used to create an array of MPDTrack objects
-         * @param size Size of the array to create
-         * @return The created array
-         */
-        @Override
-        public MPDTrack[] newArray(int size) {
-            return new MPDTrack[size];
-        }
-    };
-
-    /**
-     * Serialized the MPDTrack object to a parcel. Check that this method is equivalent with the
-     * deserializing creator above.
-     *
-     * @param dest  Parcel to write the properties to
-     * @param flags Special flags
-     */
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        // Serialize MPDTrack properties
-        dest.writeString(mPath);
-        dest.writeString(pTrackTitle);
-        dest.writeString(pTrackAlbum);
-        dest.writeString(pTrackArtist);
-        dest.writeString(pTrackAlbumArtist);
-        dest.writeString(pTrackName);
-
-        dest.writeString(pDate);
-
-        dest.writeString(pTrackMBID);
-        dest.writeString(pTrackAlbumMBID);
-        dest.writeString(pTrackArtistMBID);
-        dest.writeString(pTrackAlbumArtistMBID);
-
-        dest.writeInt(pLength);
-        dest.writeInt(pTrackNumber);
-        dest.writeInt(pAlbumTrackCount);
-        dest.writeInt(pDiscNumber);
-        dest.writeInt(pAlbumDiscCount);
-        dest.writeInt(pSongPosition);
-        dest.writeInt(pSongID);
-        dest.writeInt(pImageFetching ? 1 : 0);
-    }
 
     public int indexCompare(MPDTrack compFile) {
         if (!pTrackAlbumMBID.equals(compFile.pTrackAlbumMBID)) {
@@ -448,6 +462,7 @@ public class MPDTrack extends MPDFileEntry implements MPDGenericItem, Parcelable
     /**
      * Compares the file names of two tracks with each other. The prefix path is discarded before
      * comparing.
+     *
      * @param another {@link MPDTrack} to compare
      * @return see super class
      */
