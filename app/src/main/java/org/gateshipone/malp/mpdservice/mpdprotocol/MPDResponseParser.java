@@ -75,9 +75,12 @@ class MPDResponseParser {
             } else if (responseString.startsWith(MPDResponses.MPD_RESPONSE_ALBUM_MBID)) {
                 // FIXME this crashed with a null-ptr. This should not happen. Investigate if repeated. (Protocol should always send "Album:" first
                 tempAlbum.setMBID(responseString.substring(MPDResponses.MPD_RESPONSE_ALBUM_MBID.length()));
-            } else if (responseString.startsWith(MPDResponses.MPD_RESPONSE_ALBUM_ARTIST_NAME)) {
+            } else if (responseString.startsWith(MPDResponses.MPD_RESPONSE_ALBUMARTIST_NAME)) {
                 /* Check if the responseString is a album artist. */
-                tempAlbum.setArtistName(responseString.substring(MPDResponses.MPD_RESPONSE_ALBUM_ARTIST_NAME.length()));
+                tempAlbum.setArtistName(responseString.substring(MPDResponses.MPD_RESPONSE_ALBUMARTIST_NAME.length()));
+            } else if (responseString.startsWith(MPDResponses.MPD_RESPONSE_ALBUMARTIST_SORT_NAME)) {
+                /* Check if the responseString is a album artist. */
+                tempAlbum.setArtistSortName(responseString.substring(MPDResponses.MPD_RESPONSE_ALBUMARTIST_SORT_NAME.length()));
             } else if (responseString.startsWith(MPDResponses.MPD_RESPONSE_DATE)) {
                 // Try to parse Date
                 String dateString = responseString.substring(MPDResponses.MPD_RESPONSE_DATE.length());
@@ -138,6 +141,18 @@ class MPDResponseParser {
                 }
                 artistName = response.substring(MPDResponses.MPD_RESPONSE_ALBUMARTIST_NAME.length());
                 tempArtist = new MPDArtist(artistName);
+            } else if (response.startsWith(MPDResponses.MPD_RESPONSE_ARTIST_SORT_NAME)) {
+                if (null != tempArtist) {
+                    artistList.add(tempArtist);
+                }
+                artistName = response.substring(MPDResponses.MPD_RESPONSE_ARTIST_SORT_NAME.length());
+                tempArtist = new MPDArtist(artistName);
+            } else if (response.startsWith(MPDResponses.MPD_RESPONSE_ALBUMARTIST_SORT_NAME)) {
+                if (null != tempArtist) {
+                    artistList.add(tempArtist);
+                }
+                artistName = response.substring(MPDResponses.MPD_RESPONSE_ALBUMARTIST_SORT_NAME.length());
+                tempArtist = new MPDArtist(artistName);
             } else if (response.startsWith(MPDResponses.MPD_RESPONSE_ARTIST_MBID)) {
                 artistMBID = response.substring(MPDResponses.MPD_RESPONSE_ARTIST_MBID.length());
                 tempArtist.addMBID(artistMBID);
@@ -193,15 +208,10 @@ class MPDResponseParser {
      * It will return a list of MPDFileEntry objects which is a parent class for (MPDTrack, MPDPlaylist,
      * MPDDirectory) you can use instanceof to check which type you got.
      *
-     * @param filterArtist    Artist used for filtering against the Artist AND AlbumArtist tag. Non matching tracks
-     *                        will be discarded.
-     * @param filterAlbumMBID MusicBrainzID of the album that is also used as a filter criteria.
-     *                        This can be used to differentiate albums with same name, same artist but different MBID.
-     *                        This is often the case for soundtrack releases. (E.g. LOTR DVD-Audio vs. CD release)
      * @return List of MPDFileEntry objects
      * @throws IOException
      */
-    static ArrayList<MPDFileEntry> parseMPDTracks(final MPDConnection connection, final String filterArtist, final String filterAlbumMBID) throws MPDException {
+    static ArrayList<MPDFileEntry> parseMPDTracks(final MPDConnection connection) throws MPDException {
         ArrayList<MPDFileEntry> trackList = new ArrayList<>();
         if (!connection.isConnected()) {
             return trackList;
@@ -216,26 +226,21 @@ class MPDResponseParser {
             /* This if block will just check all the different response possible by MPDs file/dir/playlist response */
             if (response.startsWith(MPDResponses.MPD_RESPONSE_FILE)) {
                 if (null != tempFileEntry) {
-                    /* Check the artist filter criteria here */
-                    if (tempFileEntry instanceof MPDTrack) {
-                        MPDTrack file = (MPDTrack) tempFileEntry;
-                        if ((filterArtist.isEmpty() || filterArtist.equals(file.getTrackAlbumArtist()) || filterArtist.equals(file.getTrackArtist()))
-                                && (filterAlbumMBID.isEmpty() || filterAlbumMBID.equals(file.getTrackAlbumMBID()))) {
-                            trackList.add(tempFileEntry);
-                        }
-                    } else {
-                        trackList.add(tempFileEntry);
-                    }
+                    trackList.add(tempFileEntry);
                 }
                 tempFileEntry = new MPDTrack(response.substring(MPDResponses.MPD_RESPONSE_FILE.length()));
             } else if (response.startsWith(MPDResponses.MPD_RESPONSE_TRACK_TITLE)) {
                 ((MPDTrack) tempFileEntry).setTrackTitle(response.substring(MPDResponses.MPD_RESPONSE_TRACK_TITLE.length()));
             } else if (response.startsWith(MPDResponses.MPD_RESPONSE_ARTIST_NAME)) {
                 ((MPDTrack) tempFileEntry).setTrackArtist(response.substring(MPDResponses.MPD_RESPONSE_ARTIST_NAME.length()));
+            } else if (response.startsWith(MPDResponses.MPD_RESPONSE_ARTIST_SORT_NAME)) {
+                ((MPDTrack) tempFileEntry).setTrackArtistSort(response.substring(MPDResponses.MPD_RESPONSE_ARTIST_SORT_NAME.length()));
             } else if (response.startsWith(MPDResponses.MPD_RESPONSE_TRACK_NAME)) {
                 ((MPDTrack) tempFileEntry).setTrackName(response.substring(MPDResponses.MPD_RESPONSE_TRACK_NAME.length()));
-            } else if (response.startsWith(MPDResponses.MPD_RESPONSE_ALBUM_ARTIST_NAME)) {
-                ((MPDTrack) tempFileEntry).setTrackAlbumArtist(response.substring(MPDResponses.MPD_RESPONSE_ALBUM_ARTIST_NAME.length()));
+            } else if (response.startsWith(MPDResponses.MPD_RESPONSE_ALBUMARTIST_NAME)) {
+                ((MPDTrack) tempFileEntry).setTrackAlbumArtist(response.substring(MPDResponses.MPD_RESPONSE_ALBUMARTIST_NAME.length()));
+            } else if (response.startsWith(MPDResponses.MPD_RESPONSE_ALBUMARTIST_SORT_NAME)) {
+                ((MPDTrack) tempFileEntry).setTrackAlbumArtistSort(response.substring(MPDResponses.MPD_RESPONSE_ALBUMARTIST_SORT_NAME.length()));
             } else if (response.startsWith(MPDResponses.MPD_RESPONSE_ALBUM_NAME)) {
                 ((MPDTrack) tempFileEntry).setTrackAlbum(response.substring(MPDResponses.MPD_RESPONSE_ALBUM_NAME.length()));
             } else if (response.startsWith(MPDResponses.MPD_RESPONSE_DATE)) {
@@ -316,30 +321,12 @@ class MPDResponseParser {
                 tempFileEntry.setLastModified(response.substring(MPDResponses.MPD_RESPONSE_LAST_MODIFIED.length()));
             } else if (response.startsWith(MPDResponses.MPD_RESPONSE_PLAYLIST)) {
                 if (null != tempFileEntry) {
-                    /* Check the artist filter criteria here */
-                    if (tempFileEntry instanceof MPDTrack) {
-                        MPDTrack file = (MPDTrack) tempFileEntry;
-                        if ((filterArtist.isEmpty() || filterArtist.equals(file.getTrackAlbumArtist()) || filterArtist.equals(file.getTrackArtist()))
-                                && (filterAlbumMBID.isEmpty() || filterAlbumMBID.equals(file.getTrackAlbumMBID()))) {
-                            trackList.add(tempFileEntry);
-                        }
-                    } else {
-                        trackList.add(tempFileEntry);
-                    }
+                    trackList.add(tempFileEntry);
                 }
                 tempFileEntry = new MPDPlaylist(response.substring(MPDResponses.MPD_RESPONSE_PLAYLIST.length()));
             } else if (response.startsWith(MPDResponses.MPD_RESPONSE_DIRECTORY)) {
                 if (null != tempFileEntry) {
-                    /* Check the artist filter criteria here */
-                    if (tempFileEntry instanceof MPDTrack) {
-                        MPDTrack file = (MPDTrack) tempFileEntry;
-                        if ((filterArtist.isEmpty() || filterArtist.equals(file.getTrackAlbumArtist()) || filterArtist.equals(file.getTrackArtist()))
-                                && (filterAlbumMBID.isEmpty() || filterAlbumMBID.equals(file.getTrackAlbumMBID()))) {
-                            trackList.add(tempFileEntry);
-                        }
-                    } else {
-                        trackList.add(tempFileEntry);
-                    }
+                    trackList.add(tempFileEntry);
                 }
                 tempFileEntry = new MPDDirectory(response.substring(MPDResponses.MPD_RESPONSE_DIRECTORY.length()));
             }
@@ -350,16 +337,7 @@ class MPDResponseParser {
 
         /* Add last remaining track to list. */
         if (null != tempFileEntry) {
-                    /* Check the artist filter criteria here */
-            if (tempFileEntry instanceof MPDTrack) {
-                MPDTrack file = (MPDTrack) tempFileEntry;
-                if ((filterArtist.isEmpty() || filterArtist.equals(file.getTrackAlbumArtist()) || filterArtist.equals(file.getTrackArtist()))
-                        && (filterAlbumMBID.isEmpty() || filterAlbumMBID.equals(file.getTrackAlbumMBID()))) {
-                    trackList.add(tempFileEntry);
-                }
-            } else {
-                trackList.add(tempFileEntry);
-            }
+            trackList.add(tempFileEntry);
         }
         return trackList;
     }
