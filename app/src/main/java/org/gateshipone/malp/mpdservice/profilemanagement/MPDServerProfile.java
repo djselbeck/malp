@@ -25,6 +25,7 @@ package org.gateshipone.malp.mpdservice.profilemanagement;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 
 import org.gateshipone.malp.mpdservice.mpdprotocol.mpdobjects.MPDGenericItem;
 
@@ -44,13 +45,17 @@ public class MPDServerProfile implements MPDGenericItem, Parcelable {
     /**
      * Server parameters.
      */
+    @NonNull
     private String mHostname = "";
+    @NonNull
     private String mPassword = "";
     private int mPort;
 
+    @NonNull
     private String mStreamingURL = "";
     private boolean mStreamingEnabled;
 
+    @NonNull
     private String mHTTPCoverRegex = "";
     private boolean mHTTPCoverEnabled;
 
@@ -129,6 +134,7 @@ public class MPDServerProfile implements MPDGenericItem, Parcelable {
      *
      * @return The profile name of this profile
      */
+    @NonNull
     public String getProfileName() {
         return mProfileName;
     }
@@ -137,7 +143,7 @@ public class MPDServerProfile implements MPDGenericItem, Parcelable {
      * Sets the profile name of this profile
      * @param profileName Profile name to set
      */
-    public void setProfileName(String profileName) {
+    public void setProfileName(@NonNull String profileName) {
         mProfileName = profileName;
     }
 
@@ -161,6 +167,7 @@ public class MPDServerProfile implements MPDGenericItem, Parcelable {
      *
      * @return Servers hostname or ip address.
      */
+    @NonNull
     public String getHostname() {
         return mHostname;
     }
@@ -169,7 +176,7 @@ public class MPDServerProfile implements MPDGenericItem, Parcelable {
      * Sets the hostname of this profile
      * @param hostname Hostname to use
      */
-    public void setHostname(String hostname) {
+    public void setHostname(@NonNull String hostname) {
         this.mHostname = hostname;
     }
 
@@ -177,6 +184,7 @@ public class MPDServerProfile implements MPDGenericItem, Parcelable {
      * The password of a profile can be left empty.
      * @return The password string or an empty string (null).
      */
+    @NonNull
     public String getPassword() {
         return mPassword;
     }
@@ -185,11 +193,7 @@ public class MPDServerProfile implements MPDGenericItem, Parcelable {
      * Password string. Could be set to null.
      * @param password
      */
-    public void setPassword(String password) {
-        if ( password == null) {
-            mPassword = "";
-            return;
-        }
+    public void setPassword(@NonNull String password) {
         this.mPassword = password;
     }
 
@@ -210,10 +214,11 @@ public class MPDServerProfile implements MPDGenericItem, Parcelable {
     }
 
 
-    public void setStreamingURL(String url) {
+    public void setStreamingURL(@NonNull String url) {
         mStreamingURL = url;
     }
 
+    @NonNull
     public String getStreamingURL() {
         return mStreamingURL;
     }
@@ -226,10 +231,11 @@ public class MPDServerProfile implements MPDGenericItem, Parcelable {
         return mStreamingEnabled;
     }
 
-    public void setHTTPRegex(String regex) {
+    public void setHTTPRegex(@NonNull String regex) {
         mHTTPCoverRegex = regex;
     }
 
+    @NonNull
     public String getHTTPRegex() {
         return mHTTPCoverRegex;
     }
