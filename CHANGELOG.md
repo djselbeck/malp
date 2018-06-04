@@ -1,3 +1,6 @@
+### Version 1.1.17 Tag: release-26 (2018-06-04)
+ * Migrate to GitLab
+
 ### Version 1.1.16 Tag: release-25 (2018-06-02)
  * Fix malformed musicbrainz requests
  * New settings option to jump directly to playlist view instead of album cover from notification or widget
