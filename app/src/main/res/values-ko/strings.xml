@@ -3,7 +3,7 @@
   ~  (Hendrik Borghorst & Frederik Luetkes)
   ~
   ~  The AUTHORS.md file contains a detailed contributors list:
-  ~  <https://github.com/gateship-one/malp/blob/master/AUTHORS.md>
+  ~  <https://gitlab.com/gateship-one/malp/blob/master/AUTHORS.md>
   ~
   ~  This program is free software: you can redistribute it and/or modify
   ~  it under the terms of the GNU General Public License as published by
@@ -329,7 +329,7 @@
     <string name="search_choice_file">파일</string>
     <string name="search_choice_everything">모두</string>
     <string name="welcome_dialog_title">프로필 없음</string>
-    <string name="welcome_dialog_text">이 앱은 MPD를 원격 제어합니다. MPD를 모르신다면 이 앱은 아마도 쓸모가 없을 것입니다. 죄송 :).\n\n이 앱을 쓰려면 위 오른쪽 모서리의 추가 단추로 새 프로필을 추가합니다.\n이 앱은 MPD 클라이언트로 Mopidy와 동작할 수도, 안 할 수도 있으며 Mopidy 지원이 제공되지 않습니다.\n\n동일한 인터페이스의 음악 플레이어를 원한다면, Odyssey (https://github.com/gateship-one/odyssey)를 써보시기 바랍니다.</string>
+    <string name="welcome_dialog_text">이 앱은 MPD를 원격 제어합니다. MPD를 모르신다면 이 앱은 아마도 쓸모가 없을 것입니다. 죄송 :).\n\n이 앱을 쓰려면 위 오른쪽 모서리의 추가 단추로 새 프로필을 추가합니다.\n이 앱은 MPD 클라이언트로 Mopidy와 동작할 수도, 안 할 수도 있으며 Mopidy 지원이 제공되지 않습니다.\n\n동일한 인터페이스의 음악 플레이어를 원한다면, Odyssey (https://gitlab.com/gateship-one/odyssey)를 써보시기 바랍니다.</string>
 
     <string name="bulk_download_notice_title">이미지 내려받기</string>
     <string name="bulk_download_notice_text">이미지를 대규모로 내려받으면 해당 서버에 큰 부하가 걸립니다. 이때 서버의 부하로 이미지를 내려받지 못할 수도 있습니다. 서버의 과부하가 감지되면 내려받기가 취소됩니다.\n\n아트워크 제공자에게 기부를 고려하시기 바랍니다.</string>
@@ -338,7 +338,7 @@
     <string name="artwork_provided_by">아트워크 제공자:</string>
     <string name="acknowledgement_text">이 GUI의 기반이 된 Odyssey 음악 플레이어 개발을 지속적으로 일깨워 준 Frederik Lütkes에게 큰 감사를 전합니다.</string>
     <string name="license_text">이 앱은 GPLv3 사용권을 따릅니다.\n재료 아이콘은 구글의 CC-BY 사용권을 따릅니다.</string>
-    <string name="sources_text">소스코드는 깃허브에서 사용할 수 있습니다:\nhttps://github.com/gateship-one/malp</string>
+    <string name="sources_text">소스코드는 깃허브에서 사용할 수 있습니다:\nhttps://gitlab.com/gateship-one/malp</string>
     <string name="activity_about_version">버전: </string>
     <!-- Bulk downloader service -->
     <string name="downloader_notification_title">대규모로 내려받는 중</string>

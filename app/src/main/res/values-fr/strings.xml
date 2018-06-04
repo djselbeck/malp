@@ -4,7 +4,7 @@
   ~  (Hendrik Borghorst & Frederik Luetkes)
   ~
   ~  The AUTHORS.md file contains a detailed contributors list:
-  ~  <https://github.com/gateship-one/malp/blob/master/AUTHORS.md>
+  ~  <https://gitlab.com/gateship-one/malp/blob/master/AUTHORS.md>
   ~
   ~  This program is free software: you can redistribute it and/or modify
   ~  it under the terms of the GNU General Public License as published by
@@ -276,14 +276,14 @@
     <string name="search_choice_file">Fichier</string>
     <string name="search_choice_everything">Tout</string>
     <string name="welcome_dialog_title">Aucun profil trouvé</string>
-    <string name="welcome_dialog_text">Cette application permet le contrôle à distance de MPD. Si vous ne savez pas ce qu\'est MPD, alors cette application vous est certainement inutile, désolé :).\n\nPour utiliser cette application, ajoutez un nouveau profil à l\'aide du bouton \"Ajouter\" dans le coin supérieur droit.\nCette application peut fonctionner ou ne pas fonctionner correctement avec Mopidy comme client MPD. Aucun support fourni pour Mopidy.\n\nSi vous souhaitez un lecteur de musique basé sur la même interface, essayez Odyssey (https://github.com/gateship-one/odyssey).</string>
+    <string name="welcome_dialog_text">Cette application permet le contrôle à distance de MPD. Si vous ne savez pas ce qu\'est MPD, alors cette application vous est certainement inutile, désolé :).\n\nPour utiliser cette application, ajoutez un nouveau profil à l\'aide du bouton \"Ajouter\" dans le coin supérieur droit.\nCette application peut fonctionner ou ne pas fonctionner correctement avec Mopidy comme client MPD. Aucun support fourni pour Mopidy.\n\nSi vous souhaitez un lecteur de musique basé sur la même interface, essayez Odyssey (https://gitlab.com/gateship-one/odyssey).</string>
     <string name="bulk_download_notice_title">Téléchargement d\'image</string>
     <string name="bulk_download_notice_text">Télécharger un grand nombre d\'images nécessite de nombreuses ressources. Il est possible que le serveur du fournisseur arrête le téléchargement s\'il détecte que la charge du serveur est trop importante.\n\nMerci de penser à donner à ces fournisseurs un peu de votre temps ou de votre argent.</string>
     <!-- About activity -->
     <string name="artwork_provided_by">Artwork fourni par :</string>
     <string name="acknowledgement_text">Un grand merci à Frederik Lütkes pour son développement actif d\'Odyssey, un lecteur de musique dont ce programme utilise le GUI.</string>
     <string name="license_text">Cette application est sous licence GPLv3.\nLes icônes \"Material Design\" sont sous licence CC-BY par Google.</string>
-    <string name="sources_text">Le code source est disponible sur GitHub :\nhttps://github.com/gateship-one/malp</string>
+    <string name="sources_text">Le code source est disponible sur Gitlab :\nhttps://gitlab.com/gateship-one/malp</string>
     <string name="activity_about_version">Version :</string>
     <!-- Bulk downloader service -->
     <string name="downloader_notification_title">Téléchargement en masse en cours</string>

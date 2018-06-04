@@ -3,7 +3,7 @@
   ~  (Hendrik Borghorst & Frederik Luetkes)
   ~
   ~  The AUTHORS.md file contains a detailed contributors list:
-  ~  <https://github.com/gateship-one/malp/blob/master/AUTHORS.md>
+  ~  <https://gitlab.com/gateship-one/malp/blob/master/AUTHORS.md>
   ~
   ~  This program is free software: you can redistribute it and/or modify
   ~  it under the terms of the GNU General Public License as published by
@@ -283,7 +283,7 @@
     <string name="search_choice_everything">Todo</string>
 
     <string name="welcome_dialog_title">No se encontraron perfiles</string>
-    <string name="welcome_dialog_text">Esta aplicación es un control remoto para MPD. Si no sabes que es MPD, probablemente esta aplicación no te sirva :).\n\nPara usar esta aplicación agregue un nuevo perfil con el botón Agregar de la esquina superior derecha.\nEsta aplicación puede o no funcionar con Mopidy ya que es un cliente MPD, sin soporte de Mopidy.\n\nSi prefiere un reproductor de música basado en la misma interfaz, pruebe Odyssey (https://github.com/gateship-one/odyssey).</string>
+    <string name="welcome_dialog_text">Esta aplicación es un control remoto para MPD. Si no sabes que es MPD, probablemente esta aplicación no te sirva :).\n\nPara usar esta aplicación agregue un nuevo perfil con el botón Agregar de la esquina superior derecha.\nEsta aplicación puede o no funcionar con Mopidy ya que es un cliente MPD, sin soporte de Mopidy.\n\nSi prefiere un reproductor de música basado en la misma interfaz, pruebe Odyssey (https://gitlab.com/gateship-one/odyssey).</string>
 
     <string name="bulk_download_notice_title">Descargar imagen</string>
     <string name="bulk_download_notice_text">Descargar una gran cantidad de imagenes implica una gran carga a los servidores que ha elegido. Puede suceder que un servidor rechaze la descarga de estas imagenes. Quien descarga debería, en tal caso, cancelar la acción si detecta una sobrecarga.\n\nPlease consider donating to the artwork services.</string>
@@ -292,7 +292,7 @@
     <string name="artwork_provided_by">Artwork provisto por:</string>
     <string name="acknowledgement_text">Muchas gracias a Frederik Lütkes por su continua presión al desarrollar Odyssey, un reproductor de música en el cual se basa esta interfaz.</string>
     <string name="license_text">Esta aplicación es licenciada bajo la licencia GPLv3.\nLos iconos materiales son licenciados bajo la licencia CC-BY de Google.</string>
-    <string name="sources_text">El código fuente esta disponible en GitHub:\nhttps://github.com/gateship-one/malp</string>
+    <string name="sources_text">El código fuente esta disponible en Gitlab:\nhttps://gitlab.com/gateship-one/malp</string>
     <string name="activity_about_version">Versión: </string>
     <!-- Bulk downloader service -->
     <string name="downloader_notification_title">Descarga masiva corriendo</string>

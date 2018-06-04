@@ -3,7 +3,7 @@
  *  (Hendrik Borghorst & Frederik Luetkes)
  *
  *  The AUTHORS.md file contains a detailed contributors list:
- *  <https://github.com/gateship-one/malp/blob/master/AUTHORS.md>
+ *  <https://gitlab.com/gateship-one/malp/blob/master/AUTHORS.md>
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -38,7 +38,7 @@ public class MALPJsonObjectRequest extends JsonObjectRequest{
     @Override
     public Map<String, String> getHeaders(){
         Map<String, String> headers = new HashMap<>();
-        headers.put("User-agent", "Application MALP/1.0 (https://github.com/gateship-one/malp)");
+        headers.put("User-agent", "Application MALP/1.0 (https://gitlab.com/gateship-one/malp)");
         return headers;
     }
 }

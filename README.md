@@ -1,13 +1,13 @@
-![Logo](https://raw.githubusercontent.com/gateship-one/malp/master/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png)
+![Logo](https://gitlab.com/gateship-one/malp/raw/master/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png)
 # M.A.L.P. - Android MPD Client #
 
 [<img src="https://f-droid.org/badge/get-it-on.png" alt="Get it on F-Droid" height="80">](https://f-droid.org/app/org.gateshipone.malp)
 
 This whole project is licensed under the  **GPLv3 or later** license (see LICENSE)
 
-**[Screenshots](https://github.com/gateship-one/malp/wiki/Screenshots)**
+**[Screenshots](https://gitlab.com/gateship-one/malp/wikis/Screenshots)**
 
-**Please check out the [Frequently Asked Questions](https://github.com/gateship-one/malp/wiki/FAQ)**
+**Please check out the [Frequently Asked Questions](https://gitlab.com/gateship-one/malp/wikis/FAQ)**
 
 ## Requirements: ##
  - Android 5.0
