@@ -3,7 +3,7 @@
  *  (Hendrik Borghorst & Frederik Luetkes)
  *
  *  The AUTHORS.md file contains a detailed contributors list:
- *  <https://github.com/gateship-one/malp/blob/master/AUTHORS.md>
+ *  <https://gitlab.com/gateship-one/malp/blob/master/AUTHORS.md>
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -347,6 +347,12 @@ public class AlbumTracksFragment extends GenericMPDFragment<List<MPDFileEntry>> 
         drawable = DrawableCompat.wrap(drawable);
         DrawableCompat.setTint(drawable, tintColor);
         menu.findItem(R.id.action_add_album).setIcon(drawable);
+
+        if(!mAlbum.getMBID().isEmpty()) {
+            // Disable legacy feature to remove filter criteria for album tracks if an MBID is
+            // available. Albums tagged with a MBID can be considered shown correctly.
+            menu.findItem(R.id.action_show_all_tracks).setVisible(false);
+        }
 
         super.onCreateOptionsMenu(menu, menuInflater);
     }

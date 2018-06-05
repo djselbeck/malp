@@ -3,7 +3,7 @@
   ~  (Hendrik Borghorst & Frederik Luetkes)
   ~
   ~  The AUTHORS.md file contains a detailed contributors list:
-  ~  <https://github.com/gateship-one/malp/blob/master/AUTHORS.md>
+  ~  <https://gitlab.com/gateship-one/malp/blob/master/AUTHORS.md>
   ~
   ~  This program is free software: you can redistribute it and/or modify
   ~  it under the terms of the GNU General Public License as published by
@@ -83,7 +83,9 @@
     <string name="action_remove_track">Remove track</string>
     <string name="action_remove_album">Remove album</string>
 
-    <string name="action_add_url">Add URL</string>
+    <string name="action_add_group">Add</string>
+    <string name="action_add_url">Add file URL</string>
+    <string name="action_add_url_playlist">Add playlist URL</string>
     <string name="action_show_albums_from_here">Show albums in this directory</string>
     <string name="action_update_database_here">Update database here</string>
 
@@ -271,6 +273,9 @@
     <string name="preference_show_artist_image_title">Show artist image</string>
     <string name="preference_show_artist_image_text">Alternate between the album cover and an image of the artist in the view for the currently playing song</string>#
 
+    <string name="preference_npv_show_playlist_title">Start with playlist view</string>
+    <string name="preference_npv_show_playlist_text">Show the playlist if M.A.L.P. is opened via widget or notification while playback is active</string>
+
     <string name="preference_default_view_title">Default view</string>
     <string name="preference_default_view_message">Select default view</string>
     <string name="preference_default_view_summary">Select the default view of the application.</string>
@@ -427,7 +432,7 @@
     </string-array>
 
     <string name="welcome_dialog_title">No profiles found</string>
-    <string name="welcome_dialog_text">This application is a remote control for MPD. If you don\'t know MPD this application is probably useless for you, sorry :).\n\nTo use this application add a new profile with a add button in the upper right corner.\nThis application may or may not work with Mopidy as this is an MPD client, no support provided for Mopidy.\n\nIf you would like an music player based on the same interface, try Odyssey (https://github.com/gateship-one/odyssey).</string>
+    <string name="welcome_dialog_text">This application is a remote control for MPD. If you don\'t know MPD this application is probably useless for you, sorry :).\n\nTo use this application add a new profile with a add button in the upper right corner.\nThis application may or may not work with Mopidy as this is an MPD client, no support provided for Mopidy.\n\nIf you would like an music player based on the same interface, try Odyssey (https://gitlab.com/gateship-one/odyssey).</string>
 
     <string name="bulk_download_notice_title">Image download</string>
     <string name="bulk_download_notice_text">Downloading a large amount of images puts heavy load on the servers of the service you chose. It may occur that a server load prevents downloading of images. The downloader will then cancel its action if it detects an overload.\n\nPlease consider donating to the artwork services.</string>
@@ -436,13 +441,13 @@
     <string name="artwork_provided_by">Artwork provided by:</string>
     <string name="acknowledgement_text">Big thanks to Frederik Lütkes for his continuous pressure to develop Odyssey, a music player on which this GUI is based on.</string>
     <string name="license_text">This application is licensed under the GPLv3 license.\nMaterial icons are licensed under the CC-BY license by Google.</string>
-    <string name="sources_text">The source code is available on GitHub:\nhttps://github.com/gateship-one/malp</string>
+    <string name="sources_text">The source code is available on GitLab:\nhttps://gitlab.com/gateship-one/malp</string>
     <string name="activity_about_version">Version: </string>
 
     <string name="url_musicbrainz" translatable="false">https://www.musicbrainz.org</string>
     <string name="url_lastfm" translatable="false">https://www.last.fm</string>
     <string name="url_fanarttv" translatable="false">https://fanart.tv</string>
-    <string name="url_faq" translatable="false">https://github.com/gateship-one/malp/wiki/FAQ</string>
+    <string name="url_faq" translatable="false">https://gitlab.com/gateship-one/malp/wikis/FAQ</string>
 
     <!-- Bulk downloader service -->
     <string name="downloader_notification_title">Bulk download running</string>

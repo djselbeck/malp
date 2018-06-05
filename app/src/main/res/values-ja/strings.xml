@@ -3,7 +3,7 @@
   ~  (Hendrik Borghorst & Frederik Luetkes)
   ~
   ~  The AUTHORS.md file contains a detailed contributors list:
-  ~  <https://github.com/gateship-one/malp/blob/master/AUTHORS.md>
+  ~  <https://gitlab.com/gateship-one/malp/blob/master/AUTHORS.md>
   ~
   ~  This program is free software: you can redistribute it and/or modify
   ~  it under the terms of the GNU General Public License as published by
@@ -303,7 +303,7 @@
     </string-array>
 
     <string name="welcome_dialog_title">プロフィールが見つかりません</string>
-    <string name="welcome_dialog_text">このアプリケーションは MPD のリモートコントロールです。 MPD をご存じない場合、このアプリケーションはおそらく役に立たないでしょう :).\n\nこのアプリケーションを使用するには、右上の追加ボタンで新しいプロフィールを追加してください。\n\n同じインターフェイスに基づく音楽プレーヤーをお好みの場合、Odyssey (https://github.com/gateship-one/odyssey) をお試しください。</string>
+    <string name="welcome_dialog_text">このアプリケーションは MPD のリモートコントロールです。 MPD をご存じない場合、このアプリケーションはおそらく役に立たないでしょう :).\n\nこのアプリケーションを使用するには、右上の追加ボタンで新しいプロフィールを追加してください。\n\n同じインターフェイスに基づく音楽プレーヤーをお好みの場合、Odyssey (https://gitlab.com/gateship-one/odyssey) をお試しください。</string>
 
     <string name="bulk_download_notice_title">画像ダウンロード</string>
     <string name="bulk_download_notice_text">大量の画像をダウンロードすると、選択したサービスのサーバーに負荷がかかります。 サーバーの負荷により画像のダウンロードを妨げることがあります。 ダウンローダーが過負荷を検出した場合、その操作をキャンセルします。\n\nアートワークサービスへの寄付をご検討ください。</string>
@@ -312,7 +312,7 @@
     <string name="artwork_provided_by">アートワークの提供:</string>
     <string name="acknowledgement_text">この GUI が基づく音楽プレーヤーの Odyssey を開発するという継続的な努力に対して Frederik Lütkes に大変感謝します。</string>
     <string name="license_text">このアプリケーションは GPLv3 ライセンスに基づいてライセンスされます。\nマテリアルアイコンは Google により CC-BY ライセンスに基づいてライセンスされます。</string>
-    <string name="sources_text">ソースコードは GitHub で利用できます:\nhttps://github.com/gateship-one/malp</string>
+    <string name="sources_text">ソースコードは Gitlab で利用できます:\nhttps://gitlab.com/gateship-one/malp</string>
     <string name="activity_about_version">バージョン: </string>
 
     <!-- Bulk downloader service -->

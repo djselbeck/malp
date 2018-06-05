@@ -3,7 +3,7 @@
  *  (Hendrik Borghorst & Frederik Luetkes)
  *
  *  The AUTHORS.md file contains a detailed contributors list:
- *  <https://github.com/gateship-one/malp/blob/master/AUTHORS.md>
+ *  <https://gitlab.com/gateship-one/malp/blob/master/AUTHORS.md>
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -361,7 +361,7 @@ public class NowPlayingView extends RelativeLayout implements PopupMenu.OnMenuIt
                 });
                 shuffleListBuilder.create().show();
             }
-                break;
+            break;
             case R.id.action_save_playlist:
                 OnSaveDialogListener plDialogCallback = new OnSaveDialogListener() {
                     @Override
@@ -403,7 +403,7 @@ public class NowPlayingView extends RelativeLayout implements PopupMenu.OnMenuIt
                 choosePlaylistDialog.setArguments(args);
                 choosePlaylistDialog.show(((AppCompatActivity) getContext()).getSupportFragmentManager(), "ChoosePlaylistDialog");
                 break;
-            case R.id.action_add_url:
+            case R.id.action_add_url: {
                 TextDialog addURLDialog = new TextDialog();
                 addURLDialog.setCallback(MPDQueryHandler::addPath);
                 Bundle textDialogArgs = new Bundle();
@@ -411,7 +411,18 @@ public class NowPlayingView extends RelativeLayout implements PopupMenu.OnMenuIt
                 textDialogArgs.putString(TextDialog.EXTRA_DIALOG_TITLE, getResources().getString(R.string.action_add_url));
                 addURLDialog.setArguments(textDialogArgs);
                 addURLDialog.show(((AppCompatActivity) getContext()).getSupportFragmentManager(), "AddURLDialog");
-                break;
+            }
+            break;
+            case R.id.action_add_url_playlist: {
+                TextDialog addURLDialog = new TextDialog();
+                addURLDialog.setCallback(MPDQueryHandler::loadPlaylist);
+                Bundle textDialogArgs = new Bundle();
+                textDialogArgs.putString(TextDialog.EXTRA_DIALOG_TEXT, "http://...");
+                textDialogArgs.putString(TextDialog.EXTRA_DIALOG_TITLE, getResources().getString(R.string.action_add_url));
+                addURLDialog.setArguments(textDialogArgs);
+                addURLDialog.show(((AppCompatActivity) getContext()).getSupportFragmentManager(), "AddURLDialog");
+            }
+            break;
             case R.id.action_jump_to_current:
                 mPlaylistView.jumpToCurrentSong();
                 break;
@@ -1306,7 +1317,7 @@ public class NowPlayingView extends RelativeLayout implements PopupMenu.OnMenuIt
             mCoverLoader.getImage(track, true, mCoverImage.getWidth(), mCoverImage.getHeight());
         }
 
-        if (mShowArtistImage && (null == mLastTrack || !track.getTrackArtist().equals(mLastTrack.getTrackArtist()) || !track.getTrackArtistMBID().equals(mLastTrack.getTrackAlbumArtistMBID()) )) {
+        if (mShowArtistImage && (null == mLastTrack || !track.getTrackArtist().equals(mLastTrack.getTrackArtist()) || !track.getTrackArtistMBID().equals(mLastTrack.getTrackAlbumArtistMBID()))) {
             mCoverImage.clearArtistImage();
 
             mCoverLoader.getArtistImage(track, true, mCoverImage.getWidth(), mCoverImage.getHeight());
