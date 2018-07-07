@@ -87,7 +87,7 @@ public class SearchFragment extends GenericMPDFragment<List<MPDFileEntry>> imple
 
     private SearchView mSearchView;
 
-    private String mSearchText;
+    private String mSearchText = "";
 
     private MPDCommands.MPD_SEARCH_TYPE mSearchType;
 
@@ -351,10 +351,11 @@ public class SearchFragment extends GenericMPDFragment<List<MPDFileEntry>> imple
      */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        Log.v(TAG,"onOptionsItemSelected: " + item.getTitle());
         switch (item.getItemId()) {
             case R.id.action_add_search_result:
-                MPDQueryHandler.searchAddFiles(mSearchText, mSearchType);
+                if(!mSearchText.isEmpty()) {
+                    MPDQueryHandler.searchAddFiles(mSearchText, mSearchType);
+                }
                 return true;
         }
 
