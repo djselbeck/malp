@@ -144,7 +144,7 @@ public class EditProfileFragment extends Fragment {
                 mHTTPCoverEnabled = false;
                 mHTTPCoverRegex = "";
 
-                mMPDCoverEnabled = false;
+                mMPDCoverEnabled = true;
 
                 mProfilenameView.setText(getString(R.string.fragment_profile_default_name));
             }

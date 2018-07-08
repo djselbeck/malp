@@ -87,6 +87,9 @@ public class MPDProfileDBHelper extends SQLiteOpenHelper{
             case 3: {
                 String sqlString = "ALTER TABLE " + MPDServerProfileTable.SQL_TABLE_NAME + " ADD COLUMN " + MPDServerProfileTable.COLUMN_PROFILE_MPD_COVER_ENABLED + " integer;";
                 database.execSQL(sqlString);
+
+                sqlString = "UPDATE " + MPDServerProfileTable.SQL_TABLE_NAME + " SET " +  MPDServerProfileTable.COLUMN_PROFILE_MPD_COVER_ENABLED + " = 1;";
+                database.execSQL(sqlString);
             }
             default:
                 break;

@@ -59,7 +59,7 @@ public class MPDServerProfile implements MPDGenericItem, Parcelable {
     private String mHTTPCoverRegex = "";
     private boolean mHTTPCoverEnabled;
 
-    private boolean mMPDCoverEnabled;
+    private boolean mMPDCoverEnabled = true;
 
     private long mCreated;
 
