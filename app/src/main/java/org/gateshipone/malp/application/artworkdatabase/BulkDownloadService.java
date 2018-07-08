@@ -299,6 +299,12 @@ public class BulkDownloadService extends Service implements ArtworkManager.BulkL
             mService.get().mSumImageDownloads = 0;
             mService.get().mRemainingArtists = 0;
             mService.get().mRemainingAlbums = 0;
+
+            // Disable MPD albumart provider if no support is available on at the server side
+            if(MPDAlbumImageProvider.mInstance.getActive() && !MPDInterface.mInstance.getServerCapabilities().hasAlbumArt()) {
+                MPDAlbumImageProvider.mInstance.setActive(false);
+            }
+
             ArtworkManager.getInstance(mService.get().getApplicationContext()).bulkLoadImages(mService.get());
         }
 

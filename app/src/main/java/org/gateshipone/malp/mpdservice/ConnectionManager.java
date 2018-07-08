@@ -218,6 +218,13 @@ public class ConnectionManager extends MPDConnectionStateChangeHandler {
             HTTPAlbumImageProvider.getInstance(mContext).setRegex(mServerProfile.getHTTPRegex());
         }
 
+        if(mServerProfile.getMPDCoverEnabled()) {
+            // Check if current server can deliver artwork over MPD protocol
+            if(!MPDInterface.mInstance.getServerCapabilities().hasAlbumArt()) {
+                MPDAlbumImageProvider.mInstance.setActive(false);
+            }
+        }
+
         MPDAlbumImageProvider.mInstance.setActive(mServerProfile.getMPDCoverEnabled());
     }
 
