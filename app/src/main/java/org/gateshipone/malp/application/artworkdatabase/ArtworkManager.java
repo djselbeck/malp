@@ -586,9 +586,8 @@ public class ArtworkManager implements ArtistFetchError, AlbumFetchError {
                 }
             });
         }
-
         // Check if user-specified HTTP cover download is activated
-        if (HTTPAlbumImageProvider.getInstance(mContext).getActive()) {
+        else if (HTTPAlbumImageProvider.getInstance(mContext).getActive()) {
             HTTPAlbumImageProvider.getInstance(mContext).fetchAlbumImage(track, response -> new InsertTrackAlbumImageTask().execute(response), new TrackAlbumFetchError() {
                 @Override
                 public void fetchJSONException(MPDTrack track, JSONException exception) {
