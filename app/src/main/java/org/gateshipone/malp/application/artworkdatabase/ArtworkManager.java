@@ -576,10 +576,16 @@ public class ArtworkManager implements ArtistFetchError, AlbumFetchError {
                 @Override
                 public void fetchVolleyError(MPDTrack track, VolleyError error) {
                     if (error.networkResponse.statusCode == 404) {
-                        synchronized (mAlbumList) {
-                            mAlbumList.add(album);
+                        // If bulk downloading is running, enqueue it as a job
+                        if (!bulkLoadFinisihed()) {
+                            synchronized (mAlbumList) {
+                                mAlbumList.add(album);
+                            }
+                            fetchNextBulkAlbum();
+                        } else {
+                            // Otherwise fetch it directly
+                            fetchAlbumImage(album);
                         }
-                        fetchNextBulkAlbum();
 
                         synchronized (mTrackList) {
                             if (!mTrackList.isEmpty()) {
