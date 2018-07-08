@@ -76,7 +76,9 @@
     <string name="action_remove_track">곡 지우기</string>
     <string name="action_remove_album">음반 지우기</string>
 
-    <string name="action_add_url">URL 추가</string>
+    <string name="action_add_group">추가</string>
+    <string name="action_add_url">파일 URL 추가</string>
+    <string name="action_add_url_playlist">연주목록 URL 추가</string>
     <string name="action_show_albums_from_here">이 디렉터리에 음반 보기</string>
     <string name="action_update_database_here">이 데이터베이스 업데이트</string>
 
@@ -134,6 +136,9 @@
     <string name="fragment_profile_streaming_url">스트리밍 url:</string>
     <string name="fragment_profile_streaming_enabled">서버로부터 스트리밍하기</string>
 
+    <string name="fragment_profile_use_mpd_covers">가능하면 MPD 음반표지 사용</string>
+    <string name="fragment_profile_use_mpd_covers_text">가능하면 MPD 음반표지 사용</string>
+
     <string name="fragment_profile_http_cover_enabled">HTTP 음반표지 우선</string>
     <string name="fragment_profile_http_cover_regex">음반표지 경로 (%d는 파일 디렉토리로 바꿈)</string>
 
@@ -148,7 +153,9 @@
     <string name="song_title">제목:</string>
     <string name="song_album">음반:</string>
     <string name="song_artist">연주자:</string>
+    <string name="song_artist_sort">연주자 (정렬):</string>
     <string name="song_album_artist">음반 연주자:</string>
+    <string name="song_album_artist_sort">음반 연주자 (정렬):</string>
 
     <string name="song_date">날짜:</string>
     <string name="song_disc">디스크:</string>
@@ -199,6 +206,8 @@
     <string name="dialog_message_delete_playlist">연주목록을 지웁니다:</string>
     <string name="dialog_message_delete_current_playlist">연주목록을 지울까요?</string>
 
+    <string name="dialog_message_shuffle_current_playlist">연주목록을 섞을까요?</string>
+
     <string name="dialog_share_song_details">곡 정보 공유</string>
 
     <!-- dialog default names  -->
@@ -237,6 +246,9 @@
     <string name="preference_show_artist_image_title">연주자 이미지 보기</string>
     <string name="preference_show_artist_image_text">지금 연주되는 곡을 보여줄 때 음반 이미지와 연주자 이미지 중에 고릅니다</string>#
 
+    <string name="preference_npv_show_playlist_title">시작할 때 연주목록 보기</string>
+    <string name="preference_npv_show_playlist_text">재생할 때 위젯이나 알림으로 열면 연주목록 보기</string>
+
     <string name="preference_default_view_title">기본 보기</string>
     <string name="preference_default_view_message">기본 보기를 고릅니다</string>
     <string name="preference_default_view_summary">앱의 기본 보기를 고릅니다.</string>
@@ -255,6 +267,9 @@
     <string name="preference_use_album_artists_title">음반 연주자 태그 사용</string>
     <string name="preference_use_album_artists_text">연주자 항목에서 음반 연주자 태그를 씁니다 (이 방법은 느리고 연주자 이미지가 잘 못 될 수 있습니다).</string>
 
+    <string name="preference_use_artist_sort_title">연주자 정렬 태그 사용</string>
+    <string name="preference_use_artist_sort_text">서버가 지원하면 연주자 정렬 (또는 음반 연주자 정렬) 태그를 사용합니다.</string>
+
     <string name="preference_use_tags_in_filebrowser_title">파일 브라우저에서 태그를 씁니다</string>
     <string name="preference_use_tags_in_filebrowser_text">파일 브라우저에서 가능하면 파일명 대신에 태그를 씁니다. 파일 브라우저에서 파일명을 보려면 이 옵션을 끕니다.</string>
 
@@ -269,6 +284,10 @@
     <string name="preference_volume_control_off">끄기</string>
     <string name="preference_volume_control_seekbar">슬라이더</string>
     <string name="preference_volume_control_buttons">버튼</string>
+
+    <string name="preference_generic_keep_display_on_title">화면을 켜두기</string>
+    <string name="preference_generic_keep_display_on_text">사용자 인터페이스가 전면에 있으면 화면이 켜져 있습니다.</string>
+
     <string name="preference_generic_hardware_keys_title">하드웨어 버튼 사용</string>
     <string name="preference_generic_hardware_keys_text">재생 컨트롤에 장치의 하드웨어 버튼을 사용합니다.</string>
 
@@ -279,7 +298,7 @@
     <string name="volume_step_size_dialog_warning">큰 음량 단위 크기를 선택합니다. 귀나 기기에 무리가 없도록 주의해야 합니다!</string>
 
     <string name="preference_show_notification_title">알림 보기</string>
-    <string name="preference_show_notification_text">메인 사용자 인터페이스를 나갈 때 알림을 보여줍니다.</string>
+    <string name="preference_show_notification_text">주 사용자 인터페이스를 나갈 때 알림을 보여줍니다. 위젯에 필요합니다. 위젯의 \'연결\'을 선택하면, 알림이 항상 보입니다.</string>
 
     <string name="preference_use_english_wikipedia_title">영문 위키피디아 사용</string>
     <string name="preference_use_english_wikipedia_text">페이지를 찾기위해 영문 위키피디아를 사용합니다</string>
@@ -338,7 +357,7 @@
     <string name="artwork_provided_by">아트워크 제공자:</string>
     <string name="acknowledgement_text">이 GUI의 기반이 된 Odyssey 음악 플레이어 개발을 지속적으로 일깨워 준 Frederik Lütkes에게 큰 감사를 전합니다.</string>
     <string name="license_text">이 앱은 GPLv3 사용권을 따릅니다.\n재료 아이콘은 구글의 CC-BY 사용권을 따릅니다.</string>
-    <string name="sources_text">소스코드는 깃허브에서 사용할 수 있습니다:\nhttps://gitlab.com/gateship-one/malp</string>
+    <string name="sources_text">소스코드는 깃랩에서 사용할 수 있습니다:\nhttps://gitlab.com/gateship-one/malp</string>
     <string name="activity_about_version">버전: </string>
     <!-- Bulk downloader service -->
     <string name="downloader_notification_title">대규모로 내려받는 중</string>
