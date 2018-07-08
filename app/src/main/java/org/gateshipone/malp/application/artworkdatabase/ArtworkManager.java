@@ -75,7 +75,7 @@ public class ArtworkManager implements ArtistFetchError, AlbumFetchError {
     /**
      * Maximmum size for either x or y of an image
      */
-    private static final int MAXIMUM_IMAGE_RESOLUTION = 500;
+    private static final int MAXIMUM_IMAGE_RESOLUTION = 750;
 
     /**
      * Compression level if images are rescaled
@@ -576,7 +576,6 @@ public class ArtworkManager implements ArtistFetchError, AlbumFetchError {
                 @Override
                 public void fetchVolleyError(MPDTrack track, VolleyError error) {
                     if (error.networkResponse.statusCode == 404) {
-                        Log.v(TAG, "Could not get cover from MPD for track: " + track.toString());
                         fetchAlbumImage(album);
                         synchronized (mTrackList) {
                             if (!mTrackList.isEmpty()) {
@@ -598,7 +597,6 @@ public class ArtworkManager implements ArtistFetchError, AlbumFetchError {
 
                 @Override
                 public void fetchVolleyError(MPDTrack track, VolleyError error) {
-                    Log.v(TAG,"Local HTTP download failed, try user-selected download provider");
                     MPDAlbum album = new MPDAlbum(track.getTrackAlbum());
                     album.setMBID(track.getTrackAlbumMBID());
                     album.setArtistName(track.getTrackAlbumArtist());
