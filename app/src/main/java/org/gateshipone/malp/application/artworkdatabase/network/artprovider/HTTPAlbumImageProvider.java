@@ -92,6 +92,14 @@ public class HTTPAlbumImageProvider implements TrackAlbumImageProvider {
 
     public void setRegex(String regex) {
         mRegex = regex;
+
+        if (mRegex == null) {
+            mRegex = "";
+        }
+        // Add a trailing / to signal it is a directory
+        if (mRegex.endsWith("%d")) {
+            mRegex += '/';
+        }
     }
 
     public String getRegex() {
