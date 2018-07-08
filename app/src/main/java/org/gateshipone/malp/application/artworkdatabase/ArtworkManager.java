@@ -576,7 +576,11 @@ public class ArtworkManager implements ArtistFetchError, AlbumFetchError {
                 @Override
                 public void fetchVolleyError(MPDTrack track, VolleyError error) {
                     if (error.networkResponse.statusCode == 404) {
-                        fetchAlbumImage(album);
+                        synchronized (mAlbumList) {
+                            mAlbumList.add(album);
+                        }
+                        fetchNextBulkAlbum();
+
                         synchronized (mTrackList) {
                             if (!mTrackList.isEmpty()) {
                                 fetchNextBulkTrackAlbum();
@@ -1130,7 +1134,7 @@ public class ArtworkManager implements ArtistFetchError, AlbumFetchError {
             synchronized (mAlbumList) {
                 album = mAlbumList.remove(0);
                 Log.v(TAG, "Bulk load next album: " + album.getName() + ":" + album.getArtistName() + " remaining: " + mAlbumList.size());
-                mBulkProgressCallback.albumsRemaining(mAlbumList.size());
+                mBulkProgressCallback.albumsRemaining(mAlbumList.size() + mTrackList.size());
             }
             mCurrentBulkAlbum = album;
 
@@ -1147,7 +1151,7 @@ public class ArtworkManager implements ArtistFetchError, AlbumFetchError {
                 isEmpty = mAlbumList.isEmpty();
             }
         }
-        if (mArtistList.isEmpty()) {
+        if (bulkLoadFinisihed()) {
             mBulkProgressCallback.finishedLoading();
         }
 
@@ -1189,7 +1193,7 @@ public class ArtworkManager implements ArtistFetchError, AlbumFetchError {
             }
         }
 
-        if (mAlbumList.isEmpty()) {
+        if (bulkLoadFinisihed()) {
             mBulkProgressCallback.finishedLoading();
         }
     }
@@ -1211,7 +1215,7 @@ public class ArtworkManager implements ArtistFetchError, AlbumFetchError {
             MPDTrack track;
             synchronized (mTrackList) {
                 track = mTrackList.remove(0);
-                mBulkProgressCallback.albumsRemaining(mTrackList.size());
+                mBulkProgressCallback.albumsRemaining(mTrackList.size() + mAlbumList.size());
             }
             mCurrentBulkTrack = track;
 
@@ -1229,11 +1233,14 @@ public class ArtworkManager implements ArtistFetchError, AlbumFetchError {
             }
         }
 
-        if (mAlbumList.isEmpty()) {
+        if (bulkLoadFinisihed()) {
             mBulkProgressCallback.finishedLoading();
         }
     }
 
+    private synchronized boolean bulkLoadFinisihed() {
+        return mTrackList.isEmpty() && mAlbumList.isEmpty() && mArtistList.isEmpty();
+    }
 
     /**
      * Interface used for adapters to be notified about data set changes
