@@ -24,6 +24,7 @@ package org.gateshipone.malp.application.artworkdatabase.network.artprovider;
 
 
 import android.content.Context;
+import android.net.Uri;
 
 import com.android.volley.Cache;
 import com.android.volley.Network;
@@ -107,8 +108,7 @@ public class HTTPAlbumImageProvider implements TrackAlbumImageProvider {
     private String resolveRegex(String path) {
         String result;
 
-        result = mRegex.replaceAll("%f", FormatHelper.encodeURLUnsafeCharacters(path));
-        result = result.replaceAll("%d", FormatHelper.encodeURLUnsafeCharacters(FormatHelper.getDirectoryFromPath(path)));
+        result = mRegex.replaceAll("%d", Uri.encode(FormatHelper.getDirectoryFromPath(path)));
 
         return result;
     }

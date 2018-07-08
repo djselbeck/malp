@@ -173,27 +173,4 @@ public class FormatHelper {
         return retVal;
     }
 
-    public static String encodeURLUnsafeCharacters(String input) {
-        StringBuilder resultStr = new StringBuilder();
-        for (char ch : input.toCharArray()) {
-            if (unsafeCharacter(ch)) {
-                resultStr.append('%');
-                resultStr.append(characterToHex(ch / 16));
-                resultStr.append(characterToHex(ch % 16));
-            } else {
-                resultStr.append(ch);
-            }
-        }
-        return resultStr.toString();
-    }
-
-    private static char characterToHex(int ch) {
-        return (char) (ch < 10 ? '0' + ch : 'A' + ch - 10);
-    }
-
-    private static boolean unsafeCharacter(char ch) {
-        if (ch > 128 || ch < 0)
-            return true;
-        return " %$&+,:;=?@<>#%".indexOf(ch) >= 0;
-    }
 }
