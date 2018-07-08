@@ -1292,6 +1292,10 @@ public class ArtworkManager implements ArtistFetchError, AlbumFetchError {
             mArtistList.clear();
         }
 
+        synchronized (mTrackList) {
+            mTrackList.clear();
+        }
+
         if (null != mBulkProgressCallback) {
             mBulkProgressCallback.finishedLoading();
         }
