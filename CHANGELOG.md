@@ -1,4 +1,4 @@
-### Version 1.1.18 Tag: release-27 (2018-mm-dd)
+### Version 1.1.18 Tag: release-27 (2018-07-12)
  * VERY EXPERIMENTAL: MPD inline artwork support. (MPD 0.21 and newer can directly feed MALP album cover artwork over the MPD protocol)
  * HTTP-based cover downloading path encoding fixed (#118)
 
