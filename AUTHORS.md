@@ -6,7 +6,8 @@
  - Guy de Mölkky (Github user) - French translation
  - Víctor García - Spanish translation
  - Minho Park - Korean translation
+ - Dániel Flórián - Hungarian translation
 
- and more, see: [Contributors](https://github.com/gateship-one/malp/graphs/contributors)
+ and more, see: [Contributors](https://gitlab.com/gateship-one/malp/graphs/master)
 
 Also a big thanks to all people contributing on Github.

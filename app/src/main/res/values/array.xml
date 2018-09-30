@@ -29,6 +29,7 @@
         <item>Guy de Mölkky</item>
         <item>Víctor García</item>
         <item>Minho Park (한국어 번역)</item>
+        <item>Dániel Flórián</item>
     </string-array>
 
     <string-array name="contributors_type">
@@ -38,5 +39,6 @@
         <item>@string/contributor_translator_french</item>
         <item>@string/contributor_translator_spanish</item>
         <item>@string/contributor_translator_korean</item>
+        <item>@string/contributor_translator_hungarian</item>
     </string-array>
 </resources>
