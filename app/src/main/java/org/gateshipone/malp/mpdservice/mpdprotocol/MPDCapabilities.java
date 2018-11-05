@@ -92,7 +92,7 @@ public class MPDCapabilities {
             mHasToggleOutput = true;
         }
 
-        if (mMinorVersion >= 19 || mMajorVersion > 0) {
+        if (mMinorVersion >= 19 && mMajorVersion == 0 && mMinorVersion < 21) {
             mHasListGroup = true;
             mHasListFiltering = true;
         }
