@@ -96,4 +96,5 @@ public class MPDResponses {
     public static final String MPD_TAGTYPE = "tagtype: ";
 
     public static final String MPD_PARSE_ARGS_LIST_ERROR = "not able to parse args";
+    public static final String MPD_UNKNOWN_FILTER_TYPE_ERROR = "Unknown filter type";
 }

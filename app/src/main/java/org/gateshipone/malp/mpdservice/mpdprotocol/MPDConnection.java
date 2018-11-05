@@ -1007,7 +1007,7 @@ class MPDConnection {
 
             if (line.startsWith("ACK")) {
                 // Probably detected mopidy. Enable workaround
-                if (line.contains(MPDResponses.MPD_PARSE_ARGS_LIST_ERROR)) {
+                if (line.contains(MPDResponses.MPD_PARSE_ARGS_LIST_ERROR) || line.contains(MPDResponses.MPD_UNKNOWN_FILTER_TYPE_ERROR)) {
                     mConnectionLock.release();
                     enableMopidyWorkaround();
                     return null;
