@@ -1,5 +1,6 @@
-### Version 1.2.1 Tag: release-28 (2018-11-04)
- * Hotfix: Workaround for MPD 0.21 protocol breakage. This will reenable MALP with reduced functionality for MPD >=0.21 until a new better solution for album retrieval is found
+### Version 1.2.1 Tag: release-28 (2018-11-05)
+ * Hotfix: Workaround for MPD 0.21 (and 0.20.22) protocol breakage. This will reenable MALP with reduced functionality for MPD >=0.21 until a new better solution for album retrieval is found
+   * see [MPD bugreport](https://github.com/MusicPlayerDaemon/MPD/issues/408)
 
 ### Version 1.2.0 Tag: release-27 (2018-07-12)
  * VERY EXPERIMENTAL: MPD inline artwork support. (MPD 0.21 and newer can directly feed MALP album cover artwork over the MPD protocol)
