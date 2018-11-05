@@ -385,7 +385,6 @@ public class MainActivity extends GenericActivity
         String fragmentTag = "";
 
         if (id == R.id.nav_library) {
-            // Handle the camera action
             fragment = new MyMusicTabsFragment();
             fragmentTag = MyMusicTabsFragment.TAG;
         } else if (id == R.id.nav_saved_playlists) {
