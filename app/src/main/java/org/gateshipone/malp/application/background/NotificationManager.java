@@ -216,7 +216,7 @@ public class NotificationManager implements CoverBitmapLoader.CoverBitmapListene
             // Open application intent
             Intent mainIntent = new Intent(mService, SplashActivity.class);
             mainIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_NO_ANIMATION);
-            mainIntent.putExtra(MainActivity.MAINACTIVITY_INTENT_EXTRA_REQUESTEDVIEW, MainActivity.MAINACTIVITY_INTENT_EXTRA_REQUESTEDVIEW_NOWPLAYINGVIEW);
+            mainIntent.putExtra(MainActivity.MAINACTIVITY_INTENT_EXTRA_REQUESTEDVIEW, MainActivity.REQUESTEDVIEW.NOWPLAYING.ordinal());
             PendingIntent contentPendingIntent = PendingIntent.getActivity(mService, INTENT_OPENGUI, mainIntent, PendingIntent.FLAG_UPDATE_CURRENT);
             mNotificationBuilder.setContentIntent(contentPendingIntent);
 

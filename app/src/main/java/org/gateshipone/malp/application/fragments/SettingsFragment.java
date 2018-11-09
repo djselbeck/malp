@@ -34,6 +34,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import org.gateshipone.malp.R;
+import org.gateshipone.malp.application.activities.MainActivity;
 import org.gateshipone.malp.application.callbacks.FABFragmentCallback;
 import org.gateshipone.malp.application.utils.ThemeUtils;
 import org.gateshipone.malp.application.views.VolumeStepPreferenceDialog;
@@ -128,6 +129,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         if (key.equals(getString(R.string.pref_theme_key)) || key.equals(getString(R.string.pref_dark_theme_key))) {
             Intent intent = getActivity().getIntent();
+            intent.putExtra(MainActivity.MAINACTIVITY_INTENT_EXTRA_REQUESTEDVIEW, MainActivity.REQUESTEDVIEW.SETTINGS.ordinal());
             getActivity().finish();
             startActivity(intent);
         }

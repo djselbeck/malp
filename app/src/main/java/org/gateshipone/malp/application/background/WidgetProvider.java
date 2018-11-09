@@ -146,7 +146,7 @@ public class WidgetProvider extends AppWidgetProvider {
             mainIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_NO_ANIMATION);
             if (nowPlaying) {
                 // add intent only if playing is active
-                mainIntent.putExtra(MainActivity.MAINACTIVITY_INTENT_EXTRA_REQUESTEDVIEW, MainActivity.MAINACTIVITY_INTENT_EXTRA_REQUESTEDVIEW_NOWPLAYINGVIEW);
+                mainIntent.putExtra(MainActivity.MAINACTIVITY_INTENT_EXTRA_REQUESTEDVIEW, MainActivity.REQUESTEDVIEW.NOWPLAYING.ordinal());
             }
             PendingIntent mainPendingIntent = PendingIntent.getActivity(context, INTENT_OPENGUI, mainIntent, PendingIntent.FLAG_UPDATE_CURRENT);
             views.setOnClickPendingIntent(R.id.widget_big_cover, mainPendingIntent);
@@ -248,19 +248,19 @@ public class WidgetProvider extends AppWidgetProvider {
 
                 if (newImage) {
                     CoverBitmapLoader coverLoader = new CoverBitmapLoader(context, new CoverReceiver(context, this));
-                    coverLoader.getImage(track, false,-1,-1);
+                    coverLoader.getImage(track, false, -1, -1);
                 }
             }
         } else if (intent.getAction().equals(BackgroundService.ACTION_SERVER_DISCONNECTED)) {
             mLastStatus = null;
             mLastTrack = null;
-        } else if ( intent.getAction().equals(ArtworkManager.ACTION_NEW_ARTWORK_READY)) {
+        } else if (intent.getAction().equals(ArtworkManager.ACTION_NEW_ARTWORK_READY)) {
             // Check if the new artwork matches the currently playing track. If so reload artwork
-            if ( mLastTrack != null && mLastTrack.getTrackAlbum().equals(intent.getStringExtra(ArtworkManager.INTENT_EXTRA_KEY_ALBUM_NAME))) {
+            if (mLastTrack != null && mLastTrack.getTrackAlbum().equals(intent.getStringExtra(ArtworkManager.INTENT_EXTRA_KEY_ALBUM_NAME))) {
                 // Got new artwork
                 mLastCover = null;
                 CoverBitmapLoader coverLoader = new CoverBitmapLoader(context, new CoverReceiver(context, this));
-                coverLoader.getImage(mLastTrack, false,-1,-1);
+                coverLoader.getImage(mLastTrack, false, -1, -1);
             }
         }
         // Refresh the widget with the new information
