@@ -429,6 +429,11 @@ public class MainActivity extends GenericActivity
 
         if (id == R.id.nav_library) {
             fragment = new MyMusicTabsFragment();
+            MyMusicTabsFragment.DEFAULTTAB defaultTab = getDefaultTab();
+            Bundle args = new Bundle();
+            args.putInt(MyMusicTabsFragment.MY_MUSIC_REQUESTED_TAB, defaultTab.ordinal());
+
+            fragment.setArguments(args);
             fragmentTag = MyMusicTabsFragment.TAG;
         } else if (id == R.id.nav_saved_playlists) {
             fragment = new SavedPlaylistsFragment();
