@@ -30,6 +30,9 @@ import android.preference.PreferenceManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.preference.Preference;
 import android.support.v7.preference.PreferenceFragmentCompat;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 
 import org.gateshipone.malp.R;
 import org.gateshipone.malp.application.artworkdatabase.ArtworkDatabaseManager;
@@ -38,6 +41,7 @@ import org.gateshipone.malp.application.artworkdatabase.BulkDownloadService;
 import org.gateshipone.malp.application.artworkdatabase.network.artprovider.HTTPAlbumImageProvider;
 import org.gateshipone.malp.application.artworkdatabase.network.artprovider.MPDAlbumImageProvider;
 import org.gateshipone.malp.application.callbacks.FABFragmentCallback;
+import org.gateshipone.malp.application.utils.ThemeUtils;
 
 
 public class ArtworkSettingsFragment extends PreferenceFragmentCompat implements SharedPreferences.OnSharedPreferenceChangeListener {
@@ -45,7 +49,7 @@ public class ArtworkSettingsFragment extends PreferenceFragmentCompat implements
 
     /**
      * Called to do initial creation of a fragment.
-     *
+     * <p>
      * This method will setup a listener to start the system audio equalizer.
      */
     @Override
@@ -98,7 +102,7 @@ public class ArtworkSettingsFragment extends PreferenceFragmentCompat implements
                         getString(R.string.pref_artwork_provider_album_default)));
                 serviceIntent.putExtra(BulkDownloadService.BUNDLE_KEY_WIFI_ONLY, sharedPref.getBoolean(getString(R.string.pref_download_wifi_only_key),
                         getResources().getBoolean(R.bool.pref_download_wifi_default)));
-                serviceIntent.putExtra(BulkDownloadService.BUNDLE_KEY_HTTP_COVER_REGEX,HTTPAlbumImageProvider.getInstance(getContext().getApplicationContext()).getRegex());
+                serviceIntent.putExtra(BulkDownloadService.BUNDLE_KEY_HTTP_COVER_REGEX, HTTPAlbumImageProvider.getInstance(getContext().getApplicationContext()).getRegex());
                 serviceIntent.putExtra(BulkDownloadService.BUNDLE_KEY_MPD_COVER_ENABLED, MPDAlbumImageProvider.mInstance.getActive());
                 getActivity().startService(serviceIntent);
             });
@@ -109,6 +113,17 @@ public class ArtworkSettingsFragment extends PreferenceFragmentCompat implements
             return true;
         });
     }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View view = super.onCreateView(inflater, container, savedInstanceState);
+
+        // we have to set the background color at this point otherwise we loose the ripple effect
+        view.setBackgroundColor(ThemeUtils.getThemeColor(getContext(), R.attr.malp_color_background));
+
+        return view;
+    }
+
 
     /**
      * Called when the fragment resumes.
@@ -167,7 +182,6 @@ public class ArtworkSettingsFragment extends PreferenceFragmentCompat implements
 
     /**
      * Called when a shared preference is changed, added, or removed.
-     *
      */
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
@@ -185,7 +199,7 @@ public class ArtworkSettingsFragment extends PreferenceFragmentCompat implements
 
             if (key.equals(albumProviderKey)) {
                 artworkManager.setAlbumProvider(sharedPreferences.getString(albumProviderKey, getString(R.string.pref_artwork_provider_album_default)));
-            } else if(key.equals(artistProviderKey)) {
+            } else if (key.equals(artistProviderKey)) {
                 artworkManager.setArtistProvider(sharedPreferences.getString(artistProviderKey, getString(R.string.pref_artwork_provider_artist_default)));
             } else if (key.equals(downloadWifiOnlyKey)) {
                 artworkManager.setWifiOnly(sharedPreferences.getBoolean(downloadWifiOnlyKey, getResources().getBoolean(R.bool.pref_download_wifi_default)));
