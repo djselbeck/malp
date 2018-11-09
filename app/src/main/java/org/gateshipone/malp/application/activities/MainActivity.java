@@ -219,19 +219,24 @@ public class MainActivity extends GenericActivity
             }
 
             Fragment fragment;
+            String fragmentTag;
 
             switch (navId) {
                 case R.id.nav_saved_playlists:
                     fragment = new SavedPlaylistsFragment();
+                    fragmentTag = SavedPlaylistsFragment.TAG;
                     break;
                 case R.id.nav_files:
                     fragment = new FilesFragment();
+                    fragmentTag = FilesFragment.TAG;
                     break;
                 case R.id.nav_profiles:
                     fragment = new ProfilesFragment();
+                    fragmentTag = ProfilesFragment.TAG;
                     break;
                 case R.id.nav_app_settings:
                     fragment = new SettingsFragment();
+                    fragmentTag = SettingsFragment.TAG;
                     break;
                 case R.id.nav_library:
                 default:
@@ -241,11 +246,12 @@ public class MainActivity extends GenericActivity
                     args.putInt(MyMusicTabsFragment.MY_MUSIC_REQUESTED_TAB, defaultTab.ordinal());
 
                     fragment.setArguments(args);
+                    fragmentTag = MyMusicTabsFragment.TAG;
                     break;
             }
 
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-            transaction.replace(R.id.fragment_container, fragment);
+            transaction.replace(R.id.fragment_container, fragment, fragmentTag);
             transaction.commit();
         }
 
