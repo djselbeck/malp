@@ -96,17 +96,21 @@ public class MainActivity extends GenericActivity
         NowPlayingView.NowPlayingDragStatusReceiver, FilesFragment.FilesCallback,
         FABFragmentCallback, SettingsFragment.OnArtworkSettingsRequestedCallback {
 
-
     private static final String TAG = "MainActivity";
 
     public final static String MAINACTIVITY_INTENT_EXTRA_REQUESTEDVIEW = "org.malp.requestedview";
-    public final static String MAINACTIVITY_INTENT_EXTRA_REQUESTEDVIEW_NOWPLAYINGVIEW = "org.malp.requestedview.nowplaying";
 
     private final static String MAINACTIVITY_SAVED_INSTANCE_NOW_PLAYING_DRAG_STATUS = "MainActivity.NowPlayingDragStatus";
     private final static String MAINACTIVITY_SAVED_INSTANCE_NOW_PLAYING_VIEW_SWITCHER_CURRENT_VIEW = "MainActivity.NowPlayingViewSwitcherCurrentView";
 
     private DRAG_STATUS mNowPlayingDragStatus;
     private DRAG_STATUS mSavedNowPlayingDragStatus = null;
+
+    public enum REQUESTEDVIEW {
+        NONE,
+        NOWPLAYING,
+        SETTINGS
+    }
 
     private ActionBarDrawerToggle mDrawerToggle;
 
@@ -119,17 +123,41 @@ public class MainActivity extends GenericActivity
 
     private FloatingActionButton mFAB;
 
+    private boolean mShowNPV = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+        boolean switchToSettings = false;
 
         // restore drag state
         if (savedInstanceState != null) {
             mSavedNowPlayingDragStatus = DRAG_STATUS.values()[savedInstanceState.getInt(MAINACTIVITY_SAVED_INSTANCE_NOW_PLAYING_DRAG_STATUS)];
             mSavedNowPlayingViewSwitcherStatus = VIEW_SWITCHER_STATUS.values()[savedInstanceState.getInt(MAINACTIVITY_SAVED_INSTANCE_NOW_PLAYING_VIEW_SWITCHER_CURRENT_VIEW)];
+        } else {
+            // if no savedInstanceState is present the activity is started for the first time so check the intent
+            final Intent intent = getIntent();
+
+            if (intent != null) {
+                // odyssey was opened by widget or notification
+                final Bundle extras = intent.getExtras();
+
+                if (extras != null) {
+                    REQUESTEDVIEW requestedView = REQUESTEDVIEW.values()[extras.getInt(MAINACTIVITY_INTENT_EXTRA_REQUESTEDVIEW, REQUESTEDVIEW.NONE.ordinal())];
+                    switch (requestedView) {
+                        case NONE:
+                            break;
+                        case NOWPLAYING:
+                            mShowNPV = true;
+                            break;
+                        case SETTINGS:
+                            switchToSettings = true;
+                            break;
+                    }
+                }
+            }
         }
 
+        super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
 
@@ -154,7 +182,7 @@ public class MainActivity extends GenericActivity
             mDrawerToggle.syncState();
         }
 
-        int navId = getDefaultViewID();
+        int navId = switchToSettings ? R.id.nav_app_settings : getDefaultViewID();
 
         NavigationView navigationView = findViewById(R.id.nav_view);
         if (navigationView != null) {
@@ -190,25 +218,40 @@ public class MainActivity extends GenericActivity
                 return;
             }
 
-            Fragment fragment = null;
+            Fragment fragment;
+            String fragmentTag;
 
-            if (navId == R.id.nav_library) {
-                fragment = new MyMusicTabsFragment();
-                MyMusicTabsFragment.DEFAULTTAB defaultTab = getDefaultTab();
-                Bundle args = new Bundle();
-                args.putInt(MyMusicTabsFragment.MY_MUSIC_REQUESTED_TAB, defaultTab.ordinal());
+            switch (navId) {
+                case R.id.nav_saved_playlists:
+                    fragment = new SavedPlaylistsFragment();
+                    fragmentTag = SavedPlaylistsFragment.TAG;
+                    break;
+                case R.id.nav_files:
+                    fragment = new FilesFragment();
+                    fragmentTag = FilesFragment.TAG;
+                    break;
+                case R.id.nav_profiles:
+                    fragment = new ProfilesFragment();
+                    fragmentTag = ProfilesFragment.TAG;
+                    break;
+                case R.id.nav_app_settings:
+                    fragment = new SettingsFragment();
+                    fragmentTag = SettingsFragment.TAG;
+                    break;
+                case R.id.nav_library:
+                default:
+                    fragment = new MyMusicTabsFragment();
+                    MyMusicTabsFragment.DEFAULTTAB defaultTab = getDefaultTab();
+                    Bundle args = new Bundle();
+                    args.putInt(MyMusicTabsFragment.MY_MUSIC_REQUESTED_TAB, defaultTab.ordinal());
 
-                fragment.setArguments(args);
-            } else if (navId == R.id.nav_saved_playlists) {
-                fragment = new SavedPlaylistsFragment();
-            } else if (navId == R.id.nav_files) {
-                fragment = new FilesFragment();
-            } else if (navId == R.id.nav_profiles) {
-                fragment = new ProfilesFragment();
+                    fragment.setArguments(args);
+                    fragmentTag = MyMusicTabsFragment.TAG;
+                    break;
             }
 
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-            transaction.replace(R.id.fragment_container, fragment);
+            transaction.replace(R.id.fragment_container, fragment, fragmentTag);
             transaction.commit();
         }
 
@@ -385,8 +428,12 @@ public class MainActivity extends GenericActivity
         String fragmentTag = "";
 
         if (id == R.id.nav_library) {
-            // Handle the camera action
             fragment = new MyMusicTabsFragment();
+            MyMusicTabsFragment.DEFAULTTAB defaultTab = getDefaultTab();
+            Bundle args = new Bundle();
+            args.putInt(MyMusicTabsFragment.MY_MUSIC_REQUESTED_TAB, defaultTab.ordinal());
+
+            fragment.setArguments(args);
             fragmentTag = MyMusicTabsFragment.TAG;
         } else if (id == R.id.nav_saved_playlists) {
             fragment = new SavedPlaylistsFragment();
@@ -430,9 +477,9 @@ public class MainActivity extends GenericActivity
     @Override
     protected void onResume() {
         super.onResume();
+
         final NowPlayingView nowPlayingView = findViewById(R.id.now_playing_layout);
         if (nowPlayingView != null) {
-
 
             nowPlayingView.registerDragStatusReceiver(this);
 
@@ -440,11 +487,8 @@ public class MainActivity extends GenericActivity
              * Check if the activity got an extra in its intend to show the nowplayingview directly.
              * If yes then pre set the dragoffset of the draggable helper.
              */
-            Intent resumeIntent = getIntent();
-            if (resumeIntent != null && resumeIntent.getExtras() != null && resumeIntent.getExtras().getString(MAINACTIVITY_INTENT_EXTRA_REQUESTEDVIEW) != null &&
-                    resumeIntent.getExtras().getString(MAINACTIVITY_INTENT_EXTRA_REQUESTEDVIEW).equals(MAINACTIVITY_INTENT_EXTRA_REQUESTEDVIEW_NOWPLAYINGVIEW)) {
+            if (mShowNPV) {
                 nowPlayingView.setDragOffset(0.0f);
-                getIntent().removeExtra(MAINACTIVITY_INTENT_EXTRA_REQUESTEDVIEW);
 
                 // check preferences if the playlist should be shown
                 final SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
@@ -456,6 +500,7 @@ public class MainActivity extends GenericActivity
                     nowPlayingView.setViewSwitcherStatus(mNowPlayingViewSwitcherStatus);
                 }
 
+                mShowNPV = false;
             } else {
                 // set drag status
                 if (mSavedNowPlayingDragStatus == DRAG_STATUS.DRAGGED_UP) {
@@ -486,8 +531,6 @@ public class MainActivity extends GenericActivity
 
             nowPlayingView.onPause();
         }
-
-
     }
 
     @Override

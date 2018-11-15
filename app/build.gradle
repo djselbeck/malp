@@ -42,13 +42,13 @@ android {
         }
     }
     compileSdkVersion 27
-    buildToolsVersion "27.0.3"
+    buildToolsVersion '28.0.3'
     defaultConfig {
         applicationId "org.gateshipone.malp"
         minSdkVersion 21
         targetSdkVersion 27
-        versionCode 27
-        versionName "1.2.0"
+        versionCode 28
+        versionName "1.2.1"
         signingConfig signingConfigs.config
     }
     buildTypes {

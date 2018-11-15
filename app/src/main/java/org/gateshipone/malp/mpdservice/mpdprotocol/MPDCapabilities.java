@@ -92,7 +92,7 @@ public class MPDCapabilities {
             mHasToggleOutput = true;
         }
 
-        if (mMinorVersion >= 19 || mMajorVersion > 0) {
+        if (mMinorVersion >= 19 || mMajorVersion >= 1) {
             mHasListGroup = true;
             mHasListFiltering = true;
         }
@@ -212,7 +212,7 @@ public class MPDCapabilities {
                 + "List filtering: " + mHasListFiltering + '\n'
                 + "Fast ranged currentplaylist delete: " + mHasCurrentPlaylistRemoveRange + '\n'
                 + "MPD based album artwork: " + mHasAlbumArt + '\n'
-                + (mMopidyDetected ? "\nMopidy detected, consider using the real MPD server (www.musicpd.org)!" : "");
+                + (mMopidyDetected ? "\nMopidy detected, consider using the real MPD server (www.musicpd.org)!\nOr you've been hit by MPD bug #408" : "");
     }
 
     public void enableMopidyWorkaround() {

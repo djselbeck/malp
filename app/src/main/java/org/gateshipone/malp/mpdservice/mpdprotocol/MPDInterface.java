@@ -409,7 +409,9 @@ public class MPDInterface {
             mConnection.sendMPDCommand(MPDCommands.MPD_COMMAND_REQUEST_ALBUM_TRACKS(albumName));
 
             result = MPDResponseParser.parseMPDTracks(mConnection);
-            MPDFileListFilter.filterAlbumMBID(result, mbid);
+            if(!mbid.isEmpty()) {
+                MPDFileListFilter.filterAlbumMBID(result, mbid);
+            }
         }
         MPDSortHelper.sortFileListNumeric(result);
         return result;
@@ -431,7 +433,9 @@ public class MPDInterface {
 
             // Filter tracks with artistName
             result = MPDResponseParser.parseMPDTracks(mConnection);
-            MPDFileListFilter.filterAlbumMBIDandAlbumArtist(result, mbid, artistName);
+            if (!mbid.isEmpty() && !artistName.isEmpty()) {
+                MPDFileListFilter.filterAlbumMBIDandAlbumArtist(result, mbid, artistName);
+            }
         }
         // Sort with disc & track number
         MPDSortHelper.sortFileListNumeric(result);
