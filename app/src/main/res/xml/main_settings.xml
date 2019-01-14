@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?><!--
+<?xml version="1.0" encoding="utf-8"?>
+<!--
   ~  Copyright (C) 2019 Team Gateship-One
   ~  (Hendrik Borghorst & Frederik Luetkes)
   ~
@@ -20,8 +21,11 @@
   ~
   -->
 
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-    <PreferenceCategory android:title="@string/preference_category_design">
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <PreferenceCategory
+        android:title="@string/preference_category_design"
+        app:iconSpaceReserved="false">
         <ListPreference
             android:defaultValue="@string/pref_theme_default"
             android:dialogTitle="@string/preference_theme_title"
@@ -30,24 +34,30 @@
             android:key="@string/pref_theme_key"
             android:persistent="true"
             android:summary="@string/preference_theme_summary"
-            android:title="@string/preference_theme_title" />
+            android:title="@string/preference_theme_title"
+            app:iconSpaceReserved="false" />
         <CheckBoxPreference
             android:defaultValue="@bool/pref_theme_dark_default"
             android:key="@string/pref_dark_theme_key"
             android:summary="@string/preference_dark_theme_message"
-            android:title="@string/preference_dark_theme_title" />
+            android:title="@string/preference_dark_theme_title"
+            app:iconSpaceReserved="false" />
         <CheckBoxPreference
             android:defaultValue="@bool/pref_show_npv_artist_image_default"
             android:key="@string/pref_show_npv_artist_image_key"
             android:summary="@string/preference_show_artist_image_text"
-            android:title="@string/preference_show_artist_image_title" />
+            android:title="@string/preference_show_artist_image_title"
+            app:iconSpaceReserved="false" />
         <CheckBoxPreference
             android:defaultValue="@bool/pref_npv_show_playlist_default"
             android:key="@string/pref_npv_show_playlist_key"
             android:summary="@string/preference_npv_show_playlist_text"
-            android:title="@string/preference_npv_show_playlist_title" />
+            android:title="@string/preference_npv_show_playlist_title"
+            app:iconSpaceReserved="false" />
     </PreferenceCategory>
-    <PreferenceCategory android:title="@string/preference_category_library">
+    <PreferenceCategory
+        android:title="@string/preference_category_library"
+        app:iconSpaceReserved="false">
         <ListPreference
             android:defaultValue="@string/pref_view_default"
             android:dialogTitle="@string/preference_default_view_message"
@@ -56,7 +66,8 @@
             android:key="@string/pref_start_view_key"
             android:persistent="true"
             android:summary="@string/preference_default_view_summary"
-            android:title="@string/preference_default_view_title" />
+            android:title="@string/preference_default_view_title"
+            app:iconSpaceReserved="false" />
         <ListPreference
             android:defaultValue="@string/pref_artist_albums_sort_default"
             android:dialogTitle="@string/preference_album_sort_order_message"
@@ -65,7 +76,8 @@
             android:key="@string/pref_album_sort_order_key"
             android:persistent="true"
             android:summary="@string/preference_album_sort_order_summary"
-            android:title="@string/preference_album_sort_order_title" />
+            android:title="@string/preference_album_sort_order_title"
+            app:iconSpaceReserved="false" />
         <ListPreference
             android:defaultValue="@string/pref_library_view_default"
             android:dialogTitle="@string/preference_library_view_message"
@@ -74,13 +86,15 @@
             android:key="@string/pref_library_view_key"
             android:persistent="true"
             android:summary="@string/preference_library_view_summary"
-            android:title="@string/preference_library_view_title" />
+            android:title="@string/preference_library_view_title"
+            app:iconSpaceReserved="false" />
         <CheckBoxPreference
             android:defaultValue="@bool/pref_use_tags_in_filebrowser_default"
             android:key="@string/pref_use_tags_in_filebrowser_key"
             android:persistent="true"
             android:summary="@string/preference_use_tags_in_filebrowser_text"
-            android:title="@string/preference_use_tags_in_filebrowser_title" />
+            android:title="@string/preference_use_tags_in_filebrowser_title"
+            app:iconSpaceReserved="false" />
         <ListPreference
             android:defaultValue="@string/pref_library_click_action_default"
             android:dialogTitle="@string/preference_library_click_action_title"
@@ -89,38 +103,46 @@
             android:key="@string/pref_library_click_action_key"
             android:persistent="true"
             android:summary="@string/preference_library_click_action_message"
-            android:title="@string/preference_library_click_action_summary" />
+            android:title="@string/preference_library_click_action_summary"
+            app:iconSpaceReserved="false" />
         <CheckBoxPreference
             android:defaultValue="@bool/pref_use_album_artists_default"
             android:key="@string/pref_use_album_artists_key"
             android:persistent="true"
             android:summary="@string/preference_use_album_artists_text"
-            android:title="@string/preference_use_album_artists_title" />
+            android:title="@string/preference_use_album_artists_title"
+            app:iconSpaceReserved="false" />
         <CheckBoxPreference
             android:defaultValue="@bool/pref_use_artist_sort_default"
             android:key="@string/pref_use_artist_sort_key"
             android:persistent="true"
             android:summary="@string/preference_use_artist_sort_text"
-            android:title="@string/preference_use_artist_sort_title" />
+            android:title="@string/preference_use_artist_sort_title"
+            app:iconSpaceReserved="false" />
         <CheckBoxPreference
             android:defaultValue="@bool/pref_show_playlist_sections_default"
             android:key="@string/pref_show_playlist_sections_key"
             android:persistent="true"
             android:summary="@string/preference_show_playlist_sections_text"
-            android:title="@string/preference_show_playlist_sections_title" />
+            android:title="@string/preference_show_playlist_sections_title"
+            app:iconSpaceReserved="false" />
     </PreferenceCategory>
-    <PreferenceCategory android:title="@string/preference_category_controls">
+    <PreferenceCategory
+        android:title="@string/preference_category_controls"
+        app:iconSpaceReserved="false">
         <CheckBoxPreference
             android:defaultValue="@bool/pref_show_notification_default"
             android:key="@string/pref_show_notification_key"
             android:summary="@string/preference_show_notification_text"
-            android:title="@string/preference_show_notification_title" />
+            android:title="@string/preference_show_notification_title"
+            app:iconSpaceReserved="false" />
         <CheckBoxPreference
             android:defaultValue="@bool/pref_keep_display_on_default"
             android:key="@string/pref_keep_display_on_key"
             android:persistent="true"
             android:summary="@string/preference_generic_keep_display_on_text"
-            android:title="@string/preference_generic_keep_display_on_title" />
+            android:title="@string/preference_generic_keep_display_on_title"
+            app:iconSpaceReserved="false" />
         <ListPreference
             android:defaultValue="@string/pref_volume_control_view_default"
             android:dialogTitle="@string/preference_volume_control_message"
@@ -129,26 +151,33 @@
             android:key="@string/pref_volume_controls_key"
             android:persistent="true"
             android:summary="@string/preference_volume_control_summary"
-            android:title="@string/preference_volume_control_title" />
+            android:title="@string/preference_volume_control_title"
+            app:iconSpaceReserved="false" />
         <CheckBoxPreference
             android:defaultValue="@bool/pref_hardware_controls_default"
             android:key="@string/pref_hardware_controls_key"
             android:persistent="true"
             android:summary="@string/preference_generic_hardware_keys_text"
-            android:title="@string/preference_generic_hardware_keys_title" />
+            android:title="@string/preference_generic_hardware_keys_title"
+            app:iconSpaceReserved="false" />
         <Preference
             android:key="@string/pref_volume_steps_dialog_key"
             android:summary="@string/preference_volume_step_text"
-            android:title="@string/preference_volume_step_title" />
+            android:title="@string/preference_volume_step_title"
+            app:iconSpaceReserved="false" />
     </PreferenceCategory>
-    <PreferenceCategory android:title="@string/preference_category_other">
+    <PreferenceCategory
+        android:title="@string/preference_category_other"
+        app:iconSpaceReserved="false">
         <CheckBoxPreference
             android:defaultValue="@bool/pref_use_english_wikipedia_default"
             android:key="@string/pref_use_english_wikipedia_key"
             android:summary="@string/preference_use_english_wikipedia_text"
-            android:title="@string/preference_use_english_wikipedia_title" />
+            android:title="@string/preference_use_english_wikipedia_title"
+            app:iconSpaceReserved="false" />
         <Preference
             android:key="@string/pref_artwork_settings_key"
-            android:title="@string/artwork_settings" />
+            android:title="@string/artwork_settings"
+            app:iconSpaceReserved="false" />
     </PreferenceCategory>
 </PreferenceScreen>

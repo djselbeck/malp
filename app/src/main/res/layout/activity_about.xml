@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?><!--
+<?xml version="1.0" encoding="utf-8"?>
+<!--
   ~  Copyright (C) 2019 Team Gateship-One
   ~  (Hendrik Borghorst & Frederik Luetkes)
   ~
@@ -20,6 +21,7 @@
   ~
   -->
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -27,8 +29,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:paddingEnd="@dimen/material_screen_edge_spacing"
-        android:paddingStart="@dimen/material_screen_edge_spacing">
+        android:paddingStart="@dimen/material_screen_edge_spacing"
+        android:paddingEnd="@dimen/material_screen_edge_spacing">
 
         <ImageView
             android:id="@+id/activity_about_logo"
@@ -72,22 +74,26 @@
                 android:textSize="@dimen/material_font_style_size_subheading" />
         </LinearLayout>
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/button_contributors"
+            style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="center"
             android:layout_marginTop="@dimen/material_content_spacing"
             android:fontFamily="sans-serif-medium"
-            android:layout_gravity="center"
             android:text="@string/contributors_title"
-            android:textSize="@dimen/material_font_style_size_subheading" />
+            android:textColor="?attr/malp_color_text_background_primary"
+            android:textSize="@dimen/material_font_style_size_subheading"
+            app:backgroundTint="?attr/malp_color_background_selected"
+            app:rippleColor="?attr/malp_color_text_background_secondary" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center_horizontal"
             android:layout_marginTop="@dimen/material_content_spacing"
-            android:text="@string/artwork_provided_by"/>
+            android:gravity="center_horizontal"
+            android:text="@string/artwork_provided_by" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -98,29 +104,29 @@
 
             <ImageButton
                 android:id="@+id/logo_musicbrainz"
+                style="?attr/borderlessButtonStyle"
                 android:layout_width="match_parent"
                 android:layout_height="64dp"
                 android:layout_weight="1"
                 android:scaleType="fitCenter"
-                style="?attr/borderlessButtonStyle"
                 android:src="@drawable/musicbrainz_logo" />
 
             <ImageButton
                 android:id="@+id/logo_lastfm"
+                style="?attr/borderlessButtonStyle"
                 android:layout_width="match_parent"
                 android:layout_height="64dp"
                 android:layout_weight="1"
                 android:scaleType="fitCenter"
-                style="?attr/borderlessButtonStyle"
                 android:src="@drawable/lastfm_logo" />
 
             <ImageButton
                 android:id="@+id/logo_fanarttv"
+                style="?attr/borderlessButtonStyle"
                 android:layout_width="match_parent"
                 android:layout_height="64dp"
                 android:layout_weight="1"
                 android:scaleType="fitCenter"
-                style="?attr/borderlessButtonStyle"
                 android:src="@drawable/fanart_tv_logo" />
         </LinearLayout>
 
@@ -155,16 +161,18 @@
             android:text="@string/license_text"
             android:textSize="@dimen/material_font_style_size_caption" />
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/thirdparty_licenses"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="center"
             android:layout_marginTop="@dimen/material_content_spacing"
             android:fontFamily="sans-serif-medium"
-            android:layout_gravity="center"
-            style="@style/Widget.AppCompat.Button.Borderless"
             android:text="@string/thirdparty_licenses_dialog_title"
-            android:textSize="@dimen/material_font_style_size_caption" />
+            android:textColor="?attr/malp_color_text_background_primary"
+            android:textSize="@dimen/material_font_style_size_caption"
+            app:rippleColor="?attr/malp_color_text_background_secondary" />
     </LinearLayout>
 
 </ScrollView>

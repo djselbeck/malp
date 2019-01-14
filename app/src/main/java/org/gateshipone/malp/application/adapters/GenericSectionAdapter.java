@@ -24,7 +24,7 @@ package org.gateshipone.malp.application.adapters;
 
 
 import android.os.AsyncTask;
-import android.support.v4.util.Pair;
+import androidx.core.util.Pair;
 import android.widget.SectionIndexer;
 
 import java.util.ArrayList;

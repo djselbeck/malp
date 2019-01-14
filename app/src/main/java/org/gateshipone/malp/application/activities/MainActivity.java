@@ -27,26 +27,26 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.annotation.NonNull;
-import android.support.design.widget.AppBarLayout;
-import android.support.design.widget.CollapsingToolbarLayout;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v4.view.ViewCompat;
-import android.support.v7.app.AlertDialog;
+import androidx.annotation.NonNull;
+import com.google.android.material.appbar.AppBarLayout;
+import com.google.android.material.appbar.CollapsingToolbarLayout;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.core.view.ViewCompat;
+import androidx.appcompat.app.AlertDialog;
 import android.transition.Slide;
 import android.view.ContextMenu;
 import android.view.Gravity;
 import android.view.MenuInflater;
 import android.view.View;
-import android.support.design.widget.NavigationView;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.widget.Toolbar;
+import com.google.android.material.navigation.NavigationView;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.widget.Toolbar;
 import android.view.MenuItem;
 import android.widget.AdapterView;
 import android.widget.ImageView;
@@ -169,7 +169,7 @@ public class MainActivity extends GenericActivity
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         // enable back navigation
-        final android.support.v7.app.ActionBar actionBar = getSupportActionBar();
+        final androidx.appcompat.app.ActionBar actionBar = getSupportActionBar();
 
         if (actionBar != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -551,7 +551,7 @@ public class MainActivity extends GenericActivity
             Snackbar sb = Snackbar.make(layout, errorText, Snackbar.LENGTH_LONG);
 
             // style the snackbar text
-            TextView sbText = sb.getView().findViewById(android.support.design.R.id.snackbar_text);
+            TextView sbText = sb.getView().findViewById(com.google.android.material.R.id.snackbar_text);
             sbText.setTextColor(ThemeUtils.getThemeColor(this, R.attr.malp_color_text_accent));
             sb.show();
         }
@@ -566,7 +566,7 @@ public class MainActivity extends GenericActivity
             Snackbar sb = Snackbar.make(layout, errorText, Snackbar.LENGTH_LONG);
 
             // style the snackbar text
-            TextView sbText = sb.getView().findViewById(android.support.design.R.id.snackbar_text);
+            TextView sbText = sb.getView().findViewById(com.google.android.material.R.id.snackbar_text);
             sbText.setTextColor(ThemeUtils.getThemeColor(this, R.attr.malp_color_text_accent));
             sb.show();
         }
@@ -604,7 +604,7 @@ public class MainActivity extends GenericActivity
 
         newFragment.setArguments(args);
 
-        android.support.v4.app.FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         // Replace whatever is in the fragment_container view with this
         // fragment,
         // and add the transaction to the back stack so the user can navigate
@@ -645,7 +645,7 @@ public class MainActivity extends GenericActivity
 
         newFragment.setArguments(args);
 
-        android.support.v4.app.FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         newFragment.setEnterTransition(new Slide(Gravity.BOTTOM));
         newFragment.setExitTransition(new Slide(Gravity.TOP));
         // Replace whatever is in the fragment_container view with this
@@ -716,7 +716,7 @@ public class MainActivity extends GenericActivity
 
         newFragment.setArguments(args);
 
-        android.support.v4.app.FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         newFragment.setEnterTransition(new Slide(GravityCompat.getAbsoluteGravity(GravityCompat.START, getResources().getConfiguration().getLayoutDirection())));
         newFragment.setExitTransition(new Slide(GravityCompat.getAbsoluteGravity(GravityCompat.END, getResources().getConfiguration().getLayoutDirection())));
         // Replace whatever is in the fragment_container view with this
@@ -742,7 +742,7 @@ public class MainActivity extends GenericActivity
 
         newFragment.setArguments(args);
 
-        android.support.v4.app.FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         newFragment.setEnterTransition(new Slide(GravityCompat.getAbsoluteGravity(GravityCompat.START, getResources().getConfiguration().getLayoutDirection())));
         newFragment.setExitTransition(new Slide(GravityCompat.getAbsoluteGravity(GravityCompat.END, getResources().getConfiguration().getLayoutDirection())));
         // Replace whatever is in the fragment_container view with this
@@ -861,7 +861,7 @@ public class MainActivity extends GenericActivity
 
         FragmentManager fragmentManager = getSupportFragmentManager();
 
-        android.support.v4.app.FragmentTransaction transaction = fragmentManager.beginTransaction();
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
 
         newFragment.setEnterTransition(new Slide(GravityCompat.getAbsoluteGravity(GravityCompat.START, getResources().getConfiguration().getLayoutDirection())));
         newFragment.setExitTransition(new Slide(GravityCompat.getAbsoluteGravity(GravityCompat.END, getResources().getConfiguration().getLayoutDirection())));
@@ -892,7 +892,7 @@ public class MainActivity extends GenericActivity
 
         newFragment.setArguments(args);
 
-        android.support.v4.app.FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         newFragment.setEnterTransition(new Slide(GravityCompat.getAbsoluteGravity(GravityCompat.START, getResources().getConfiguration().getLayoutDirection())));
         newFragment.setExitTransition(new Slide(GravityCompat.getAbsoluteGravity(GravityCompat.END, getResources().getConfiguration().getLayoutDirection())));
         // Replace whatever is in the fragment_container view with this
@@ -929,7 +929,7 @@ public class MainActivity extends GenericActivity
 
         FragmentManager fragmentManager = getSupportFragmentManager();
 
-        android.support.v4.app.FragmentTransaction transaction = fragmentManager.beginTransaction();
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
 
         newFragment.setEnterTransition(new Slide(GravityCompat.getAbsoluteGravity(GravityCompat.START, getResources().getConfiguration().getLayoutDirection())));
         newFragment.setExitTransition(new Slide(GravityCompat.getAbsoluteGravity(GravityCompat.END, getResources().getConfiguration().getLayoutDirection())));

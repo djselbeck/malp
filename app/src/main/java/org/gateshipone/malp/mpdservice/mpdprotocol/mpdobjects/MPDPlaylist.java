@@ -23,7 +23,7 @@
 package org.gateshipone.malp.mpdservice.mpdprotocol.mpdobjects;
 
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 public class MPDPlaylist extends MPDFileEntry implements MPDGenericItem {
     public MPDPlaylist(@NonNull String path) {

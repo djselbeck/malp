@@ -29,12 +29,11 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.annotation.NonNull;
-import android.support.v4.app.FragmentActivity;
-import android.support.v4.content.Loader;
-import android.support.v4.graphics.drawable.DrawableCompat;
-import android.support.v4.widget.SwipeRefreshLayout;
-import android.util.Log;
+import androidx.annotation.NonNull;
+import androidx.fragment.app.FragmentActivity;
+import androidx.loader.content.Loader;
+import androidx.core.graphics.drawable.DrawableCompat;
+
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;

@@ -24,7 +24,7 @@ package org.gateshipone.malp.application.callbacks;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 
 import org.gateshipone.malp.R;
 import org.gateshipone.malp.application.fragments.TextDialog;

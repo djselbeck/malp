@@ -228,7 +228,7 @@
     </style>
 
 
-    <style name="AppTheme" parent="Theme.AppCompat">
+    <style name="AppTheme" parent="Theme.MaterialComponents">
         <item name="android:alertDialogTheme">@style/AppTheme.Dialog</item>
         <item name="android:dialogTheme">@style/AppTheme.Dialog</item>
         <item name="alertDialogTheme">@style/AppTheme.Dialog</item>
@@ -266,7 +266,7 @@
         <item name="android:textColorPrimary">?attr/malp_color_text_background_primary</item>
     </style>
 
-    <style name="AppTheme.Preference" parent="@style/PreferenceThemeOverlay.v14.Material">
+    <style name="AppTheme.Preference" parent="@style/PreferenceThemeOverlay">
         <item name="colorPrimary">?attr/malp_color_accent</item>
         <item name="android:textColor">?attr/malp_color_text_background_primary</item>
         <item name="android:textColorPrimary">?attr/malp_color_text_background_primary</item>
@@ -281,7 +281,7 @@
         <item name="android:windowBackground">@drawable/splash_background</item>
     </style>
 
-    <style name="AppTheme.Dialog" parent="Theme.AppCompat.Dialog.Alert">
+    <style name="AppTheme.Dialog" parent="Theme.MaterialComponents.Dialog.Alert">
         <item name="android:colorAccent">?attr/malp_color_accent</item>
         <item name="android:textColor">?attr/malp_color_text_background_primary</item>
         <item name="android:textColorPrimary">?attr/malp_color_text_background_primary</item>
@@ -291,7 +291,7 @@
         <item name="colorAccent">?attr/malp_color_accent</item>
     </style>
 
-    <style name="AppThemeLight" parent="Theme.AppCompat.Light">
+    <style name="AppThemeLight" parent="Theme.MaterialComponents.Light">
         <item name="android:alertDialogTheme">@style/AppThemeLight.Dialog</item>
         <item name="android:dialogTheme">@style/AppThemeLight.Dialog</item>
         <item name="alertDialogTheme">@style/AppThemeLight.Dialog</item>
@@ -330,7 +330,7 @@
         <item name="android:textColorPrimary">?attr/malp_color_text_background_primary</item>
     </style>
 
-    <style name="AppThemeLight.Preference" parent="@style/PreferenceThemeOverlay.v14.Material">
+    <style name="AppThemeLight.Preference" parent="@style/PreferenceThemeOverlay">
         <item name="colorPrimary">?attr/malp_color_accent</item>
         <item name="android:textColor">?attr/malp_color_text_background_primary</item>
         <item name="android:textColorPrimary">?attr/malp_color_text_background_primary</item>
@@ -341,7 +341,7 @@
         <item name="colorPrimaryDark">?attr/malp_color_primary</item>
     </style>
 
-    <style name="AppThemeLight.Dialog" parent="Theme.AppCompat.Light.Dialog.Alert">
+    <style name="AppThemeLight.Dialog" parent="Theme.MaterialComponents.Light.Dialog.Alert">
         <item name="android:colorAccent">?attr/malp_color_accent</item>
         <item name="android:textColor">?attr/malp_color_text_background_primary</item>
         <item name="android:textColorPrimary">?attr/malp_color_text_background_primary</item>

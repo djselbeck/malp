@@ -27,9 +27,9 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.preference.Preference;
-import android.support.v7.preference.PreferenceFragmentCompat;
+import androidx.appcompat.app.AlertDialog;
+import androidx.preference.Preference;
+import androidx.preference.PreferenceFragmentCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -95,7 +95,7 @@ public class ArtworkSettingsFragment extends PreferenceFragmentCompat implements
             builder.setPositiveButton(R.string.dialog_action_ok, (dialog, id) -> {
                 Intent serviceIntent = new Intent(getActivity(), BulkDownloadService.class);
                 serviceIntent.setAction(BulkDownloadService.ACTION_START_BULKDOWNLOAD);
-                SharedPreferences sharedPref = android.support.v7.preference.PreferenceManager.getDefaultSharedPreferences(getContext().getApplicationContext());
+                SharedPreferences sharedPref = androidx.preference.PreferenceManager.getDefaultSharedPreferences(getContext().getApplicationContext());
                 serviceIntent.putExtra(BulkDownloadService.BUNDLE_KEY_ARTIST_PROVIDER, sharedPref.getString(getString(R.string.pref_artist_provider_key),
                         getString(R.string.pref_artwork_provider_artist_default)));
                 serviceIntent.putExtra(BulkDownloadService.BUNDLE_KEY_ALBUM_PROVIDER, sharedPref.getString(getString(R.string.pref_album_provider_key),

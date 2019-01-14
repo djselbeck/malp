@@ -26,7 +26,7 @@ package org.gateshipone.malp.application.loaders;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
-import android.support.v4.content.Loader;
+import androidx.loader.content.Loader;
 
 import java.lang.ref.WeakReference;
 import java.util.Collections;
