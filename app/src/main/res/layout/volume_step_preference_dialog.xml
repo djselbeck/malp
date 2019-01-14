@@ -22,17 +22,17 @@
   -->
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:padding="@dimen/material_standard_horizontal_spacing"
-    >
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="@dimen/material_standard_horizontal_spacing">
 
     <TextView
         android:id="@+id/volume_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="@dimen/material_standard_horizontal_spacing"
-        android:textSize="@dimen/material_font_style_size_title" />
+        android:textSize="@dimen/material_font_style_size_subheading" />
 
     <SeekBar
         android:id="@+id/volume_seekbar"
@@ -45,35 +45,8 @@
         android:id="@+id/volume_warning_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:visibility="invisible"
+        android:text="@string/volume_step_size_dialog_warning"
         android:textColor="#ff0000"
-        android:text="@string/volume_step_size_dialog_warning" />
+        android:visibility="invisible" />
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="horizontal">
-
-        <Button
-            android:id="@+id/button_ok"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center_vertical"
-            android:text="@string/dialog_action_ok"
-            android:textAlignment="center"
-            android:textColor="?attr/colorAccent"
-            style="?attr/borderlessButtonStyle" />
-
-        <Button
-            android:id="@+id/button_cancel"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center_vertical"
-            android:text="@string/dialog_action_cancel"
-            android:textAlignment="center"
-            android:textColor="?attr/colorAccent"
-            style="?attr/borderlessButtonStyle"/>
-    </LinearLayout>
 </LinearLayout>

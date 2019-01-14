@@ -23,10 +23,14 @@
 package org.gateshipone.malp.application.views;
 
 
+import android.app.Dialog;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.RemoteException;
 import android.preference.PreferenceManager;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.DialogFragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -48,14 +52,17 @@ public class VolumeStepPreferenceDialog extends DialogFragment implements SeekBa
 
     private int mVolumeStepSize;
 
+    @NonNull
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        View rootView = inflater.inflate(R.layout.volume_step_preference_dialog, container, false);
+    public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
+        final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 
-        mSeekBar = rootView.findViewById(R.id.volume_seekbar);
-        mVolumeLabel = rootView.findViewById(R.id.volume_text);
-        mWarningLabel = rootView.findViewById(R.id.volume_warning_text);
+        final LayoutInflater inflater = getActivity().getLayoutInflater();
+        final View seekView = inflater.inflate(R.layout.volume_step_preference_dialog, null);
+
+        mSeekBar = seekView.findViewById(R.id.volume_seekbar);
+        mVolumeLabel = seekView.findViewById(R.id.volume_text);
+        mWarningLabel = seekView.findViewById(R.id.volume_warning_text);
 
         final SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
 
@@ -64,18 +71,19 @@ public class VolumeStepPreferenceDialog extends DialogFragment implements SeekBa
         mSeekBar.setProgress(mVolumeStepSize);
         mSeekBar.setOnSeekBarChangeListener(this);
 
-        rootView.findViewById(R.id.button_ok).setOnClickListener(v -> {
+        updateLabels();
+
+        builder.setView(seekView);
+
+        builder.setPositiveButton(R.string.dialog_action_ok, ((dialog, which) -> {
             SharedPreferences.Editor editor = sharedPreferences.edit();
             editor.putInt(getString(R.string.pref_volume_steps_key), mVolumeStepSize == 0 ? 1 : mVolumeStepSize);
             editor.apply();
             dismiss();
-        });
+        }));
+        builder.setNegativeButton(R.string.dialog_action_cancel, (dialog, which) -> dismiss());
 
-        rootView.findViewById(R.id.button_cancel).setOnClickListener(v -> dismiss());
-
-        updateLabels();
-
-        return rootView;
+        return builder.create();
     }
 
     @Override
