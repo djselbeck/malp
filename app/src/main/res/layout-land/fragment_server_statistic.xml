@@ -22,9 +22,10 @@
   -->
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="horizontal"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="horizontal">
 
     <ScrollView
         android:layout_width="match_parent"
@@ -32,16 +33,18 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:weightSum="2"
             android:layout_height="wrap_content"
+            android:orientation="horizontal"
             android:paddingStart="@dimen/material_screen_edge_spacing"
             android:paddingEnd="@dimen/material_screen_edge_spacing"
-            android:orientation="horizontal">
+            android:weightSum="2">
+
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:layout_weight="1">
+                android:layout_weight="1"
+                android:orientation="vertical">
+
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -115,8 +118,9 @@
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:layout_weight="1">
+                android:layout_weight="1"
+                android:orientation="vertical">
+
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -167,21 +171,27 @@
                     android:fontFamily="sans-serif-medium"
                     android:textColor="?attr/malp_color_text_background_primary"
                     android:textSize="@dimen/material_font_style_size_body_2" />
-                <Button
+
+                <com.google.android.material.button.MaterialButton
                     android:id="@+id/server_statistic_update_db_btn"
+                    style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/server_statistic_update_database" />
+                    android:text="@string/server_statistic_update_database"
+                    android:textColor="?attr/malp_color_text_background_primary"
+                    app:backgroundTint="?attr/malp_color_background_selected"
+                    app:rippleColor="?attr/malp_color_text_background_secondary" />
+
                 <TextView
                     android:id="@+id/server_statistic_updateing_db"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:visibility="gone"
                     android:fontFamily="sans-serif-medium"
+                    android:text="@string/server_statistic_updateing_database"
                     android:textColor="#ff4444"
                     android:textSize="@dimen/material_font_style_size_body_2"
-                    android:text="@string/server_statistic_updateing_database"
-                    />
+                    android:visibility="gone" />
+
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -193,8 +203,8 @@
 
                 <TextView
                     android:id="@+id/server_statistic_malp_server_information"
-                    android:layout_height="wrap_content"
                     android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
                     android:fontFamily="sans-serif-medium"
                     android:textColor="?attr/malp_color_text_background_primary"
                     android:textSize="@dimen/material_font_style_size_body_2" />
@@ -203,8 +213,6 @@
         </LinearLayout>
 
     </ScrollView>
-
-
 
 
 </LinearLayout>
