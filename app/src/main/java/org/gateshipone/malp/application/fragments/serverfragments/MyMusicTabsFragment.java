@@ -108,7 +108,7 @@ public class MyMusicTabsFragment extends Fragment implements TabLayout.OnTabSele
         mMyMusicPagerAdapter = new MyMusicPagerAdapter(getChildFragmentManager());
         mViewPager.setAdapter(mMyMusicPagerAdapter);
         mViewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
-        tabLayout.setOnTabSelectedListener(this);
+        tabLayout.addOnTabSelectedListener(this);
 
         // set start page
         Bundle args = getArguments();

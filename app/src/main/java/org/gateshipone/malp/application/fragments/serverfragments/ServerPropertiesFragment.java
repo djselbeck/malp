@@ -67,7 +67,7 @@ public class ServerPropertiesFragment extends Fragment implements TabLayout.OnTa
         mTabAdapter = new ServerPropertiesTabAdapter(getChildFragmentManager());
         mViewPager.setAdapter(mTabAdapter);
         mViewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
-        tabLayout.setOnTabSelectedListener(this);
+        tabLayout.addOnTabSelectedListener(this);
 
         // Icons
         final ColorStateList tabColors = tabLayout.getTabTextColors();
