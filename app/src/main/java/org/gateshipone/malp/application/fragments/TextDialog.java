@@ -49,10 +49,6 @@ public class TextDialog extends DialogFragment {
         mSaveCallback = callback;
     }
 
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-    }
-
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
