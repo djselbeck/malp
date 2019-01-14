@@ -90,7 +90,7 @@ public class MPDAlbumImageProvider implements TrackAlbumImageProvider {
                 response.url = url;
                 mListener.onResponse(response);
             } else {
-                mErrorListener.fetchVolleyError(mTrack, new VolleyError(new NetworkResponse(404,null,null,true)));
+                mErrorListener.fetchVolleyError(mTrack, new VolleyError(new NetworkResponse(404,null,true, 0, null)));
             }
         }
     }
