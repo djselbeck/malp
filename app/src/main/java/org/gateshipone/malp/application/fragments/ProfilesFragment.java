@@ -207,7 +207,7 @@ public class ProfilesFragment extends Fragment implements LoaderManager.LoaderCa
         MPDProfileManager.getInstance(getActivity()).addObserver(this);
 
         // Prepare loader ( start new one or reuse old )
-        getLoaderManager().restartLoader(0, getArguments(), this);
+        LoaderManager.getInstance(this).restartLoader(0, getArguments(), this);
 
         if ( null != mFABCallback ) {
             mFABCallback.setupFAB(false,null);
@@ -255,7 +255,7 @@ public class ProfilesFragment extends Fragment implements LoaderManager.LoaderCa
             ConnectionManager.getInstance(getContext().getApplicationContext()).removeProfile((MPDServerProfile)mAdapter.getItem(index),getContext());
             mAdapter.swapModel(null);
             // Prepare loader ( start new one or reuse old )
-            getLoaderManager().restartLoader(0, getArguments(), this);
+            LoaderManager.getInstance(this).restartLoader(0, getArguments(), this);
         }
     }
 
@@ -270,6 +270,6 @@ public class ProfilesFragment extends Fragment implements LoaderManager.LoaderCa
     @Override
     public void update(Observable o, Object arg) {
         // Prepare loader ( start new one or reuse old )
-        getLoaderManager().restartLoader(0, getArguments(), this);
+        LoaderManager.getInstance(this).restartLoader(0, getArguments(), this);
     }
 }

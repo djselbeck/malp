@@ -30,6 +30,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.FragmentActivity;
+import androidx.loader.app.LoaderManager;
 import androidx.loader.content.Loader;
 import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.appcompat.app.AppCompatActivity;
@@ -377,9 +378,9 @@ public class AlbumTracksFragment extends GenericMPDFragment<List<MPDFileEntry>> 
             case R.id.action_show_all_tracks:
                 mAlbum.setMBID("");
                 mAlbum.setArtistName("");
-                getLoaderManager().destroyLoader(0);
+                LoaderManager.getInstance(this).destroyLoader(0);
 
-                getLoaderManager().initLoader(0, getArguments(), this);
+                LoaderManager.getInstance(this).initLoader(0, getArguments(), this);
                 return true;
         }
 

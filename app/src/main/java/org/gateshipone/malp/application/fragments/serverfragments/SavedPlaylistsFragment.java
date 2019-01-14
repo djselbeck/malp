@@ -26,6 +26,7 @@ package org.gateshipone.malp.application.fragments.serverfragments;
 import android.content.Context;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
+import androidx.loader.app.LoaderManager;
 import androidx.loader.content.Loader;
 import androidx.appcompat.app.AlertDialog;
 import android.view.ContextMenu;
@@ -176,8 +177,8 @@ public class SavedPlaylistsFragment extends GenericMPDFragment<List<MPDFileEntry
                 removeListBuilder.setPositiveButton(R.string.dialog_action_yes, (dialog, which) -> {
                     MPDQueryHandler.removePlaylist(playlist.getPath());
                     mPlaylistAdapter.swapModel(null);
-                    getLoaderManager().destroyLoader(0);
-                    getLoaderManager().initLoader(0, getArguments(), SavedPlaylistsFragment.this);
+                    LoaderManager.getInstance(this).destroyLoader(0);
+                    LoaderManager.getInstance(this).initLoader(0, getArguments(), SavedPlaylistsFragment.this);
                 });
                 removeListBuilder.setNegativeButton(R.string.dialog_action_no, (dialog, which) -> {
 

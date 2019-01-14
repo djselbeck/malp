@@ -60,7 +60,7 @@ public abstract class GenericMPDFragment<T extends Object> extends DialogFragmen
     public void onPause() {
         super.onPause();
         synchronized (this) {
-            getLoaderManager().destroyLoader(0);
+            LoaderManager.getInstance(this).destroyLoader(0);
             MPDInterface.mInstance.removeMPDConnectionStateChangeListener(mConnectionStateListener);
             mConnectionStateListener = null;
         }
@@ -72,7 +72,7 @@ public abstract class GenericMPDFragment<T extends Object> extends DialogFragmen
             mSwipeRefreshLayout.post(() -> mSwipeRefreshLayout.setRefreshing(true));
         }
         if ( !isDetached()) {
-            getLoaderManager().restartLoader(0, getArguments(), this);
+            LoaderManager.getInstance(this).restartLoader(0, getArguments(), this);
         }
     }
 
@@ -98,8 +98,8 @@ public abstract class GenericMPDFragment<T extends Object> extends DialogFragmen
             }
             synchronized (fragment) {
                 if (!fragment.isDetached()) {
-                    if(fragment.getLoaderManager().hasRunningLoaders()) {
-                        fragment.getLoaderManager().destroyLoader(0);
+                    if(LoaderManager.getInstance(fragment).hasRunningLoaders()) {
+                        LoaderManager.getInstance(fragment).destroyLoader(0);
                         fragment.finishedLoading();
                     }
                 }

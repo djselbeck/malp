@@ -26,6 +26,7 @@ import android.app.Dialog;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
+import androidx.loader.app.LoaderManager;
 import androidx.loader.content.Loader;
 import androidx.appcompat.app.AlertDialog;
 
@@ -133,7 +134,7 @@ public class ChoosePlaylistDialog extends GenericMPDFragment<List<MPDFileEntry>>
         });
 
         // Prepare loader ( start new one or reuse old )
-        getLoaderManager().initLoader(0, getArguments(), this);
+        LoaderManager.getInstance(this).initLoader(0, getArguments(), this);
 
         // set divider
         AlertDialog dlg = builder.create();
