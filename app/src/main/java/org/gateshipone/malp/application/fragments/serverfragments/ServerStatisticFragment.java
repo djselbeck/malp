@@ -102,6 +102,8 @@ public class ServerStatisticFragment extends Fragment {
         MPDQueryHandler.getStatistics(new StatisticResponseHandler());
 
         MPDStateMonitoringHandler.getHandler().registerStatusListener(mServerStatusHandler);
+
+        mServerStatusHandler.onNewStatusReady(MPDStateMonitoringHandler.getHandler().getLastStatus());
     }
 
     @Override
@@ -143,7 +145,9 @@ public class ServerStatisticFragment extends Fragment {
                 mDBLength.setText(FormatHelper.formatTracktimeFromSWithDays(statistics.getAllSongDuration(), context));
             }
 
-            mLastUpdate.setText(FormatHelper.formatTimeStampToString(statistics.getLastDBUpdate() * 1000));
+            if (statistics.getLastDBUpdate() != 0) {
+                mLastUpdate.setText(FormatHelper.formatTimeStampToString(statistics.getLastDBUpdate() * 1000));
+            }
 
             MPDCapabilities capabilities = MPDInterface.mInstance.getServerCapabilities();
             if (null != capabilities) {

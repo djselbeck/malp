@@ -22,7 +22,6 @@
 
 package org.gateshipone.malp.mpdservice.mpdprotocol.mpdobjects;
 
-
 public class MPDStatistics {
     private int mArtistsCount;
     private int mAlbumCount;
@@ -42,7 +41,7 @@ public class MPDStatistics {
         mServerUptime = 0;
         mAllSongDuration = 0;
 
-        mLastDBUpdate = System.currentTimeMillis();
+        mLastDBUpdate = 0;
         mPlayDuration = 0;
     }
 

@@ -150,11 +150,6 @@ public class MPDStateMonitoringHandler extends MPDGenericHandler {
 
     }
 
-
-    public void updateStatus() {
-        resynchronizeState();
-    }
-
     private void stopInterpolation() {
         synchronized (mInterpolateTimer) {
             if (mInterpolateTask != null) {
