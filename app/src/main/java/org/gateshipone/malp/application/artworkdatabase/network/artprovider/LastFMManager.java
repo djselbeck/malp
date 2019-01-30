@@ -49,7 +49,7 @@ public class LastFMManager implements ArtistImageProvider, AlbumImageProvider {
     /**
      * Last.fm API url used for requests
      */
-    private static final String LAST_FM_API_URL = "http://ws.audioscrobbler.com/2.0/?method=";
+    private static final String LAST_FM_API_URL = "https://ws.audioscrobbler.com/2.0/?method=";
 
     /**
      * API-Key for used for last.fm
