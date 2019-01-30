@@ -805,14 +805,14 @@ public class ArtworkManager implements ArtistFetchError, AlbumFetchError {
             options.inJustDecodeBounds = true;
             BitmapFactory.decodeByteArray(response.image, 0, response.image.length, options);
             if ((options.outHeight > MAXIMUM_IMAGE_RESOLUTION || options.outWidth > MAXIMUM_IMAGE_RESOLUTION)) {
-                Log.v(TAG, "Image to big, rescaling");
+                float factor = Math.min((float)MAXIMUM_IMAGE_RESOLUTION / (float)options.outHeight, (float)MAXIMUM_IMAGE_RESOLUTION / (float)options.outWidth);
+
                 options.inJustDecodeBounds = false;
                 Bitmap bm = BitmapFactory.decodeByteArray(response.image, 0, response.image.length, options);
                 ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
-                Bitmap.createScaledBitmap(bm, MAXIMUM_IMAGE_RESOLUTION, MAXIMUM_IMAGE_RESOLUTION, true).compress(Bitmap.CompressFormat.JPEG, IMAGE_COMPRESSION_SETTING, byteStream);
-                if(byteStream.size() <= MAXIMUM_IMAGE_SIZE) {
-                    mDBManager.insertArtistImage(mContext, response.artist, byteStream.toByteArray());
-                }
+                Bitmap.createScaledBitmap(bm, (int)(options.outWidth * factor), (int)(options.outHeight * factor), true).compress(Bitmap.CompressFormat.JPEG, IMAGE_COMPRESSION_SETTING, byteStream);
+
+                mDBManager.insertArtistImage(mContext, response.artist, byteStream.toByteArray());
             } else {
                 if(response.image.length <= MAXIMUM_IMAGE_SIZE) {
                     mDBManager.insertArtistImage(mContext, response.artist, response.image);
@@ -862,20 +862,20 @@ public class ArtworkManager implements ArtistFetchError, AlbumFetchError {
                 return response.album;
             }
 
-            Log.v(TAG, "Inserting image for album: " + response.album.getName());
             // Rescale them if to big
             BitmapFactory.Options options = new BitmapFactory.Options();
             options.inJustDecodeBounds = true;
             BitmapFactory.decodeByteArray(response.image, 0, response.image.length, options);
             if ((options.outHeight > MAXIMUM_IMAGE_RESOLUTION || options.outWidth > MAXIMUM_IMAGE_RESOLUTION)) {
-                Log.v(TAG, "Image to big, rescaling");
+                // Calculate rescaling ratio
+                float factor = Math.min((float)MAXIMUM_IMAGE_RESOLUTION / (float)options.outHeight, (float)MAXIMUM_IMAGE_RESOLUTION / (float)options.outWidth);
+
                 options.inJustDecodeBounds = false;
                 Bitmap bm = BitmapFactory.decodeByteArray(response.image, 0, response.image.length, options);
                 ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
-                Bitmap.createScaledBitmap(bm, MAXIMUM_IMAGE_RESOLUTION, MAXIMUM_IMAGE_RESOLUTION, true).compress(Bitmap.CompressFormat.JPEG, IMAGE_COMPRESSION_SETTING, byteStream);
-                if(byteStream.size() <= MAXIMUM_IMAGE_SIZE) {
-                    mDBManager.insertAlbumImage(mContext, response.album, byteStream.toByteArray());
-                }
+                Bitmap.createScaledBitmap(bm, (int)(options.outWidth * factor), (int)(options.outHeight * factor), true).compress(Bitmap.CompressFormat.JPEG, IMAGE_COMPRESSION_SETTING, byteStream);
+
+                mDBManager.insertAlbumImage(mContext, response.album, byteStream.toByteArray());
             } else {
                 if(response.image.length <= MAXIMUM_IMAGE_SIZE) {
                     mDBManager.insertAlbumImage(mContext, response.album, response.image);
@@ -925,21 +925,19 @@ public class ArtworkManager implements ArtistFetchError, AlbumFetchError {
             fakeAlbum.setMBID(response.track.getTrackAlbumMBID());
 
 
-            Log.v(TAG, "Inserting image for track: " + response.track.getTrackAlbum());
+
             // Rescale them if to big
             BitmapFactory.Options options = new BitmapFactory.Options();
             options.inJustDecodeBounds = true;
             BitmapFactory.decodeByteArray(response.image, 0, response.image.length, options);
             if ((options.outHeight > MAXIMUM_IMAGE_RESOLUTION || options.outWidth > MAXIMUM_IMAGE_RESOLUTION)) {
-                Log.v(TAG, "Image to big, rescaling");
+                float factor = Math.min((float)MAXIMUM_IMAGE_RESOLUTION / (float)options.outHeight, (float)MAXIMUM_IMAGE_RESOLUTION / (float)options.outWidth);
                 options.inJustDecodeBounds = false;
                 Bitmap bm = BitmapFactory.decodeByteArray(response.image, 0, response.image.length, options);
                 ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
-                Bitmap scaledBitmap = Bitmap.createScaledBitmap(bm, MAXIMUM_IMAGE_RESOLUTION, MAXIMUM_IMAGE_RESOLUTION, true);
-                scaledBitmap.compress(Bitmap.CompressFormat.JPEG, IMAGE_COMPRESSION_SETTING, byteStream);
-                if(byteStream.size() <= MAXIMUM_IMAGE_SIZE) {
-                    mDBManager.insertAlbumImage(mContext, fakeAlbum, byteStream.toByteArray());
-                }
+                Bitmap.createScaledBitmap(bm, (int)(options.outWidth * factor), (int)(options.outHeight * factor), true).compress(Bitmap.CompressFormat.JPEG, IMAGE_COMPRESSION_SETTING, byteStream);
+
+                mDBManager.insertAlbumImage(mContext, fakeAlbum, byteStream.toByteArray());
             } else {
                 mDBManager.insertAlbumImage(mContext, fakeAlbum, response.image);
             }
