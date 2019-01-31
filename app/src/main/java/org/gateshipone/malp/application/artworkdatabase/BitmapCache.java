@@ -152,25 +152,28 @@ public class BitmapCache {
     }
 
     /**
+     * Removes an album image from the cache
+     *
+     * @param album Album object to use for cache key
+     */
+    public synchronized void removeAlbumBitmap(MPDAlbum album) {
+        mCache.remove(getAlbumHash(album));
+    }
+
+    /**
      * Private hash method for cache key
      *
      * @param album Album to calculate the key from
      * @return Hash string for cache key
      */
     private String getAlbumHash(MPDAlbum album) {
-        String hashString = "ALBUM_";
         final String albumMBID = album.getMBID();
 
         if (!albumMBID.isEmpty()) {
-            hashString += albumMBID;
-            return hashString;
+            return getAlbumHashMBID(albumMBID);
+        } else {
+            return getAlbumHash(album.getName(), album.getArtistName());
         }
-
-        final String albumArtist = album.getArtistName();
-        final String albumName = album.getName();
-
-        hashString += albumArtist + '_' + albumName;
-        return hashString;
     }
 
     /**
@@ -218,6 +221,15 @@ public class BitmapCache {
         if (bm != null) {
             mCache.put(getArtistHash(artist), bm);
         }
+    }
+
+    /**
+     * Removes an artist image from the cache
+     *
+     * @param artist Artist used as cache key
+     */
+    public synchronized void removeArtistImage(MPDArtist artist) {
+        mCache.remove(getArtistHash(artist));
     }
 
     /**

@@ -249,6 +249,9 @@ public class ArtworkManager implements ArtistFetchError, AlbumFetchError {
         // Clear the old image
         mDBManager.removeAlbumImage(mContext, album);
 
+        // Clear the old image from the cache
+        BitmapCache.getInstance().removeAlbumBitmap(album);
+
         // Reload the image from the internet
         fetchAlbumImage(album);
     }
@@ -266,6 +269,9 @@ public class ArtworkManager implements ArtistFetchError, AlbumFetchError {
 
         // Clear the old image
         mDBManager.removeArtistImage(mContext, artist);
+
+        // Clear the old image from the cache
+        BitmapCache.getInstance().removeArtistImage(artist);
 
         // Reload the image from the internet
         fetchArtistImage(artist);
