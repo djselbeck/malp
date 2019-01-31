@@ -1150,7 +1150,15 @@ public class ArtworkManager implements ArtistFetchError, AlbumFetchError {
 
             // Check if image already there
             try {
-                mDBManager.getAlbumImage(mContext, album);
+                if (album.getMBID().isEmpty()) {
+                    // Check if ID is available (should be the case). If not use the album name for
+                    // lookup.
+                    // FIXME use artistname also
+                    mDBManager.getAlbumImage(mContext, album.getName());
+                } else {
+                    // If id is available use it.
+                    mDBManager.getAlbumImage(mContext, album);
+                }
                 // If this does not throw the exception it already has an image.
             } catch (ImageNotFoundException e) {
                 fetchAlbumImage(album);
