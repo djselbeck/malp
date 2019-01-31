@@ -28,6 +28,7 @@ import android.util.Log;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
+import com.android.volley.VolleyError;
 
 import org.gateshipone.malp.application.artworkdatabase.network.responses.AlbumFetchError;
 import org.gateshipone.malp.application.artworkdatabase.network.responses.AlbumImageResponse;
@@ -131,8 +132,6 @@ public class LastFMManager implements ArtistImageProvider, AlbumImageProvider {
      * @param errorListener Callback to handle a fetch error
      */
     private void getArtistImageURL(String artistName, Response.Listener<JSONObject> listener, Response.ErrorListener errorListener) {
-
-
         String url = LAST_FM_API_URL + "artist.getinfo&artist=" + artistName + "&api_key=" + API_KEY + LAST_FM_FORMAT_JSON;
         Log.v(TAG, url);
 
@@ -198,12 +197,16 @@ public class LastFMManager implements ArtistImageProvider, AlbumImageProvider {
         String albumName = Uri.encode(album.getName());
         String artistName = Uri.encode(album.getArtistName());
 
-        String url = LAST_FM_API_URL + "album.getinfo&album=" + albumName + "&artist=" + artistName + "&api_key=" + API_KEY + LAST_FM_FORMAT_JSON;
-        Log.v(TAG, url);
+        if (albumName.isEmpty() || artistName.isEmpty()) {
+            errorListener.onErrorResponse(new VolleyError("required arguments are empty"));
+        } else {
+            String url = LAST_FM_API_URL + "album.getinfo&album=" + albumName + "&artist=" + artistName + "&api_key=" + API_KEY + LAST_FM_FORMAT_JSON;
+            Log.v(TAG, url);
 
-        MALPJsonObjectRequest jsonObjectRequest = new MALPJsonObjectRequest(Request.Method.GET, url, null, listener, errorListener);
+            MALPJsonObjectRequest jsonObjectRequest = new MALPJsonObjectRequest(Request.Method.GET, url, null, listener, errorListener);
 
-        mRequestQueue.add(jsonObjectRequest);
+            mRequestQueue.add(jsonObjectRequest);
+        }
     }
 
 
