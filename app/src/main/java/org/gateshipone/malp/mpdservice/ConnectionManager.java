@@ -32,8 +32,8 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import org.gateshipone.malp.R;
-import org.gateshipone.malp.application.artworkdatabase.network.artprovider.HTTPAlbumImageProvider;
-import org.gateshipone.malp.application.artworkdatabase.network.artprovider.MPDAlbumImageProvider;
+import org.gateshipone.malp.application.artwork.network.artprovider.HTTPAlbumImageProvider;
+import org.gateshipone.malp.application.artwork.network.artprovider.MPDAlbumImageProvider;
 import org.gateshipone.malp.application.background.BackgroundService;
 import org.gateshipone.malp.mpdservice.handlers.MPDConnectionStateChangeHandler;
 import org.gateshipone.malp.mpdservice.handlers.serverhandler.MPDCommandHandler;

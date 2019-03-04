@@ -29,7 +29,7 @@ import android.widget.AbsListView;
 import android.widget.GridView;
 
 import org.gateshipone.malp.R;
-import org.gateshipone.malp.application.artworkdatabase.ArtworkManager;
+import org.gateshipone.malp.application.artwork.ArtworkManager;
 import org.gateshipone.malp.application.listviewitems.GenericGridItem;
 import org.gateshipone.malp.application.listviewitems.ImageListItem;
 import org.gateshipone.malp.mpdservice.mpdprotocol.mpdobjects.MPDAlbum;

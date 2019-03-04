@@ -60,7 +60,7 @@ import android.widget.ViewSwitcher;
 
 import org.gateshipone.malp.R;
 import org.gateshipone.malp.application.activities.FanartActivity;
-import org.gateshipone.malp.application.artworkdatabase.ArtworkManager;
+import org.gateshipone.malp.application.artwork.ArtworkManager;
 import org.gateshipone.malp.application.background.BackgroundService;
 import org.gateshipone.malp.application.background.BackgroundServiceConnection;
 import org.gateshipone.malp.application.callbacks.OnSaveDialogListener;

@@ -41,10 +41,10 @@ import android.widget.TextView;
 import android.widget.ViewSwitcher;
 
 import org.gateshipone.malp.R;
-import org.gateshipone.malp.application.artworkdatabase.network.responses.FanartFetchError;
-import org.gateshipone.malp.application.artworkdatabase.network.artprovider.FanartTVManager;
-import org.gateshipone.malp.application.artworkdatabase.network.MALPRequestQueue;
-import org.gateshipone.malp.application.artworkdatabase.fanartcache.FanartCacheManager;
+import org.gateshipone.malp.application.artwork.network.responses.FanartFetchError;
+import org.gateshipone.malp.application.artwork.network.artprovider.FanartTVManager;
+import org.gateshipone.malp.application.artwork.network.MALPRequestQueue;
+import org.gateshipone.malp.application.artwork.FanartCacheManager;
 import org.gateshipone.malp.application.utils.ThemeUtils;
 import org.gateshipone.malp.application.utils.VolumeButtonLongClickListener;
 import org.gateshipone.malp.mpdservice.handlers.MPDStatusChangeHandler;

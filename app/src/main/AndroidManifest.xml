@@ -76,7 +76,7 @@
         </activity>
 
         <service
-            android:name=".application.artworkdatabase.BulkDownloadService"
+            android:name=".application.artwork.BulkDownloadService"
             android:exported="false"
             android:process=":downloadProcess" />
 

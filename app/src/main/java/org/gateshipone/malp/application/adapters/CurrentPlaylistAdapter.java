@@ -33,7 +33,7 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 
 import org.gateshipone.malp.R;
-import org.gateshipone.malp.application.artworkdatabase.ArtworkManager;
+import org.gateshipone.malp.application.artwork.ArtworkManager;
 import org.gateshipone.malp.application.listviewitems.FileListItem;
 import org.gateshipone.malp.mpdservice.handlers.MPDConnectionStateChangeHandler;
 import org.gateshipone.malp.mpdservice.handlers.MPDStatusChangeHandler;

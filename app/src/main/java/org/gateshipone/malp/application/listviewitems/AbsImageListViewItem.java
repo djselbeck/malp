@@ -32,7 +32,7 @@ import android.widget.RelativeLayout;
 import android.widget.ViewSwitcher;
 
 import org.gateshipone.malp.application.adapters.ScrollSpeedAdapter;
-import org.gateshipone.malp.application.artworkdatabase.ArtworkManager;
+import org.gateshipone.malp.application.artwork.ArtworkManager;
 import org.gateshipone.malp.application.utils.AsyncLoader;
 import org.gateshipone.malp.mpdservice.mpdprotocol.mpdobjects.MPDGenericItem;
 

@@ -28,8 +28,8 @@ import android.util.Pair;
 
 
 import org.gateshipone.malp.application.adapters.ScrollSpeedAdapter;
-import org.gateshipone.malp.application.artworkdatabase.ArtworkManager;
-import org.gateshipone.malp.application.artworkdatabase.ImageNotFoundException;
+import org.gateshipone.malp.application.artwork.ArtworkManager;
+import org.gateshipone.malp.application.artwork.storage.ImageNotFoundException;
 import org.gateshipone.malp.application.listviewitems.CoverLoadable;
 import org.gateshipone.malp.mpdservice.mpdprotocol.mpdobjects.MPDAlbum;
 import org.gateshipone.malp.mpdservice.mpdprotocol.mpdobjects.MPDArtist;

@@ -25,9 +25,9 @@ package org.gateshipone.malp.application.utils;
 import android.content.Context;
 import android.graphics.Bitmap;
 
-import org.gateshipone.malp.application.artworkdatabase.ArtworkManager;
-import org.gateshipone.malp.application.artworkdatabase.BitmapCache;
-import org.gateshipone.malp.application.artworkdatabase.ImageNotFoundException;
+import org.gateshipone.malp.application.artwork.ArtworkManager;
+import org.gateshipone.malp.application.artwork.BitmapCache;
+import org.gateshipone.malp.application.artwork.storage.ImageNotFoundException;
 import org.gateshipone.malp.mpdservice.mpdprotocol.mpdobjects.MPDAlbum;
 import org.gateshipone.malp.mpdservice.mpdprotocol.mpdobjects.MPDArtist;
 import org.gateshipone.malp.mpdservice.mpdprotocol.mpdobjects.MPDTrack;

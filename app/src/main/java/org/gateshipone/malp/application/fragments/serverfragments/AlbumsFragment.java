@@ -48,7 +48,7 @@ import android.widget.ListView;
 
 import org.gateshipone.malp.R;
 import org.gateshipone.malp.application.adapters.AlbumsAdapter;
-import org.gateshipone.malp.application.artworkdatabase.ArtworkManager;
+import org.gateshipone.malp.application.artwork.ArtworkManager;
 import org.gateshipone.malp.application.callbacks.FABFragmentCallback;
 import org.gateshipone.malp.application.listviewitems.AbsImageListViewItem;
 import org.gateshipone.malp.application.loaders.AlbumsLoader;

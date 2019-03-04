@@ -46,7 +46,7 @@ import java.util.List;
 
 import org.gateshipone.malp.R;
 import org.gateshipone.malp.application.adapters.ArtistsAdapter;
-import org.gateshipone.malp.application.artworkdatabase.ArtworkManager;
+import org.gateshipone.malp.application.artwork.ArtworkManager;
 import org.gateshipone.malp.application.callbacks.FABFragmentCallback;
 import org.gateshipone.malp.application.listviewitems.AbsImageListViewItem;
 import org.gateshipone.malp.application.loaders.ArtistsLoader;

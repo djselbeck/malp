@@ -37,7 +37,7 @@ import android.widget.RemoteViews;
 import org.gateshipone.malp.R;
 import org.gateshipone.malp.application.activities.MainActivity;
 import org.gateshipone.malp.application.activities.SplashActivity;
-import org.gateshipone.malp.application.artworkdatabase.ArtworkManager;
+import org.gateshipone.malp.application.artwork.ArtworkManager;
 import org.gateshipone.malp.application.utils.CoverBitmapLoader;
 import org.gateshipone.malp.mpdservice.mpdprotocol.mpdobjects.MPDCurrentStatus;
 import org.gateshipone.malp.mpdservice.mpdprotocol.mpdobjects.MPDTrack;

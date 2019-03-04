@@ -35,11 +35,11 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import org.gateshipone.malp.R;
-import org.gateshipone.malp.application.artworkdatabase.ArtworkDatabaseManager;
-import org.gateshipone.malp.application.artworkdatabase.ArtworkManager;
-import org.gateshipone.malp.application.artworkdatabase.BulkDownloadService;
-import org.gateshipone.malp.application.artworkdatabase.network.artprovider.HTTPAlbumImageProvider;
-import org.gateshipone.malp.application.artworkdatabase.network.artprovider.MPDAlbumImageProvider;
+import org.gateshipone.malp.application.artwork.storage.ArtworkDatabaseManager;
+import org.gateshipone.malp.application.artwork.ArtworkManager;
+import org.gateshipone.malp.application.artwork.BulkDownloadService;
+import org.gateshipone.malp.application.artwork.network.artprovider.HTTPAlbumImageProvider;
+import org.gateshipone.malp.application.artwork.network.artprovider.MPDAlbumImageProvider;
 import org.gateshipone.malp.application.callbacks.FABFragmentCallback;
 import org.gateshipone.malp.application.utils.ThemeUtils;
 
