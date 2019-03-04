@@ -25,7 +25,6 @@ package org.gateshipone.malp.application.artwork.network.requests;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
-
 import org.gateshipone.malp.BuildConfig;
 
 import java.util.HashMap;
@@ -34,12 +33,12 @@ import java.util.Map;
 public abstract class MALPRequest<T> extends Request<T> {
 
 
-    public MALPRequest(int method, String url, Response.ErrorListener listener) {
+    MALPRequest(int method, String url, Response.ErrorListener listener) {
         super(method, url, listener);
     }
 
     @Override
-    public Map<String, String> getHeaders(){
+    public Map<String, String> getHeaders() {
         Map<String, String> headers = new HashMap<>();
         headers.put("User-agent", "Application MALP/" + BuildConfig.VERSION_NAME + " (https://gitlab.com/gateship-one/malp)");
         return headers;

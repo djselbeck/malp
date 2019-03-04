@@ -20,16 +20,12 @@
  *
  */
 
-package org.gateshipone.malp.application.artwork.network.artprovider;
+package org.gateshipone.malp.application.artwork.network.responses;
 
+import org.gateshipone.malp.application.artwork.network.ArtworkRequestModel;
 
-import com.android.volley.Response;
-
-import org.gateshipone.malp.application.artwork.network.responses.TrackAlbumFetchError;
-import org.gateshipone.malp.application.artwork.network.responses.TrackAlbumImageResponse;
-import org.gateshipone.malp.mpdservice.mpdprotocol.mpdobjects.MPDTrack;
-
-public interface TrackAlbumImageProvider {
-    void fetchAlbumImage(final MPDTrack track, final Response.Listener<TrackAlbumImageResponse> listener, final TrackAlbumFetchError errorListener);
-
+public class ImageResponse {
+    public ArtworkRequestModel model;
+    public String url;
+    public byte[] image;
 }

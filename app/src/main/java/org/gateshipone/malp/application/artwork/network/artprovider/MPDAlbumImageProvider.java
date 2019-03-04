@@ -22,38 +22,55 @@
 
 package org.gateshipone.malp.application.artwork.network.artprovider;
 
+import android.content.Context;
 import android.os.Looper;
-
 import com.android.volley.NetworkResponse;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-
-import org.gateshipone.malp.application.artwork.network.responses.TrackAlbumFetchError;
-import org.gateshipone.malp.application.artwork.network.responses.TrackAlbumImageResponse;
+import org.gateshipone.malp.application.artwork.network.ArtworkRequestModel;
+import org.gateshipone.malp.application.artwork.network.responses.ImageResponse;
 import org.gateshipone.malp.mpdservice.handlers.responsehandler.MPDResponseAlbumArt;
 import org.gateshipone.malp.mpdservice.handlers.serverhandler.MPDQueryHandler;
-import org.gateshipone.malp.mpdservice.mpdprotocol.mpdobjects.MPDTrack;
 
-public class MPDAlbumImageProvider implements TrackAlbumImageProvider {
+public class MPDAlbumImageProvider extends ArtProvider {
 
     /**
      * Singleton instance
      */
-    public static MPDAlbumImageProvider mInstance = new MPDAlbumImageProvider();
+    private static MPDAlbumImageProvider mInstance;
 
     private boolean mActive;
 
     private Looper mResponseLooper;
 
-    @Override
-    public void fetchAlbumImage(MPDTrack track, Response.Listener<TrackAlbumImageResponse> listener, TrackAlbumFetchError errorListener) {
-        if(mResponseLooper == null) {
-            return;
+    public static synchronized MPDAlbumImageProvider getInstance() {
+        if (mInstance == null) {
+            mInstance = new MPDAlbumImageProvider();
         }
-        MPDQueryHandler.getAlbumArtwork(track.getPath(), new AlbumArtResponseListener(mResponseLooper, track, listener, errorListener));
+        return mInstance;
     }
 
-    public void setActive(boolean active) {
+    @Override
+    public void fetchImage(final ArtworkRequestModel model, final Context context,
+                           final Response.Listener<ImageResponse> listener, final ArtFetchError errorListener) {
+        if (mResponseLooper == null) {
+            errorListener.fetchVolleyError(model, context, null);
+            return;
+        }
+        switch (model.getType()) {
+            case ALBUM:
+                // not used for this provider
+                break;
+            case ARTIST:
+                // not used for this provider
+                break;
+            case TRACK:
+                MPDQueryHandler.getAlbumArtwork(model.getPath(), new AlbumArtResponseListener(mResponseLooper, model, context, listener, errorListener));
+                break;
+        }
+    }
+
+    public void setActive(final boolean active) {
         mActive = active;
     }
 
@@ -61,20 +78,25 @@ public class MPDAlbumImageProvider implements TrackAlbumImageProvider {
         return mActive;
     }
 
-    public void setResponseLooper(Looper looper) {
+    public void setResponseLooper(final Looper looper) {
         mResponseLooper = looper;
     }
 
-
     private static class AlbumArtResponseListener extends MPDResponseAlbumArt {
 
-        private MPDTrack mTrack;
-        private Response.Listener<TrackAlbumImageResponse> mListener;
-        private TrackAlbumFetchError mErrorListener;
+        private final ArtworkRequestModel mModel;
 
-        public AlbumArtResponseListener(Looper looper, MPDTrack track, Response.Listener<TrackAlbumImageResponse> listener, TrackAlbumFetchError errorListener) {
+        private final Response.Listener<ImageResponse> mListener;
+
+        private final ArtFetchError mErrorListener;
+
+        private final Context mContext;
+
+        AlbumArtResponseListener(final Looper looper, final ArtworkRequestModel model, final Context context,
+                                 final Response.Listener<ImageResponse> listener, final ArtFetchError errorListener) {
             super(looper);
-            mTrack = track;
+            mModel = model;
+            mContext = context;
             mListener = listener;
             mErrorListener = errorListener;
         }
@@ -82,13 +104,13 @@ public class MPDAlbumImageProvider implements TrackAlbumImageProvider {
         @Override
         public void handleAlbumArt(byte[] artworkData, String url) {
             if (artworkData != null) {
-                TrackAlbumImageResponse response = new TrackAlbumImageResponse();
-                response.track = mTrack;
+                ImageResponse response = new ImageResponse();
+                response.model = mModel;
                 response.image = artworkData;
                 response.url = url;
                 mListener.onResponse(response);
             } else {
-                mErrorListener.fetchVolleyError(mTrack, new VolleyError(new NetworkResponse(404,null,true, 0, null)));
+                mErrorListener.fetchVolleyError(mModel, mContext, new VolleyError(new NetworkResponse(404, null, true, 0, null)));
             }
         }
     }

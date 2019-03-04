@@ -277,4 +277,5 @@
     <string name="preference_npv_show_playlist_text">Zeige die Wiedergabeliste wenn während der Wiedergabe M.A.L.P. über ein Widget oder Benachrichtigung gestartet wird</string>
     <string name="action_add_group">Hinzufügen</string>
     <string name="action_add_url_playlist">Playlist-URL hinzufügen</string>
+    <string name="downloader_notification_initialize">Initialisiere Download</string>
 </resources>

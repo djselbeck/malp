@@ -27,19 +27,18 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import androidx.appcompat.app.AlertDialog;
-import androidx.preference.Preference;
-import androidx.preference.PreferenceFragmentCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
+import androidx.appcompat.app.AlertDialog;
+import androidx.preference.Preference;
+import androidx.preference.PreferenceFragmentCompat;
 import org.gateshipone.malp.R;
-import org.gateshipone.malp.application.artwork.storage.ArtworkDatabaseManager;
 import org.gateshipone.malp.application.artwork.ArtworkManager;
 import org.gateshipone.malp.application.artwork.BulkDownloadService;
 import org.gateshipone.malp.application.artwork.network.artprovider.HTTPAlbumImageProvider;
 import org.gateshipone.malp.application.artwork.network.artprovider.MPDAlbumImageProvider;
+import org.gateshipone.malp.application.artwork.storage.ArtworkDatabaseManager;
 import org.gateshipone.malp.application.callbacks.FABFragmentCallback;
 import org.gateshipone.malp.application.utils.ThemeUtils;
 
@@ -103,7 +102,7 @@ public class ArtworkSettingsFragment extends PreferenceFragmentCompat implements
                 serviceIntent.putExtra(BulkDownloadService.BUNDLE_KEY_WIFI_ONLY, sharedPref.getBoolean(getString(R.string.pref_download_wifi_only_key),
                         getResources().getBoolean(R.bool.pref_download_wifi_default)));
                 serviceIntent.putExtra(BulkDownloadService.BUNDLE_KEY_HTTP_COVER_REGEX, HTTPAlbumImageProvider.getInstance(getContext().getApplicationContext()).getRegex());
-                serviceIntent.putExtra(BulkDownloadService.BUNDLE_KEY_MPD_COVER_ENABLED, MPDAlbumImageProvider.mInstance.getActive());
+                serviceIntent.putExtra(BulkDownloadService.BUNDLE_KEY_MPD_COVER_ENABLED, MPDAlbumImageProvider.getInstance().getActive());
                 getActivity().startService(serviceIntent);
             });
             AlertDialog dialog = builder.create();
@@ -195,7 +194,7 @@ public class ArtworkSettingsFragment extends PreferenceFragmentCompat implements
 
             ArtworkManager artworkManager = ArtworkManager.getInstance(getContext().getApplicationContext());
 
-            artworkManager.cancelAllRequests();
+            artworkManager.cancelAllRequests(getContext().getApplicationContext());
 
             if (key.equals(albumProviderKey)) {
                 artworkManager.setAlbumProvider(sharedPreferences.getString(albumProviderKey, getString(R.string.pref_artwork_provider_album_default)));

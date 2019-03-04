@@ -23,19 +23,18 @@ package org.gateshipone.malp.application.artwork.network.artprovider;
 
 import android.content.Context;
 import android.net.Uri;
-
+import android.util.Log;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
-
-import org.gateshipone.malp.application.artwork.network.responses.ArtistFetchError;
-import org.gateshipone.malp.application.artwork.network.responses.ArtistImageResponse;
-import org.gateshipone.malp.application.artwork.network.responses.FanartFetchError;
-import org.gateshipone.malp.application.artwork.network.requests.ArtistImageByteRequest;
-import org.gateshipone.malp.application.artwork.network.requests.FanartImageRequest;
-import org.gateshipone.malp.application.artwork.network.requests.MALPJsonObjectRequest;
+import org.gateshipone.malp.application.artwork.network.ArtworkRequestModel;
 import org.gateshipone.malp.application.artwork.network.MALPRequestQueue;
+import org.gateshipone.malp.application.artwork.network.requests.FanartImageRequest;
+import org.gateshipone.malp.application.artwork.network.requests.MALPByteRequest;
+import org.gateshipone.malp.application.artwork.network.requests.MALPJsonObjectRequest;
+import org.gateshipone.malp.application.artwork.network.responses.FanartFetchError;
 import org.gateshipone.malp.application.artwork.network.responses.FanartResponse;
+import org.gateshipone.malp.application.artwork.network.responses.ImageResponse;
 import org.gateshipone.malp.application.utils.FormatHelper;
 import org.gateshipone.malp.mpdservice.mpdprotocol.mpdobjects.MPDArtist;
 import org.gateshipone.malp.mpdservice.mpdprotocol.mpdobjects.MPDTrack;
@@ -50,7 +49,7 @@ import java.util.List;
  * Artwork downloading class for http://fanart.tv. This class provides an interface
  * to download artist images and artist fanart images.
  */
-public class FanartTVProvider implements ArtistImageProvider, FanartProvider {
+public class FanartTVProvider extends ArtProvider implements FanartProvider {
     private static final String TAG = FanartTVProvider.class.getSimpleName();
 
     /**
@@ -110,20 +109,54 @@ public class FanartTVProvider implements ArtistImageProvider, FanartProvider {
         return mInstance;
     }
 
+    @Override
+    public void fetchImage(final ArtworkRequestModel model, final Context context,
+                           final Response.Listener<ImageResponse> listener, final ArtFetchError errorListener) {
+        switch (model.getType()) {
+            case ALBUM:
+                // not used for this provider
+                break;
+            case ARTIST:
+                tryArtistMBID(0, model, context, listener, errorListener);
+                break;
+        }
+    }
+
     /**
-     * Fetch an image for an given {@link MPDArtist}. Make sure to provide response and error listener.
-     * @param artist Artist to try to get an image for.
-     * @param listener ResponseListener that reacts on successful retrieval of an image.
-     * @param errorListener Error listener that is called when an error occurs.
+     * Recursive method to try all available MBIDs from an {@link MPDArtist}
+     *
+     * @param mbidIndex     Index of the available MBIDs for the given artists
+     * @param model         {@link ArtworkRequestModel} to check for images
+     * @param listener      Response listener called when an image is found
+     * @param errorListener Error listener called when an error occurs during communication
      */
-    public void fetchArtistImage(final MPDArtist artist, final Response.Listener<ArtistImageResponse> listener, final ArtistFetchError errorListener) {
-        // Check if the artist already has MBIDs set.
-        if (artist.getMBIDCount() > 0) {
-            // Try to use the first MBID set for this artist
-            tryArtistMBID(0, artist, listener, errorListener);
+    private void tryArtistMBID(final int mbidIndex, final ArtworkRequestModel model, final Context context,
+                               final Response.Listener<ImageResponse> listener, final ArtFetchError errorListener) {
+        final String mbid = model.getMBID(mbidIndex);
+
+        // Check if recursive call ends here.
+        if (mbid != null) {
+            // Query fanart.tv for this MBID
+            getArtistImageURL(mbid, response -> {
+                JSONArray thumbImages;
+                try {
+                    thumbImages = response.getJSONArray("artistthumb");
+
+                    final JSONObject firstThumbImage = thumbImages.getJSONObject(0);
+
+                    getArtistImage(firstThumbImage.getString("url"), model, listener, error -> {
+                        // If we have multiple artist mbids try the next one
+                        tryArtistMBID(mbidIndex + 1, model, context, listener, errorListener);
+                    });
+
+                } catch (JSONException e) {
+                    // If we have multiple artist mbids try the next one
+                    tryArtistMBID(mbidIndex + 1, model, context, listener, errorListener);
+                }
+            }, error -> errorListener.fetchVolleyError(model, context, error));
         } else {
             // If no MBID is set at this point try to resolve one with musicbrainz database.
-            String artistURLName = Uri.encode(artist.getArtistName().replaceAll("/", " "));
+            String artistURLName = model.getEncodedArtistName();
 
             // Get the list of artists "matching" the name.
             getArtists(artistURLName, response -> {
@@ -137,119 +170,88 @@ public class FanartTVProvider implements ArtistImageProvider, FanartProvider {
                         final String artistMBID = artistObj.getString("id");
 
                         // Try to get information for this artist from fanart.tv
-                        queryArtistMBIDonFanartTV(artistMBID, response1 -> {
-                            JSONArray thumbImages = null;
+                        getArtistImageURL(artistMBID, response1 -> {
+                            JSONArray thumbImages;
                             try {
                                 thumbImages = response1.getJSONArray("artistthumb");
 
                                 JSONObject firstThumbImage = thumbImages.getJSONObject(0);
 
                                 // Get the image for the artist.
-                                getArtistImage(firstThumbImage.getString("url"), artist, listener, error -> errorListener.fetchVolleyError(artist, error));
+                                getArtistImage(firstThumbImage.getString("url"), model, listener, error -> errorListener.fetchVolleyError(model, context, error));
 
                             } catch (JSONException e) {
-                                errorListener.fetchJSONException(artist, e);
+                                errorListener.fetchJSONException(model, context, e);
                             }
-                        }, error -> errorListener.fetchVolleyError(artist, error));
+                        }, error -> errorListener.fetchVolleyError(model, context, error));
                     }
                 } catch (JSONException e) {
-                    errorListener.fetchJSONException(artist, e);
+                    errorListener.fetchJSONException(model, context, e);
                 }
-            }, error -> errorListener.fetchVolleyError(artist, error));
-        }
-    }
-
-    /**
-     * Recursive method to try all available MBIDs from an {@link MPDArtist}
-     * @param mbidIndex Index of the available MBIDs for the given artists
-     * @param artist {@link MPDArtist} to check for images
-     * @param listener Response listener called when an image is found
-     * @param errorListener Error listener called when an error occurs during communication
-     */
-    private void tryArtistMBID(final int mbidIndex, final MPDArtist artist, final Response.Listener<ArtistImageResponse> listener, final ArtistFetchError errorListener) {
-        // Check if recursive call ends here.
-        if (mbidIndex < artist.getMBIDCount()) {
-            // Query fanart.tv for this MBID
-            queryArtistMBIDonFanartTV(artist.getMBID(0), response -> {
-                JSONArray thumbImages = null;
-                try {
-                    thumbImages = response.getJSONArray("artistthumb");
-
-                    JSONObject firstThumbImage = thumbImages.getJSONObject(0);
-                    getArtistImage(firstThumbImage.getString("url"), artist, listener, error -> {
-                        // If we have multiple artist mbids try the next one
-                        if (mbidIndex + 1 < artist.getMBIDCount()) {
-                            tryArtistMBID(mbidIndex + 1, artist, listener, errorListener);
-                        } else {
-                            // All tried
-                            errorListener.fetchVolleyError(artist, null);
-                        }
-                    });
-
-                } catch (JSONException e) {
-                    // If we have multiple artist mbids try the next one
-                    if (mbidIndex + 1 < artist.getMBIDCount()) {
-                        tryArtistMBID(mbidIndex + 1, artist, listener, errorListener);
-                    } else {
-                        // All tried
-                        errorListener.fetchJSONException(artist, e);
-                    }
-                }
-            }, error -> errorListener.fetchVolleyError(artist, error));
+            }, error -> errorListener.fetchVolleyError(model, context, error));
         }
     }
 
     /**
      * Gets a list of possible artists from Musicbrainz database.
-     * @param artistName Name of the artist to search for
-     * @param listener Response listener to handle the artist list
+     *
+     * @param artistName    Name of the artist to search for
+     * @param listener      Response listener to handle the artist list
      * @param errorListener Error listener
      */
     private void getArtists(String artistName, Response.Listener<JSONObject> listener, Response.ErrorListener errorListener) {
-        if ( artistName == null || artistName.isEmpty() ) {
-            // Cancel the nonsense here
-            return;
-        }
 
-        String queryArtist = FormatHelper.escapeSpecialCharsLucene(artistName);
-        String url = MUSICBRAINZ_API_URL + "/" + "artist/?query=artist:" + queryArtist + MUSICBRAINZ_LIMIT_RESULT + MUSICBRAINZ_FORMAT_JSON;
-        MALPJsonObjectRequest jsonObjectRequest = new MALPJsonObjectRequest(Request.Method.GET, url, null, listener, errorListener);
+        Log.v(FanartTVProvider.class.getSimpleName(), artistName);
+
+        String queryArtistname = FormatHelper.escapeSpecialCharsLucene(artistName);
+
+        String url = MUSICBRAINZ_API_URL + "/" + "artist/?query=artist:" + queryArtistname + MUSICBRAINZ_LIMIT_RESULT + MUSICBRAINZ_FORMAT_JSON;
+
+        MALPJsonObjectRequest jsonObjectRequest = new MALPJsonObjectRequest(url, null, listener, errorListener);
 
         mRequestQueue.add(jsonObjectRequest);
     }
 
     /**
-     * Retrieves all available information for an artist with an MBID of fanart.tv
-     * @param artistMBID Artists MBID to query
-     * @param listener Response listener to handle the artists information from fanart.tv
+     * Retrieves all available information (Artist image url, fanart url, ...) for an artist with an MBID of fanart.tv
+     *
+     * @param artistMBID    Artists MBID to query
+     * @param listener      Response listener to handle the artists information from fanart.tv
      * @param errorListener Error listener
      */
-    private void queryArtistMBIDonFanartTV(String artistMBID, Response.Listener<JSONObject> listener, Response.ErrorListener errorListener) {
+    private void getArtistImageURL(final String artistMBID, final Response.Listener<JSONObject> listener, final Response.ErrorListener errorListener) {
+
+        Log.v(FanartTVProvider.class.getSimpleName(), artistMBID);
 
         String url = FANART_TV_API_URL + "/" + artistMBID + "?api_key=" + API_KEY;
 
-        MALPJsonObjectRequest jsonObjectRequest = new MALPJsonObjectRequest(Request.Method.GET, url, null, listener, errorListener);
+        MALPJsonObjectRequest jsonObjectRequest = new MALPJsonObjectRequest(url, null, listener, errorListener);
 
         mRequestQueue.add(jsonObjectRequest);
     }
 
     /**
      * Raw download for an image-
-     * @param url Final image URL to download
-     * @param artist Artist associated with the image to download
-     * @param listener Response listener to receive the image as a byte array
+     *
+     * @param url           Final image URL to download
+     * @param model         Artist associated with the image to download
+     * @param listener      Response listener to receive the image as a byte array
      * @param errorListener Error listener
      */
-    private void getArtistImage(String url, MPDArtist artist, Response.Listener<ArtistImageResponse> listener, Response.ErrorListener errorListener) {
-        Request<ArtistImageResponse> byteResponse = new ArtistImageByteRequest(url, artist, listener, errorListener);
+    private void getArtistImage(final String url, final ArtworkRequestModel model,
+                                final Response.Listener<ImageResponse> listener, final Response.ErrorListener errorListener) {
+        Log.v(FanartTVProvider.class.getSimpleName(), url);
+
+        Request<ImageResponse> byteResponse = new MALPByteRequest(model, url, listener, errorListener);
 
         mRequestQueue.add(byteResponse);
     }
 
     /**
      * Wrapper to get an artist out of an {@link MPDTrack}.
-     * @param track Track to get artist information for
-     * @param listener Response listener
+     *
+     * @param track         Track to get artist information for
+     * @param listener      Response listener
      * @param errorListener Error listener
      */
     @Override
@@ -286,14 +288,15 @@ public class FanartTVProvider implements ArtistImageProvider, FanartProvider {
 
     /**
      * Retrieves a list of fanart image urls for the given MBID.
-     * @param mbid MBID to get fanart images for.
-     * @param listener Response listener to handle the URL list retrieved by this method
+     *
+     * @param mbid          MBID to get fanart images for.
+     * @param listener      Response listener to handle the URL list retrieved by this method
      * @param errorListener Error listener
      */
     @Override
     public void getArtistFanartURLs(String mbid, final Response.Listener<List<String>> listener, final FanartFetchError errorListener) {
-        queryArtistMBIDonFanartTV(mbid, response -> {
-            JSONArray backgroundImages = null;
+        getArtistImageURL(mbid, response -> {
+            JSONArray backgroundImages;
             try {
                 backgroundImages = response.getJSONArray("artistbackground");
                 if (backgroundImages.length() == 0) {
@@ -307,16 +310,17 @@ public class FanartTVProvider implements ArtistImageProvider, FanartProvider {
                     listener.onResponse(urls);
                 }
             } catch (JSONException exception) {
-
+                errorListener.imageListFetchError();
             }
-        }, Throwable::printStackTrace);
+        }, error -> errorListener.imageListFetchError());
     }
 
     /**
      * Raw image download to download fanart images
-     * @param track Track for the associated image
-     * @param url URL to download
-     * @param listener Listener to handle the downloaded image as a byte response.
+     *
+     * @param track         Track for the associated image
+     * @param url           URL to download
+     * @param listener      Listener to handle the downloaded image as a byte response.
      * @param errorListener Error listener
      */
     @Override
@@ -325,6 +329,4 @@ public class FanartTVProvider implements ArtistImageProvider, FanartProvider {
 
         mRequestQueue.add(byteResponse);
     }
-
-
 }

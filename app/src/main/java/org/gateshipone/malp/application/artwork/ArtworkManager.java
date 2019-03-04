@@ -24,55 +24,81 @@ package org.gateshipone.malp.application.artwork;
 
 import android.content.*;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.ConnectivityManager;
-import android.os.AsyncTask;
 import android.os.Looper;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import com.android.volley.NetworkResponse;
 import com.android.volley.VolleyError;
 import org.gateshipone.malp.R;
+import org.gateshipone.malp.application.artwork.network.ArtworkRequestModel;
+import org.gateshipone.malp.application.artwork.network.InsertImageTask;
 import org.gateshipone.malp.application.artwork.network.MALPRequestQueue;
 import org.gateshipone.malp.application.artwork.network.artprovider.*;
-import org.gateshipone.malp.application.artwork.network.responses.*;
+import org.gateshipone.malp.application.artwork.network.responses.ImageResponse;
 import org.gateshipone.malp.application.artwork.storage.ArtworkDatabaseManager;
 import org.gateshipone.malp.application.artwork.storage.ImageNotFoundException;
 import org.gateshipone.malp.application.utils.BitmapUtils;
-import org.gateshipone.malp.application.utils.FormatHelper;
 import org.gateshipone.malp.application.utils.NetworkUtils;
-import org.gateshipone.malp.mpdservice.handlers.responsehandler.MPDResponseAlbumList;
-import org.gateshipone.malp.mpdservice.handlers.responsehandler.MPDResponseArtistList;
-import org.gateshipone.malp.mpdservice.handlers.responsehandler.MPDResponseFileList;
-import org.gateshipone.malp.mpdservice.handlers.serverhandler.MPDQueryHandler;
 import org.gateshipone.malp.mpdservice.mpdprotocol.mpdobjects.MPDAlbum;
 import org.gateshipone.malp.mpdservice.mpdprotocol.mpdobjects.MPDArtist;
-import org.gateshipone.malp.mpdservice.mpdprotocol.mpdobjects.MPDFileEntry;
 import org.gateshipone.malp.mpdservice.mpdprotocol.mpdobjects.MPDTrack;
 import org.json.JSONException;
 
-import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 
-public class ArtworkManager implements ArtistFetchError, AlbumFetchError {
+public class ArtworkManager implements ArtProvider.ArtFetchError, InsertImageTask.ImageSavedCallback {
     private static final String TAG = ArtworkManager.class.getSimpleName();
 
     /**
-     * Maximmum size for either x or y of an image
+     * Interface used for adapters to be notified about data set changes
      */
-    private static final int MAXIMUM_IMAGE_RESOLUTION = 750;
+    public interface onNewArtistImageListener {
+        void newArtistImage(MPDArtist artist);
+    }
 
     /**
-     * Compression level if images are rescaled
+     * Interface used for adapters to be notified about data set changes
      */
-    private static final int IMAGE_COMPRESSION_SETTING = 80;
+    public interface onNewAlbumImageListener {
+        void newAlbumImage(MPDAlbum album);
+    }
+
 
     /**
-     * Maximum size of an image blob to insert in SQLite database. (1MB)
+     * Broadcast constants
      */
-    private static final int MAXIMUM_IMAGE_SIZE = 1024 * 1024;
+    public static final String ACTION_NEW_ARTWORK_READY = "org.gateshipone.malp.action_new_artwork_ready";
+
+    public static final String INTENT_EXTRA_KEY_ALBUM_NAME = "org.gateshipone.malp.extra.album_name";
+
+    private static final String INTENT_EXTRA_KEY_ARTIST_MBID = "org.gateshipone.malp.extra.artist_mbid";
+
+    private static final String INTENT_EXTRA_KEY_ARTIST_NAME = "org.gateshipone.malp.extra.artist_name";
+
+    private static final String INTENT_EXTRA_KEY_ALBUM_MBID = "org.gateshipone.malp.extra.album_mbid";
+
+    /**
+     * Private static singleton instance that can be used by other classes via the
+     * getInstance method.
+     */
+    private static ArtworkManager mInstance;
+
+    /**
+     * Settings string which artist download provider to use
+     */
+    private String mArtistProvider;
+
+    /**
+     * Settings string which album download provider to use
+     */
+    private String mAlbumProvider;
+
+    /**
+     * Settings value if artwork download is only allowed via wifi/wired connection.
+     */
+    private boolean mWifiOnly;
+
 
     /**
      * Manager for the SQLite database handling
@@ -90,89 +116,11 @@ public class ArtworkManager implements ArtistFetchError, AlbumFetchError {
     private final ArrayList<onNewAlbumImageListener> mAlbumListeners;
 
     /**
-     * Private static singleton instance that can be used by other classes via the
-     * getInstance method.
-     */
-    private static ArtworkManager mInstance;
-
-    /**
      * Private {@link Context} used for all kinds of things like Broadcasts.
      * It is using the ApplicationContext so it should be safe against
      * memory leaks.
      */
     private Context mContext;
-
-    /**
-     * Lists of {@link MPDAlbum} objects used for bulk downloading.
-     */
-    private final List<MPDAlbum> mAlbumList = new ArrayList<>();
-
-    /**
-     * Lists of {@link MPDArtist} objects used for bulk downloading.
-     */
-    private final List<MPDArtist> mArtistList = new ArrayList<>();
-
-    /**
-     * Lists of {@link MPDTrack} objects used for bulk downloading.
-     */
-    private final List<MPDTrack> mTrackList = new ArrayList<>();
-
-    /**
-     * Current {@link MPDAlbum} handled by the bulk downloading
-     */
-    private MPDAlbum mCurrentBulkAlbum = null;
-
-    /**
-     * Current {@link MPDArtist} handled by the bulk downloading
-     */
-    private MPDArtist mCurrentBulkArtist = null;
-
-    /**
-     * Current {@link MPDTrack} handled by the bulk downloading
-     */
-    private MPDTrack mCurrentBulkTrack = null;
-
-    /**
-     * Callback for the bulkdownload observer (s. {@link BulkDownloadService})
-     */
-    private BulkLoadingProgressCallback mBulkProgressCallback;
-
-    /**
-     * Settings string which artist download provider to use
-     */
-    private String mArtistProvider;
-
-    /**
-     * Settings string which album download provider to use
-     */
-    private String mAlbumProvider;
-
-    /**
-     * Settings value if artwork download is only allowed via wifi/wired connection.
-     */
-    private boolean mWifiOnly;
-
-    /**
-     * Set when the list of albums for the bulk loading is ready to be processed
-     */
-    private boolean mBulkLoadAlbumsReady;
-
-    /**
-     * Set when the list of artists for the bulk loading is ready to be processed
-     */
-    private boolean mBulkLoadArtistsReady;
-
-
-    /*
-     * Broadcast constants
-     */
-    public static final String ACTION_NEW_ARTWORK_READY = "org.gateshipone.malp.action_new_artwork_ready";
-
-    public static final String INTENT_EXTRA_KEY_ARTIST_MBID = "org.gateshipone.malp.extra.artist_mbid";
-    public static final String INTENT_EXTRA_KEY_ARTIST_NAME = "org.gateshipone.malp.extra.artist_name";
-
-    public static final String INTENT_EXTRA_KEY_ALBUM_MBID = "org.gateshipone.malp.extra.album_mbid";
-    public static final String INTENT_EXTRA_KEY_ALBUM_NAME = "org.gateshipone.malp.extra.album_name";
 
     private ArtworkManager(Context context) {
 
@@ -180,7 +128,6 @@ public class ArtworkManager implements ArtistFetchError, AlbumFetchError {
 
         mArtistListeners = new ArrayList<>();
         mAlbumListeners = new ArrayList<>();
-
 
         mContext = context.getApplicationContext();
 
@@ -194,7 +141,7 @@ public class ArtworkManager implements ArtistFetchError, AlbumFetchError {
         mAlbumProvider = sharedPref.getString(context.getString(R.string.pref_album_provider_key), context.getString(R.string.pref_artwork_provider_album_default));
         mWifiOnly = sharedPref.getBoolean(context.getString(R.string.pref_download_wifi_only_key), context.getResources().getBoolean(R.bool.pref_download_wifi_default));
 
-        MPDAlbumImageProvider.mInstance.setResponseLooper(Looper.getMainLooper());
+        MPDAlbumImageProvider.getInstance().setResponseLooper(Looper.getMainLooper());
     }
 
     public static synchronized ArtworkManager getInstance(Context context) {
@@ -240,7 +187,7 @@ public class ArtworkManager implements ArtistFetchError, AlbumFetchError {
         BitmapCache.getInstance().removeAlbumBitmap(album);
 
         // Reload the image from the internet
-        fetchAlbumImage(album);
+        fetchImage(album);
     }
 
 
@@ -261,26 +208,19 @@ public class ArtworkManager implements ArtistFetchError, AlbumFetchError {
         BitmapCache.getInstance().removeArtistImage(artist);
 
         // Reload the image from the internet
-        fetchArtistImage(artist);
+        fetchImage(artist);
     }
 
-    /**
-     * Returns an artist image for the given artist.
-     *
-     * @param artist {@link MPDArtist} to get the image for-
-     * @return The image if found or null if it is not available and has been tried to download before.
-     * @throws ImageNotFoundException If the image is not found and was not searched before.
-     */
-    public Bitmap getArtistImage(final MPDArtist artist, int width, int height, boolean skipCache) throws ImageNotFoundException {
+    public Bitmap getImage(final MPDArtist artist, int width, int height, boolean skipCache) throws ImageNotFoundException {
         if (null == artist) {
             return null;
         }
 
         if (!skipCache) {
             // Try cache first
-            Bitmap cacheBitmap = BitmapCache.getInstance().requestArtistImage(artist);
-            if (cacheBitmap != null && width <= cacheBitmap.getWidth() && height <= cacheBitmap.getWidth()) {
-                return cacheBitmap;
+            Bitmap cacheImage = BitmapCache.getInstance().requestArtistImage(artist);
+            if (cacheImage != null && width <= cacheImage.getWidth() && height <= cacheImage.getWidth()) {
+                return cacheImage;
             }
         }
 
@@ -296,14 +236,7 @@ public class ArtworkManager implements ArtistFetchError, AlbumFetchError {
         return null;
     }
 
-    /**
-     * Returns an album image for the given track.
-     *
-     * @param track {@link MPDTrack} to get the album image for.
-     * @return The image if found or null if it is not available and has been tried to download before.
-     * @throws ImageNotFoundException If the image is not found and was not searched before.
-     */
-    public Bitmap getAlbumImageForTrack(final MPDTrack track, int width, int height, boolean skipCache) throws ImageNotFoundException {
+    public Bitmap getImage(final MPDTrack track, int width, int height, boolean skipCache) throws ImageNotFoundException {
         if (null == track) {
             return null;
         }
@@ -328,14 +261,7 @@ public class ArtworkManager implements ArtistFetchError, AlbumFetchError {
         return null;
     }
 
-    /**
-     * Returns an album image for the given {@link MPDAlbum}
-     *
-     * @param album {@link MPDAlbum} to get the image for.
-     * @return The image if found or null if it is not available and has been tried to download before.
-     * @throws ImageNotFoundException If the image is not found and was not searched before.
-     */
-    public Bitmap getAlbumImage(final MPDAlbum album, int width, int height, boolean skipCache) throws ImageNotFoundException {
+    public Bitmap getImage(final MPDAlbum album, int width, int height, boolean skipCache) throws ImageNotFoundException {
         if (null == album) {
             return null;
         }
@@ -363,103 +289,103 @@ public class ArtworkManager implements ArtistFetchError, AlbumFetchError {
     /**
      * Starts an asynchronous fetch for the image of the given artist.
      *
-     * @param artist Artist to fetch an image for.
+     * @param artist             Artist to fetch an image for.
+     * @param imageSavedCallback Callback if an image was saved.
+     * @param errorCallback      Callback if an error occured.
      */
-    public void fetchArtistImage(final MPDArtist artist) {
+    void fetchImage(final MPDArtist artist,
+                    final InsertImageTask.ImageSavedCallback imageSavedCallback,
+                    final ArtProvider.ArtFetchError errorCallback) {
         if (!NetworkUtils.isDownloadAllowed(mContext, mWifiOnly)) {
             return;
         }
 
+        final ArtworkRequestModel requestModel = new ArtworkRequestModel(artist);
+
         if (mArtistProvider.equals(mContext.getString(R.string.pref_artwork_provider_lastfm_key))) {
-            LastFMProvider.getInstance(mContext).fetchArtistImage(artist, response -> new InsertArtistImageTask().execute(response), this);
+            LastFMProvider.getInstance(mContext).fetchImage(requestModel, mContext,
+                    response -> new InsertImageTask(mContext, imageSavedCallback).execute(response),
+                    errorCallback);
         } else if (mArtistProvider.equals(mContext.getString(R.string.pref_artwork_provider_fanarttv_key))) {
-            FanartTVProvider.getInstance(mContext).fetchArtistImage(artist, response -> new InsertArtistImageTask().execute(response), this);
+            FanartTVProvider.getInstance(mContext).fetchImage(requestModel, mContext,
+                    response -> new InsertImageTask(mContext, imageSavedCallback).execute(response),
+                    errorCallback);
         }
     }
 
     /**
-     * Starts an asynchronous fetch for the image of the given album
+     * Starts an asynchronous fetch for the image of the given artist.
+     * This method will use internal callbacks.
+     *
+     * @param artist Artist to fetch an image for.
+     */
+    public void fetchImage(final MPDArtist artist) {
+        fetchImage(artist, this, this);
+    }
+
+    /**
+     * Starts an asynchronous fetch for the image of the given album.
+     *
+     * @param album              Album to fetch an image for.
+     * @param imageSavedCallback Callback if an image was saved.
+     * @param errorCallback      Callback if an error occured.
+     */
+    void fetchImage(final MPDAlbum album,
+                    final InsertImageTask.ImageSavedCallback imageSavedCallback,
+                    final ArtProvider.ArtFetchError errorCallback) {
+        if (!NetworkUtils.isDownloadAllowed(mContext, mWifiOnly)) {
+            return;
+        }
+
+        ArtworkRequestModel requestModel = new ArtworkRequestModel(album);
+
+        if (mAlbumProvider.equals(mContext.getString(R.string.pref_artwork_provider_musicbrainz_key))) {
+            MusicBrainzProvider.getInstance(mContext).fetchImage(requestModel, mContext,
+                    response -> new InsertImageTask(mContext, imageSavedCallback).execute(response),
+                    errorCallback);
+        } else if (mAlbumProvider.equals(mContext.getString(R.string.pref_artwork_provider_lastfm_key))) {
+            LastFMProvider.getInstance(mContext).fetchImage(requestModel, mContext,
+                    response -> new InsertImageTask(mContext, imageSavedCallback).execute(response),
+                    errorCallback);
+        }
+    }
+
+    /**
+     * Starts an asynchronous fetch for the image of the given album.
+     * This method will use internal callbacks.
      *
      * @param album Album to fetch an image for.
      */
-    public void fetchAlbumImage(final MPDAlbum album) {
-        if (!NetworkUtils.isDownloadAllowed(mContext, mWifiOnly)) {
-            return;
-        }
-
-        if (mAlbumProvider.equals(mContext.getString(R.string.pref_artwork_provider_musicbrainz_key))) {
-            MusicBrainzProvider.getInstance(mContext).fetchAlbumImage(album, response -> new InsertAlbumImageTask().execute(response), this);
-        } else if (mAlbumProvider.equals(mContext.getString(R.string.pref_artwork_provider_lastfm_key))) {
-            LastFMProvider.getInstance(mContext).fetchAlbumImage(album, response -> new InsertAlbumImageTask().execute(response), this);
-        }
+    public void fetchImage(final MPDAlbum album) {
+        fetchImage(album, this, this);
     }
 
-    /**
-     * Starts an asynchronous fetch for the image of the given album
-     *
-     * @param track Track to be used for image fetching
-     */
-    public void fetchAlbumImage(final MPDTrack track) {
-        // Create a dummy album
-        MPDAlbum album = new MPDAlbum(track.getTrackAlbum());
-        album.setMBID(track.getTrackAlbumMBID());
-        album.setArtistName(track.getTrackAlbumArtist());
+    public void fetchImage(final MPDTrack track) {
+        fetchImage(track, this, this);
+    }
 
-        // Check if MPD cover transfer is activated
-        if (MPDAlbumImageProvider.mInstance.getActive()) {
-            MPDAlbumImageProvider.mInstance.fetchAlbumImage(track, response -> new InsertTrackAlbumImageTask().execute(response), new TrackAlbumFetchError() {
-                @Override
-                public void fetchJSONException(MPDTrack track, JSONException exception) {
+    public void fetchImage(final MPDTrack track,
+                           final InsertImageTask.ImageSavedCallback imageSavedCallback,
+                           final ArtProvider.ArtFetchError errorCallback) {
+        final ArtworkRequestModel requestModel = new ArtworkRequestModel(track);
 
-                }
-
-                @Override
-                public void fetchVolleyError(MPDTrack track, VolleyError error) {
-                    if (error.networkResponse.statusCode == 404) {
-                        // If bulk downloading is running, enqueue it as a job
-                        if (!bulkLoadFinisihed()) {
-                            synchronized (mAlbumList) {
-                                mAlbumList.add(album);
-                            }
-                            fetchNextBulkAlbum();
-                        } else {
-                            // Otherwise fetch it directly
-                            fetchAlbumImage(album);
-                        }
-
-                        synchronized (mTrackList) {
-                            if (!mTrackList.isEmpty()) {
-                                fetchNextBulkTrackAlbum();
-                            }
-                        }
-                    }
-                }
-            });
-        }
-        // Check if user-specified HTTP cover download is activated
-        else if (HTTPAlbumImageProvider.getInstance(mContext).getActive()) {
-            HTTPAlbumImageProvider.getInstance(mContext).fetchAlbumImage(track, response -> new InsertTrackAlbumImageTask().execute(response), new TrackAlbumFetchError() {
-                @Override
-                public void fetchJSONException(MPDTrack track, JSONException exception) {
-
-                }
-
-                @Override
-                public void fetchVolleyError(MPDTrack track, VolleyError error) {
-                    MPDAlbum album = new MPDAlbum(track.getTrackAlbum());
-                    album.setMBID(track.getTrackAlbumMBID());
-                    album.setArtistName(track.getTrackAlbumArtist());
-                    fetchAlbumImage(album);
-                    synchronized (mTrackList) {
-                        if (!mTrackList.isEmpty()) {
-                            fetchNextBulkTrackAlbum();
-                        }
-                    }
-                }
-            });
+        if (MPDAlbumImageProvider.getInstance().getActive()) {
+            // Check if MPD cover transfer is activated
+            MPDAlbumImageProvider.getInstance().fetchImage(requestModel, mContext,
+                    response -> new InsertImageTask(mContext, imageSavedCallback).execute(response),
+                    errorCallback);
+        } else if (HTTPAlbumImageProvider.getInstance(mContext).getActive()) {
+            // Check if user-specified HTTP cover download is activated
+            HTTPAlbumImageProvider.getInstance(mContext).fetchImage(requestModel, mContext,
+                    response -> new InsertImageTask(mContext, imageSavedCallback).execute(response),
+                    errorCallback);
         } else {
-            // Use the dummy album to fetch the image
-            fetchAlbumImage(album);
+            // Use a dummy album to fetch the image
+            final MPDAlbum album = new MPDAlbum(track.getTrackAlbum());
+            album.setMBID(track.getTrackAlbumMBID());
+            album.setArtistName(track.getTrackAlbumArtist());
+
+            fetchImage(album, imageSavedCallback, errorCallback);
         }
     }
 
@@ -515,590 +441,105 @@ public class ArtworkManager implements ArtistFetchError, AlbumFetchError {
         }
     }
 
+    @Override
+    public void onImageSaved(final ArtworkRequestModel artworkRequestModel, final Context applicationContext) {
+        broadcastNewArtwokInfo(artworkRequestModel, applicationContext);
 
-    /**
-     * Interface implementation to handle errors during fetching of album images
-     *
-     * @param album Album that resulted in a fetch error
-     */
-    public void fetchJSONException(MPDAlbum album, JSONException exception) {
-        Log.e(TAG, "Error fetching album: " + album.getName() + "-" + album.getArtistName());
-        AlbumImageResponse imageResponse = new AlbumImageResponse();
-        imageResponse.album = album;
-        imageResponse.image = null;
-        imageResponse.url = null;
-        new InsertAlbumImageTask().execute(imageResponse);
-    }
-
-    /**
-     * Called if a volley error occurs during internet communication.
-     *
-     * @param album {@link MPDAlbum} the error occured for.
-     * @param error {@link VolleyError} that was emitted
-     */
-    public void fetchVolleyError(MPDAlbum album, VolleyError error) {
-        Log.e(TAG, "VolleyError for album: " + album.getName() + "-" + album.getArtistName());
-
-        if (error != null) {
-            NetworkResponse networkResponse = error.networkResponse;
-            /**
-             * Rate limit probably reached. Discontinue downloading to prevent
-             * ban on the servers.
-             */
-            if (networkResponse != null && networkResponse.statusCode == 503) {
-                mAlbumList.clear();
-                cancelAllRequests();
-                boolean isEmpty;
-                synchronized (mArtistList) {
-                    isEmpty = mArtistList.isEmpty();
-                }
-                if (isEmpty && mBulkProgressCallback != null) {
-                    mBulkProgressCallback.finishedLoading();
-                }
-                return;
-            }
-        }
-
-        AlbumImageResponse imageResponse = new AlbumImageResponse();
-        imageResponse.album = album;
-        imageResponse.image = null;
-        imageResponse.url = null;
-        new InsertAlbumImageTask().execute(imageResponse);
-    }
-
-    /**
-     * Interface implementation to handle errors during fetching of artist images
-     *
-     * @param artist Artist that resulted in a fetch error
-     */
-    public void fetchJSONException(MPDArtist artist, JSONException exception) {
-        Log.e(TAG, "Error fetching artist: " + artist.getArtistName());
-        ArtistImageResponse imageResponse = new ArtistImageResponse();
-        imageResponse.artist = artist;
-        imageResponse.image = null;
-        imageResponse.url = null;
-        new InsertArtistImageTask().execute(imageResponse);
-    }
-
-    /**
-     * Called if a volley error occurs during internet communication.
-     *
-     * @param artist {@link MPDArtist} the error occured for.
-     * @param error  {@link VolleyError} that was emitted
-     */
-    public void fetchVolleyError(MPDArtist artist, VolleyError error) {
-        Log.e(TAG, "VolleyError fetching: " + artist.getArtistName());
-
-        if (error != null) {
-            NetworkResponse networkResponse = error.networkResponse;
-            /**
-             * Rate limit probably reached. Discontinue downloading to prevent
-             * ban on the servers.
-             */
-            if (networkResponse != null && networkResponse.statusCode == 503) {
-                mArtistList.clear();
-                cancelAllRequests();
-                boolean isEmpty;
-                synchronized (mAlbumList) {
-                    isEmpty = mAlbumList.isEmpty();
-                }
-                if (isEmpty && mBulkProgressCallback != null) {
-                    mBulkProgressCallback.finishedLoading();
-                }
-                return;
-            }
-        }
-        ArtistImageResponse imageResponse = new ArtistImageResponse();
-        imageResponse.artist = artist;
-        imageResponse.image = null;
-        imageResponse.url = null;
-        new InsertArtistImageTask().execute(imageResponse);
-    }
-
-    /**
-     * AsyncTask to insert the images to the SQLdatabase. This is necessary as the Volley response
-     * is handled in the UI thread.
-     */
-    private class InsertArtistImageTask extends AsyncTask<ArtistImageResponse, Object, MPDArtist> {
-
-        /**
-         * Inserts the image to the database.
-         *
-         * @param params Pair of byte[] (containing the image itself) and MPDArtist for which the image is for
-         * @return the artist model that was inserted to the database.
-         */
-        @Override
-        protected MPDArtist doInBackground(ArtistImageResponse... params) {
-            ArtistImageResponse response = params[0];
-            if (mCurrentBulkArtist == response.artist) {
-                fetchNextBulkArtist();
-            }
-
-
-            if (response.image == null) {
-                mDBManager.insertArtistImage(mContext, response.artist, response.image);
-                return response.artist;
-            }
-
-            // Rescale them if to big
-            BitmapFactory.Options options = new BitmapFactory.Options();
-            options.inJustDecodeBounds = true;
-            BitmapFactory.decodeByteArray(response.image, 0, response.image.length, options);
-            if ((options.outHeight > MAXIMUM_IMAGE_RESOLUTION || options.outWidth > MAXIMUM_IMAGE_RESOLUTION)) {
-                float factor = Math.min((float) MAXIMUM_IMAGE_RESOLUTION / (float) options.outHeight, (float) MAXIMUM_IMAGE_RESOLUTION / (float) options.outWidth);
-
-                options.inJustDecodeBounds = false;
-                Bitmap bm = BitmapFactory.decodeByteArray(response.image, 0, response.image.length, options);
-                ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
-                Bitmap.createScaledBitmap(bm, (int) (options.outWidth * factor), (int) (options.outHeight * factor), true).compress(Bitmap.CompressFormat.JPEG, IMAGE_COMPRESSION_SETTING, byteStream);
-
-                mDBManager.insertArtistImage(mContext, response.artist, byteStream.toByteArray());
-            } else {
-                if (response.image.length <= MAXIMUM_IMAGE_SIZE) {
-                    mDBManager.insertArtistImage(mContext, response.artist, response.image);
-                }
-            }
-
-            broadcastNewArtistImageInfo(response, mContext);
-
-            return response.artist;
-        }
-
-        /**
-         * Notifies the listeners about a change in the image dataset. Called in the UI thread.
-         *
-         * @param result Artist that was inserted in the database
-         */
-        protected void onPostExecute(MPDArtist result) {
-            synchronized (mArtistListeners) {
-                for (onNewArtistImageListener artistListener : mArtistListeners) {
-                    artistListener.newArtistImage(result);
-                }
-            }
-        }
-
-    }
-
-    /**
-     * AsyncTask to insert the images to the SQLdatabase. This is necessary as the Volley response
-     * is handled in the UI thread.
-     */
-    private class InsertAlbumImageTask extends AsyncTask<AlbumImageResponse, Object, MPDAlbum> {
-
-        /**
-         * Inserts the image to the database.
-         *
-         * @param params Pair of byte[] (containing the image itself) and MPDAlbum for which the image is for
-         * @return the album model that was inserted to the database.
-         */
-        @Override
-        protected MPDAlbum doInBackground(AlbumImageResponse... params) {
-            AlbumImageResponse response = params[0];
-            if (mCurrentBulkAlbum == response.album) {
-                fetchNextBulkAlbum();
-            }
-            if (response.image == null) {
-                mDBManager.insertAlbumImage(mContext, response.album, response.image);
-                return response.album;
-            }
-
-            // Rescale them if to big
-            BitmapFactory.Options options = new BitmapFactory.Options();
-            options.inJustDecodeBounds = true;
-            BitmapFactory.decodeByteArray(response.image, 0, response.image.length, options);
-            if ((options.outHeight > MAXIMUM_IMAGE_RESOLUTION || options.outWidth > MAXIMUM_IMAGE_RESOLUTION)) {
-                // Calculate rescaling ratio
-                float factor = Math.min((float) MAXIMUM_IMAGE_RESOLUTION / (float) options.outHeight, (float) MAXIMUM_IMAGE_RESOLUTION / (float) options.outWidth);
-
-                options.inJustDecodeBounds = false;
-                Bitmap bm = BitmapFactory.decodeByteArray(response.image, 0, response.image.length, options);
-                ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
-                Bitmap.createScaledBitmap(bm, (int) (options.outWidth * factor), (int) (options.outHeight * factor), true).compress(Bitmap.CompressFormat.JPEG, IMAGE_COMPRESSION_SETTING, byteStream);
-
-                mDBManager.insertAlbumImage(mContext, response.album, byteStream.toByteArray());
-            } else {
-                if (response.image.length <= MAXIMUM_IMAGE_SIZE) {
-                    mDBManager.insertAlbumImage(mContext, response.album, response.image);
-                }
-            }
-
-            broadcastNewAlbumImageInfo(response, mContext);
-
-            return response.album;
-        }
-
-        /**
-         * Notifies the listeners about a change in the image dataset. Called in the UI thread.
-         *
-         * @param result Album that was inserted in the database
-         */
-        protected void onPostExecute(MPDAlbum result) {
-            synchronized (mAlbumListeners) {
-                for (onNewAlbumImageListener albumListener : mAlbumListeners) {
-                    albumListener.newAlbumImage(result);
-                }
-            }
-        }
-    }
-
-    /**
-     * AsyncTask to insert the images to the SQLdatabase. This is necessary as the Volley response
-     * is handled in the UI thread.
-     */
-    private class InsertTrackAlbumImageTask extends AsyncTask<TrackAlbumImageResponse, Object, MPDAlbum> {
-
-        /**
-         * Inserts the image to the database.
-         *
-         * @param params Pair of byte[] (containing the image itself) and MPDAlbum for which the image is for
-         * @return the album model that was inserted to the database.
-         */
-        @Override
-        protected MPDAlbum doInBackground(TrackAlbumImageResponse... params) {
-            TrackAlbumImageResponse response = params[0];
-            if (mCurrentBulkTrack == response.track) {
-                fetchNextBulkTrackAlbum();
-            }
-
-            MPDAlbum fakeAlbum = new MPDAlbum(response.track.getTrackAlbum());
-            fakeAlbum.setArtistName(response.track.getTrackAlbumArtist());
-            fakeAlbum.setMBID(response.track.getTrackAlbumMBID());
-
-
-            // Rescale them if to big
-            BitmapFactory.Options options = new BitmapFactory.Options();
-            options.inJustDecodeBounds = true;
-            BitmapFactory.decodeByteArray(response.image, 0, response.image.length, options);
-            if ((options.outHeight > MAXIMUM_IMAGE_RESOLUTION || options.outWidth > MAXIMUM_IMAGE_RESOLUTION)) {
-                float factor = Math.min((float) MAXIMUM_IMAGE_RESOLUTION / (float) options.outHeight, (float) MAXIMUM_IMAGE_RESOLUTION / (float) options.outWidth);
-                options.inJustDecodeBounds = false;
-                Bitmap bm = BitmapFactory.decodeByteArray(response.image, 0, response.image.length, options);
-                ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
-                Bitmap.createScaledBitmap(bm, (int) (options.outWidth * factor), (int) (options.outHeight * factor), true).compress(Bitmap.CompressFormat.JPEG, IMAGE_COMPRESSION_SETTING, byteStream);
-
-                mDBManager.insertAlbumImage(mContext, fakeAlbum, byteStream.toByteArray());
-            } else {
-                mDBManager.insertAlbumImage(mContext, fakeAlbum, response.image);
-            }
-
-            AlbumImageResponse albumResponse = new AlbumImageResponse();
-            albumResponse.album = fakeAlbum;
-
-            broadcastNewAlbumImageInfo(albumResponse, mContext);
-
-            return fakeAlbum;
-        }
-
-        /**
-         * Notifies the listeners about a change in the image dataset. Called in the UI thread.
-         *
-         * @param result Album that was inserted in the database
-         */
-        protected void onPostExecute(MPDAlbum result) {
-            synchronized (mAlbumListeners) {
-                for (onNewAlbumImageListener albumListener : mAlbumListeners) {
-                    albumListener.newAlbumImage(result);
-                }
-            }
-        }
-    }
-
-    /**
-     * Used to broadcast information about new available artwork to {@link BroadcastReceiver} like
-     * the {@link org.gateshipone.malp.application.background.WidgetProvider} to reload its artwork.
-     *
-     * @param artistImage Image response containing the artist that an image was inserted for.
-     * @param context     Context used for broadcasting
-     */
-    private void broadcastNewArtistImageInfo(ArtistImageResponse artistImage, Context context) {
-        Intent newImageIntent = new Intent(ACTION_NEW_ARTWORK_READY);
-
-        newImageIntent.putExtra(INTENT_EXTRA_KEY_ARTIST_MBID, artistImage.artist.getMBIDCount() > 0 ? artistImage.artist.getMBID(0) : "");
-        newImageIntent.putExtra(INTENT_EXTRA_KEY_ARTIST_NAME, artistImage.artist.getArtistName());
-
-        context.sendBroadcast(newImageIntent);
-    }
-
-    /**
-     * Used to broadcast information about new available artwork to {@link BroadcastReceiver} like
-     * the {@link org.gateshipone.malp.application.background.WidgetProvider} to reload its artwork.
-     *
-     * @param albumImage Image response containing the album that an image was inserted for.
-     * @param context    Context used for broadcasting
-     */
-    private void broadcastNewAlbumImageInfo(AlbumImageResponse albumImage, Context context) {
-        Intent newImageIntent = new Intent(ACTION_NEW_ARTWORK_READY);
-
-        newImageIntent.putExtra(INTENT_EXTRA_KEY_ALBUM_MBID, albumImage.album.getMBID());
-        newImageIntent.putExtra(INTENT_EXTRA_KEY_ALBUM_NAME, albumImage.album.getName());
-
-        context.sendBroadcast(newImageIntent);
-    }
-
-    /**
-     * Asynchronous task that is called as a callback for the list of albums.
-     * Clears the old list and starts to download album images.
-     */
-    private class ParseMPDAlbumListTask extends AsyncTask<List<MPDAlbum>, Object, Object> {
-
-        @SafeVarargs
-        @Override
-        protected final Object doInBackground(List<MPDAlbum>... lists) {
-            List<MPDAlbum> albumList = lists[0];
-
-            mBulkProgressCallback.startAlbumLoading(albumList.size());
-
-            Log.v(TAG, "Received " + albumList.size() + " albums for bulk loading");
-            synchronized (mAlbumList) {
-                mAlbumList.clear();
-                mAlbumList.addAll(albumList);
-            }
-            mBulkLoadAlbumsReady = true;
-            fetchNextBulkAlbum();
-            return null;
-        }
-    }
-
-    /**
-     * Asynchronous task that is called as a callback for the list of artists.
-     * Clears the old list and starts to download artist images.
-     */
-    private class ParseMPDArtistListTask extends AsyncTask<List<MPDArtist>, Object, Object> {
-
-        @SafeVarargs
-        @Override
-        protected final Object doInBackground(List<MPDArtist>... lists) {
-            List<MPDArtist> artistList = lists[0];
-
-            Log.v(TAG, "Received " + artistList.size() + " artists for bulk loading");
-            mBulkProgressCallback.startArtistLoading(artistList.size());
-            synchronized (mArtistList) {
-                mArtistList.clear();
-                mArtistList.addAll(artistList);
-            }
-
-            mBulkLoadArtistsReady = true;
-            fetchNextBulkArtist();
-            return null;
-        }
-    }
-
-    /**
-     * Asynchronous task that is called as a callback for the list of albums.
-     * Clears the old list and starts to download album images.
-     */
-    private class ParseMPDTrackListTask extends AsyncTask<List<MPDFileEntry>, Object, Object> {
-        private HashMap<String, MPDTrack> mAlbumPaths;
-
-        @SafeVarargs
-        @Override
-        protected final Object doInBackground(List<MPDFileEntry>... lists) {
-            mAlbumPaths = new HashMap<>();
-            List<MPDFileEntry> tracks = lists[0];
-
-            // Get a list of unique album folders
-            for (MPDFileEntry track : tracks) {
-                String dirPath = FormatHelper.getDirectoryFromPath(track.getPath());
-                if (track instanceof MPDTrack && !mAlbumPaths.containsKey(dirPath)) {
-                    mAlbumPaths.put(FormatHelper.getDirectoryFromPath(track.getPath()), (MPDTrack) track);
-                }
-            }
-            Log.v(TAG, "Unique path count: " + mAlbumPaths.size());
-
-            int count = mAlbumPaths.size();
-            mBulkProgressCallback.startAlbumLoading(count);
-            synchronized (mTrackList) {
-                mTrackList.clear();
-                mTrackList.addAll(mAlbumPaths.values());
-            }
-            fetchNextBulkTrackAlbum();
-            return null;
-        }
-    }
-
-    /**
-     * Entrance point to start downloading all images for the complete database of the current
-     * default MPD server.
-     *
-     * @param progressCallback Used callback interface to be notified about the download progress.
-     */
-    public void bulkLoadImages(BulkLoadingProgressCallback progressCallback) {
-        if (progressCallback == null) {
-            return;
-        }
-        mBulkProgressCallback = progressCallback;
-        mArtistList.clear();
-        mAlbumList.clear();
-        mBulkLoadAlbumsReady = false;
-        mBulkLoadArtistsReady = false;
-        Log.v(TAG, "Start bulk loading");
-
-        if (HTTPAlbumImageProvider.getInstance(mContext).getActive() || MPDAlbumImageProvider.mInstance.getActive()) {
-            Log.v(TAG, "Try to get all tracks from MPD");
-            MPDQueryHandler.getAllTracks(new MPDResponseFileList() {
-                @Override
-                public void handleTracks(List<MPDFileEntry> fileList, int windowstart, int windowend) {
-                    Log.v(TAG, "Received track count: " + fileList.size());
-                    new ParseMPDTrackListTask().execute(fileList);
-                }
-            });
-        } else {
-
-            if (!mAlbumProvider.equals(mContext.getString((R.string.pref_artwork_provider_none_key)))) {
-                MPDQueryHandler.getAlbums(new MPDResponseAlbumList() {
-                    @Override
-                    public void handleAlbums(List<MPDAlbum> albumList) {
-                        new ParseMPDAlbumListTask().execute(albumList);
+        switch (artworkRequestModel.getType()) {
+            case ALBUM:
+                synchronized (mAlbumListeners) {
+                    for (onNewAlbumImageListener albumListener : mAlbumListeners) {
+                        albumListener.newAlbumImage(((MPDAlbum) artworkRequestModel.getGenericModel()));
                     }
-                });
-            }
-        }
-
-        if (!mArtistProvider.equals(mContext.getString((R.string.pref_artwork_provider_none_key)))) {
-            MPDQueryHandler.getArtists(new MPDResponseArtistList() {
-                @Override
-                public void handleArtists(List<MPDArtist> artistList) {
-                    new ParseMPDArtistListTask().execute(artistList);
                 }
-            });
+                break;
+            case ARTIST:
+                synchronized (mArtistListeners) {
+                    for (onNewArtistImageListener artistListener : mArtistListeners) {
+                        artistListener.newArtistImage((MPDArtist) artworkRequestModel.getGenericModel());
+                    }
+                }
+                break;
+            case TRACK:
+                final MPDTrack track = (MPDTrack) artworkRequestModel.getGenericModel();
+                final MPDAlbum album = new MPDAlbum(track.getTrackAlbum());
+                album.setMBID(track.getTrackAlbumMBID());
+                album.setArtistName(track.getTrackAlbumArtist());
+                synchronized (mAlbumListeners) {
+                    for (onNewAlbumImageListener albumListener : mAlbumListeners) {
+                        albumListener.newAlbumImage(((MPDAlbum) artworkRequestModel.getGenericModel()));
+                    }
+                }
+                break;
         }
     }
 
-    /**
-     * Iterates over the list of albums and downloads images for them.
-     */
-    private void fetchNextBulkAlbum() {
-        boolean isEmpty;
-        synchronized (mAlbumList) {
-            isEmpty = mAlbumList.isEmpty();
-        }
+    @Override
+    public void fetchJSONException(ArtworkRequestModel model, Context context, JSONException exception) {
+        Log.e(TAG, "JSONException fetching: " + model.getLoggingString());
+        ImageResponse imageResponse = new ImageResponse();
+        imageResponse.model = model;
+        imageResponse.image = null;
+        imageResponse.url = null;
+        new InsertImageTask(context, this).execute(imageResponse);
+    }
 
-        while (!isEmpty) {
-            MPDAlbum album;
-            synchronized (mAlbumList) {
-                album = mAlbumList.remove(0);
-                Log.v(TAG, "Bulk load next album: " + album.getName() + ":" + album.getArtistName() + " remaining: " + mAlbumList.size());
-                mBulkProgressCallback.albumsRemaining(mAlbumList.size() + mTrackList.size());
-            }
-            mCurrentBulkAlbum = album;
+    @Override
+    public void fetchVolleyError(ArtworkRequestModel model, Context context, VolleyError error) {
+        Log.e(TAG, "VolleyError for request: " + model.getLoggingString());
 
-            // Check if image already there
-            try {
-                mDBManager.getAlbumImage(mContext, album);
-
-                // If this does not throw the exception it already has an image.
-            } catch (ImageNotFoundException e) {
-                fetchAlbumImage(album);
+        if (error != null) {
+            NetworkResponse networkResponse = error.networkResponse;
+            if (networkResponse != null && networkResponse.statusCode == 503) {
+                cancelAllRequests(context);
                 return;
             }
-
-            synchronized (mAlbumList) {
-                isEmpty = mAlbumList.isEmpty();
-            }
-        }
-        if (bulkLoadFinisihed()) {
-            mBulkProgressCallback.finishedLoading();
         }
 
+        ImageResponse imageResponse = new ImageResponse();
+        imageResponse.model = model;
+        imageResponse.image = null;
+        imageResponse.url = null;
+        new InsertImageTask(context, this).execute(imageResponse);
     }
 
     /**
-     * Iterates over the list of artists and downloads images for them.
+     * This will cancel the last used album/artist image providers. To make this useful on connection change
+     * it is important to cancel all requests when changing the provider in settings.
      */
-    private void fetchNextBulkArtist() {
-        Log.v(TAG, "fetchNextBulkArtist");
-
-        boolean isEmpty;
-        synchronized (mArtistList) {
-            isEmpty = mArtistList.isEmpty();
-        }
-
-        while (!isEmpty) {
-            Log.v(TAG, "Next artist");
-
-            MPDArtist artist;
-            synchronized (mArtistList) {
-                artist = mArtistList.remove(0);
-                Log.v(TAG, "Bulk load next artist: " + artist.getArtistName() + " remaining: " + mArtistList.size());
-                mBulkProgressCallback.artistsRemaining(mArtistList.size());
-            }
-            mCurrentBulkArtist = artist;
-
-            // Check if image already there
-            try {
-                mDBManager.getArtistImage(mContext, artist);
-                // If this does not throw the exception it already has an image.
-            } catch (ImageNotFoundException e) {
-                fetchArtistImage(artist);
-                return;
-            }
-
-            synchronized (mArtistList) {
-                isEmpty = mArtistList.isEmpty();
-            }
-        }
-
-        if (bulkLoadFinisihed()) {
-            mBulkProgressCallback.finishedLoading();
-        }
+    public void cancelAllRequests(Context context) {
+        MALPRequestQueue.getInstance(context).cancelAll(request -> true);
     }
 
     /**
-     * Iterates over the list of artists and downloads images for them.
+     * Used to broadcast information about new available artwork to {@link BroadcastReceiver} like
+     * the {@link org.gateshipone.malp.application.background.WidgetProvider} to reload its artwork.
+     *
+     * @param model   The model that an image was inserted for.
+     * @param context Context used for broadcasting
      */
-    private void fetchNextBulkTrackAlbum() {
-        Log.v(TAG, "fetchNextBulkTrackAlbum");
+    private void broadcastNewArtwokInfo(ArtworkRequestModel model, Context context) {
+        Intent newImageIntent = new Intent(ACTION_NEW_ARTWORK_READY);
 
-        boolean isEmpty;
-        synchronized (mTrackList) {
-            isEmpty = mTrackList.isEmpty();
+        switch (model.getType()) {
+            case ALBUM:
+                MPDAlbum album = (MPDAlbum) model.getGenericModel();
+                newImageIntent.putExtra(INTENT_EXTRA_KEY_ALBUM_MBID, album.getMBID());
+                newImageIntent.putExtra(INTENT_EXTRA_KEY_ALBUM_NAME, album.getName());
+                break;
+            case ARTIST:
+                MPDArtist artist = (MPDArtist) model.getGenericModel();
+                newImageIntent.putExtra(INTENT_EXTRA_KEY_ARTIST_MBID, artist.getMBIDCount() > 0 ? artist.getMBID(0) : "");
+                newImageIntent.putExtra(INTENT_EXTRA_KEY_ARTIST_NAME, artist.getArtistName());
+                break;
+            case TRACK:
+                final MPDTrack track = (MPDTrack) model.getGenericModel();
+                newImageIntent.putExtra(INTENT_EXTRA_KEY_ALBUM_MBID, track.getTrackAlbumMBID());
+                newImageIntent.putExtra(INTENT_EXTRA_KEY_ALBUM_NAME, track.getTrackAlbum());
+                break;
         }
 
-        while (!isEmpty) {
-            Log.v(TAG, "Next track album");
-
-            MPDTrack track;
-            synchronized (mTrackList) {
-                track = mTrackList.remove(0);
-                mBulkProgressCallback.albumsRemaining(mTrackList.size() + mAlbumList.size());
-            }
-            mCurrentBulkTrack = track;
-
-            // Check if image already there
-            try {
-                getAlbumImageForTrack(track, -1, -1, true);
-                // If this does not throw the exception it already has an image.
-            } catch (ImageNotFoundException e) {
-                fetchAlbumImage(track);
-                return;
-            }
-
-            synchronized (mTrackList) {
-                isEmpty = mTrackList.isEmpty();
-            }
-        }
-
-        if (bulkLoadFinisihed()) {
-            mBulkProgressCallback.finishedLoading();
-        }
-    }
-
-    private synchronized boolean bulkLoadFinisihed() {
-        return mTrackList.isEmpty() && mAlbumList.isEmpty() && mArtistList.isEmpty();
-    }
-
-    /**
-     * Interface used for adapters to be notified about data set changes
-     */
-    public interface onNewArtistImageListener {
-        void newArtistImage(MPDArtist artist);
-    }
-
-    /**
-     * Interface used for adapters to be notified about data set changes
-     */
-    public interface onNewAlbumImageListener {
-        void newAlbumImage(MPDAlbum album);
+        context.sendBroadcast(newImageIntent);
     }
 
     /**
@@ -1112,48 +553,8 @@ public class ArtworkManager implements ArtistFetchError, AlbumFetchError {
             if (!NetworkUtils.isDownloadAllowed(context, mWifiOnly)) {
                 // Cancel all downloads
                 Log.v(TAG, "Cancel all downloads because of connection change");
-                cancelAllRequests();
+                cancelAllRequests(context);
             }
         }
-    }
-
-    /**
-     * This will cancel the last used album/artist image providers. To make this useful on connection change
-     * it is important to cancel all requests when changing the provider in settings.
-     */
-    public void cancelAllRequests() {
-        Log.v(TAG, "Cancel all download requests");
-        MALPRequestQueue.getInstance(mContext).cancelAll(request -> true);
-
-        // Stop bulk loading as well
-        synchronized (mAlbumList) {
-            mAlbumList.clear();
-        }
-        synchronized (mArtistList) {
-            mArtistList.clear();
-        }
-
-        synchronized (mTrackList) {
-            mTrackList.clear();
-        }
-
-        if (null != mBulkProgressCallback) {
-            mBulkProgressCallback.finishedLoading();
-        }
-    }
-
-    /**
-     * Interface used for BulkLoading processes. (S. {@link BulkDownloadService} )
-     */
-    public interface BulkLoadingProgressCallback {
-        void startAlbumLoading(int albumCount);
-
-        void startArtistLoading(int artistCount);
-
-        void albumsRemaining(int remainingAlbums);
-
-        void artistsRemaining(int remainingArtists);
-
-        void finishedLoading();
     }
 }

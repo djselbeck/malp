@@ -22,29 +22,21 @@
 package org.gateshipone.malp.application.artwork.network.artprovider;
 
 import android.content.Context;
-import android.net.Uri;
 import android.util.Log;
-
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-
-import org.gateshipone.malp.application.artwork.network.responses.AlbumFetchError;
-import org.gateshipone.malp.application.artwork.network.responses.AlbumImageResponse;
-import org.gateshipone.malp.application.artwork.network.responses.ArtistFetchError;
-import org.gateshipone.malp.application.artwork.network.requests.AlbumImageByteRequest;
-import org.gateshipone.malp.application.artwork.network.requests.ArtistImageByteRequest;
-import org.gateshipone.malp.application.artwork.network.requests.MALPJsonObjectRequest;
+import org.gateshipone.malp.application.artwork.network.ArtworkRequestModel;
 import org.gateshipone.malp.application.artwork.network.MALPRequestQueue;
-import org.gateshipone.malp.application.artwork.network.responses.ArtistImageResponse;
-import org.gateshipone.malp.mpdservice.mpdprotocol.mpdobjects.MPDAlbum;
-import org.gateshipone.malp.mpdservice.mpdprotocol.mpdobjects.MPDArtist;
+import org.gateshipone.malp.application.artwork.network.requests.MALPByteRequest;
+import org.gateshipone.malp.application.artwork.network.requests.MALPJsonObjectRequest;
+import org.gateshipone.malp.application.artwork.network.responses.ImageResponse;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class LastFMProvider implements ArtistImageProvider, AlbumImageProvider {
+public class LastFMProvider extends ArtProvider {
     private static final String TAG = LastFMProvider.class.getSimpleName();
 
     /**
@@ -90,112 +82,37 @@ public class LastFMProvider implements ArtistImageProvider, AlbumImageProvider {
     }
 
 
-    /**
-     * Fetch an image for an given {@link MPDArtist}. Make sure to provide response and error listener.
-     * @param artist Artist to try to get an image for.
-     * @param listener ResponseListener that reacts on successful retrieval of an image.
-     * @param errorListener Error listener that is called when an error occurs.
-     */
-    public void fetchArtistImage(final MPDArtist artist, final Response.Listener<ArtistImageResponse> listener, final ArtistFetchError errorListener) {
-
-
-        String artistURLName = Uri.encode(artist.getArtistName().replaceAll("/", " "));
-
-        getArtistImageURL(artistURLName, response -> {
-            try {
-                JSONObject artistObj = response.getJSONObject("artist");
-                // FIXME optionally get mbid here without aborting the image fetch
-                JSONArray images = artistObj.getJSONArray("image");
-                for (int i = 0; i < images.length(); i++) {
-                    JSONObject image = images.getJSONObject(i);
-                    if (image.getString("size").equals(LAST_FM_REQUESTED_IMAGE_SIZE)) {
-                        String url = image.getString("#text");
-                        if (!url.isEmpty()) {
-                            getArtistImage(image.getString("#text"), artist, listener, error -> errorListener.fetchVolleyError(artist, error));
-                        } else {
-                            errorListener.fetchVolleyError(artist, null);
-                        }
-                    }
-                }
-            } catch (JSONException e) {
-                errorListener.fetchJSONException(artist, e);
-            }
-        }, error -> errorListener.fetchVolleyError(artist, error));
-
-    }
-
-
-    /**
-     * Fetches the image URL for the raw image blob.
-     * @param artistName Artist name to look for an image
-     * @param listener Callback listener to handle the response
-     * @param errorListener Callback to handle a fetch error
-     */
-    private void getArtistImageURL(String artistName, Response.Listener<JSONObject> listener, Response.ErrorListener errorListener) {
-        String url = LAST_FM_API_URL + "artist.getinfo&artist=" + artistName + "&api_key=" + API_KEY + LAST_FM_FORMAT_JSON;
-        Log.v(TAG, url);
-
-        MALPJsonObjectRequest jsonObjectRequest = new MALPJsonObjectRequest(Request.Method.GET, url, null, listener, errorListener);
-
-        mRequestQueue.add(jsonObjectRequest);
-    }
-
-    /**
-     * Raw download for an image
-     * @param url Final image URL to download
-     * @param artist Artist associated with the image to download
-     * @param listener Response listener to receive the image as a byte array
-     * @param errorListener Error listener
-     */
-    private void getArtistImage(String url, MPDArtist artist, Response.Listener<ArtistImageResponse> listener, Response.ErrorListener errorListener) {
-        Log.v(LastFMProvider.class.getSimpleName(), url);
-
-        Request<ArtistImageResponse> byteResponse = new ArtistImageByteRequest(url, artist, listener, errorListener);
-
-        mRequestQueue.add(byteResponse);
-    }
-
-
-    /**
-     * Public interface to get an image for an album.
-     * @param album Album to check for an image
-     * @param listener Callback to handle the fetched image
-     * @param errorListener Callback to handle errors
-     */
     @Override
-    public void fetchAlbumImage(final MPDAlbum album, final Response.Listener<AlbumImageResponse> listener, final AlbumFetchError errorListener) {
-        getAlbumImageURL(album, response -> {
-            try {
-                JSONObject albumObj = response.getJSONObject("album");
-                JSONArray images = albumObj.getJSONArray("image");
-                // FIXME optionally get mbid here without aborting the image fetch
-                for (int i = 0; i < images.length(); i++) {
-                    JSONObject image = images.getJSONObject(i);
-                    if (image.getString("size").equals(LAST_FM_REQUESTED_IMAGE_SIZE)) {
-                        String url = image.getString("#text");
-                        if (!url.isEmpty()) {
-                            getAlbumImage(image.getString("#text"), album, listener, error -> errorListener.fetchVolleyError(album, error));
-                        } else {
-                            errorListener.fetchVolleyError(album, null);
-                        }
-
-                    }
-                }
-            } catch (JSONException e) {
-                errorListener.fetchJSONException(album, e);
-            }
-        }, error -> errorListener.fetchVolleyError(album, error));
+    public void fetchImage(final ArtworkRequestModel model, final Context context,
+                           final Response.Listener<ImageResponse> listener, final ArtFetchError errorListener) {
+        switch (model.getType()) {
+            case ALBUM:
+                getAlbumImageURL(model,
+                        response -> parseJSONResponse(model, context, response, listener, errorListener),
+                        error -> errorListener.fetchVolleyError(model, context, error));
+                break;
+            case ARTIST:
+                getArtistImageURL(model.getEncodedArtistName(),
+                        response -> parseJSONResponse(model, context, response, listener, errorListener),
+                        error -> errorListener.fetchVolleyError(model, context, error));
+                break;
+            case TRACK:
+                // not
+                break;
+        }
     }
 
     /**
      * Fetches the image URL for the raw image blob.
-     * @param album Album to look for an image
-     * @param listener Callback listener to handle the response
+     *
+     * @param model         Album to look for an image
+     * @param listener      Callback listener to handle the response
      * @param errorListener Callback to handle a fetch error
      */
-    private void getAlbumImageURL(MPDAlbum album, Response.Listener<JSONObject> listener, Response.ErrorListener errorListener) {
-        String albumName = Uri.encode(album.getName());
-        String artistName = Uri.encode(album.getArtistName());
+    private void getAlbumImageURL(final ArtworkRequestModel model,
+                                  final Response.Listener<JSONObject> listener, final Response.ErrorListener errorListener) {
+        String albumName = model.getEncodedAlbumName();
+        String artistName = model.getEncodedArtistName();
 
         if (albumName.isEmpty() || artistName.isEmpty()) {
             errorListener.onErrorResponse(new VolleyError("required arguments are empty"));
@@ -203,24 +120,85 @@ public class LastFMProvider implements ArtistImageProvider, AlbumImageProvider {
             String url = LAST_FM_API_URL + "album.getinfo&album=" + albumName + "&artist=" + artistName + "&api_key=" + API_KEY + LAST_FM_FORMAT_JSON;
             Log.v(TAG, url);
 
-            MALPJsonObjectRequest jsonObjectRequest = new MALPJsonObjectRequest(Request.Method.GET, url, null, listener, errorListener);
+            MALPJsonObjectRequest jsonObjectRequest = new MALPJsonObjectRequest(url, null, listener, errorListener);
 
             mRequestQueue.add(jsonObjectRequest);
         }
     }
 
+    /**
+     * Fetches the image URL for the raw image blob.
+     *
+     * @param artistName    Artist name to look for an image
+     * @param listener      Callback listener to handle the response
+     * @param errorListener Callback to handle a fetch error
+     */
+    private void getArtistImageURL(String artistName, Response.Listener<JSONObject> listener, Response.ErrorListener errorListener) {
+
+
+        String url = LAST_FM_API_URL + "artist.getinfo&artist=" + artistName + "&api_key=" + API_KEY + LAST_FM_FORMAT_JSON;
+        Log.v(TAG, url);
+
+        MALPJsonObjectRequest jsonObjectRequest = new MALPJsonObjectRequest(url, null, listener, errorListener);
+
+        mRequestQueue.add(jsonObjectRequest);
+    }
+
+    /**
+     * Method to parse the album/artist info json response.
+     * The response will be used to get an image for the requested album/artist.
+     *
+     * @param model         The model representing the album/artist for which an image was requested.
+     * @param context       The current application context.
+     * @param response      The album/artist info response as a {@link JSONObject}.
+     * @param listener      Callback if an image could be loaded successfully.
+     * @param errorListener Callback if an error occured.
+     */
+    private void parseJSONResponse(final ArtworkRequestModel model, final Context context, final JSONObject response,
+                                   final Response.Listener<ImageResponse> listener, final ArtFetchError errorListener) {
+        try {
+            String baseObjKey = "";
+
+            switch (model.getType()) {
+                case ALBUM:
+                    baseObjKey = "album";
+                    break;
+                case ARTIST:
+                    baseObjKey = "artist";
+                    break;
+            }
+            JSONObject baseObj = response.getJSONObject(baseObjKey);
+            JSONArray images = baseObj.getJSONArray("image");
+            Log.v(TAG, "Found: " + images.length() + " images");
+            for (int i = 0; i < images.length(); i++) {
+                JSONObject image = images.getJSONObject(i);
+                if (image.getString("size").equals(LAST_FM_REQUESTED_IMAGE_SIZE)) {
+                    String url = image.getString("#text");
+                    if (!url.isEmpty()) {
+                        getByteImage(image.getString("#text"), model, listener, error -> errorListener.fetchVolleyError(model, context, error));
+                    } else {
+                        errorListener.fetchVolleyError(model, context, null);
+                    }
+                }
+            }
+        } catch (JSONException e) {
+            errorListener.fetchJSONException(model, context, e);
+        }
+    }
 
     /**
      * Raw download for an image
-     * @param url Final image URL to download
-     * @param album Album associated with the image to download
-     * @param listener Response listener to receive the image as a byte array
+     *
+     * @param url           Final image URL to download
+     * @param model         Album associated with the image to download
+     * @param listener      Response listener to receive the image as a byte array
      * @param errorListener Error listener
      */
-    private void getAlbumImage(String url, MPDAlbum album, Response.Listener<AlbumImageResponse> listener, Response.ErrorListener errorListener) {
-        Log.v(LastFMProvider.class.getSimpleName(), url);
+    private void getByteImage(final String url, final ArtworkRequestModel model,
+                              final Response.Listener<ImageResponse> listener, final Response.ErrorListener errorListener) {
+        Log.v(LastFMProvider.class.getSimpleName(), "Get byte image:" + url);
 
-        Request<AlbumImageResponse> byteResponse = new AlbumImageByteRequest(url, album, listener, errorListener);
+        Request<ImageResponse> byteResponse = new MALPByteRequest(model, url, listener, errorListener);
 
         mRequestQueue.add(byteResponse);
     }

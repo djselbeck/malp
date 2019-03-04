@@ -27,7 +27,6 @@
     <string name="team" translatable="false">Team Gateship One</string>
 
 
-
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
@@ -274,10 +273,13 @@
     <string name="preference_dark_theme_message">Use a dark theme</string>
 
     <string name="preference_show_artist_image_title">Show artist image</string>
-    <string name="preference_show_artist_image_text">Alternate between the album cover and an image of the artist in the view for the currently playing song</string>#
+    <string name="preference_show_artist_image_text">Alternate between the album cover and an image of the artist in the
+        view for the currently playing song</string>#
 
     <string name="preference_npv_show_playlist_title">Start with playlist view</string>
-    <string name="preference_npv_show_playlist_text">Show the playlist if M.A.L.P. is opened via widget or notification while playback is active</string>
+    <string name="preference_npv_show_playlist_text">Show the playlist if M.A.L.P. is opened via widget or notification
+        while playback is active
+    </string>
 
     <string name="preference_default_view_title">Default view</string>
     <string name="preference_default_view_message">Select default view</string>
@@ -308,22 +310,31 @@
     </string-array>
 
     <string name="preference_use_album_artists_title">Use AlbumArtist tag</string>
-    <string name="preference_use_album_artists_text">Use the AlbumArtist tag for the artist list (This method is slower and may result in erroneous artist images).</string>
+    <string name="preference_use_album_artists_text">Use the AlbumArtist tag for the artist list (This method is slower
+        and may result in erroneous artist images).
+    </string>
 
     <string name="preference_use_artist_sort_title">Use ArtistSort tag</string>
-    <string name="preference_use_artist_sort_text">Use the ArtistSort tag (or AlbumartistSort) if the server provides the tag.</string>
+    <string name="preference_use_artist_sort_text">Use the ArtistSort tag (or AlbumartistSort) if the server provides
+        the tag.
+    </string>
 
     <string name="preference_use_tags_in_filebrowser_title">Use tags in file browser</string>
-    <string name="preference_use_tags_in_filebrowser_text">Use tags in file browser instead of filenames if available. Disable this option to show filenames in file browser.</string>
+    <string name="preference_use_tags_in_filebrowser_text">Use tags in file browser instead of filenames if available.
+        Disable this option to show filenames in file browser.
+    </string>
 
     <string name="preference_library_click_action_title">Track click action</string>
     <string name="preference_library_click_action_summary">Select action for tracks in library</string>
-    <string name="preference_library_click_action_message">Select the default action to take if you click on a track in the library views</string>
+    <string name="preference_library_click_action_message">Select the default action to take if you click on a track in
+        the library views
+    </string>
 
     <string name="preference_library_click_action_details" translatable="false">@string/action_show_details</string>
     <string name="preference_library_click_action_add" translatable="false">@string/action_add</string>
     <string name="preference_library_click_action_play" translatable="false">@string/action_play_song</string>
-    <string name="preference_library_click_action_play_next" translatable="false">@string/action_enqueue_as_next</string>
+    <string name="preference_library_click_action_play_next" translatable="false">@string/action_enqueue_as_next
+    </string>
 
     <string-array name="preference_library_click">
         <item>@string/preference_library_click_action_details</item>
@@ -335,7 +346,9 @@
 
     <string name="preference_volume_control_title">Select volume control view</string>
     <string name="preference_volume_control_message">Select volume control view</string>
-    <string name="preference_volume_control_summary">Select the type of view that is used to control the volume of music playback</string>
+    <string name="preference_volume_control_summary">Select the type of view that is used to control the volume of music
+        playback
+    </string>
 
     <string name="preference_volume_control_off">Off</string>
     <string name="preference_volume_control_seekbar">Slider</string>
@@ -348,19 +361,28 @@
     </string-array>
 
     <string name="preference_generic_keep_display_on_title">Keep the display on</string>
-    <string name="preference_generic_keep_display_on_text">The display will be kept active as long as the user interface is in foreground.</string>
+    <string name="preference_generic_keep_display_on_text">The display will be kept active as long as the user interface
+        is in foreground.
+    </string>
 
     <string name="preference_generic_hardware_keys_title">Use hardware buttons</string>
-    <string name="preference_generic_hardware_keys_text">Use the devices hardware buttons to control the playback.</string>
+    <string name="preference_generic_hardware_keys_text">Use the devices hardware buttons to control the playback.
+    </string>
 
     <string name="preference_volume_step_title">Volume step size</string>
-    <string name="preference_volume_step_text">The size of volume steps of the hardware and software volume buttons.</string>
+    <string name="preference_volume_step_text">The size of volume steps of the hardware and software volume buttons.
+    </string>
 
     <string name="volume_step_size_dialog_title">Step size: %d%%</string>
-    <string name="volume_step_size_dialog_warning">You are selecting a high value for your volume step size. Be careful not to harm your ears or your equipment!</string>
+    <string name="volume_step_size_dialog_warning">You are selecting a high value for your volume step size. Be careful
+        not to harm your ears or your equipment!
+    </string>
 
     <string name="preference_show_notification_title">Show notification</string>
-    <string name="preference_show_notification_text">Show a notification when leaving the main user interface. This is necessary for the widget to work. If you click on \'connect\' on the widget, the notification will be shown in any case.</string>
+    <string name="preference_show_notification_text">Show a notification when leaving the main user interface. This is
+        necessary for the widget to work. If you click on \'connect\' on the widget, the notification will be shown in
+        any case.
+    </string>
 
     <string name="preference_use_english_wikipedia_title">Use English Wikipedia</string>
     <string name="preference_use_english_wikipedia_text">Use the English Wikipedia version to lookup pages</string>
@@ -405,15 +427,23 @@
     <string name="preference_artwork_clear_album_summary">Removes all saved images for albums.</string>
 
     <string name="preference_artwork_clear_blocked_artist">Clear blocked artist images</string>
-    <string name="preference_artwork_clear_blocked_artist_summary">Removes all entries for artists that where searched for but not found.</string>
+    <string name="preference_artwork_clear_blocked_artist_summary">Removes all entries for artists that where searched
+        for but not found.
+    </string>
     <string name="preference_artwork_clear_blocked_album">Clear blocked album images</string>
-    <string name="preference_artwork_clear_blocked_album_summary">Removes all entries for albums that where searched for but not found.</string>
+    <string name="preference_artwork_clear_blocked_album_summary">Removes all entries for albums that where searched for
+        but not found.
+    </string>
 
     <string name="preference_artwork_bulk_load">Try to load all images for your database.</string>
-    <string name="preference_artwork_bulk_load_summary">This will load a lot of images. Be warned this will take some time. It might result in a temporary rate limit of the provider.</string>
+    <string name="preference_artwork_bulk_load_summary">This will load a lot of images. Be warned this will take some
+        time. It might result in a temporary rate limit of the provider.
+    </string>
 
     <string name="preference_artwork_wifi_only_title">Only use WIFI for downloading</string>
-    <string name="preference_artwork_wifi_only_text">Artwork downloading will only take place if the device is connected via WIFI.</string>
+    <string name="preference_artwork_wifi_only_text">Artwork downloading will only take place if the device is connected
+        via WIFI.
+    </string>
 
     <string name="preference_category_artwork_settings">Artwork settings</string>
     <string name="preference_category_artwork_database_cleanup">Database cleanup</string>
@@ -435,17 +465,29 @@
     </string-array>
 
     <string name="welcome_dialog_title">No profiles found</string>
-    <string name="welcome_dialog_text">This application is a remote control for MPD. If you don\'t know MPD this application is probably useless for you, sorry :).\n\nTo use this application add a new profile with a add button in the upper right corner.\nThis application may or may not work with Mopidy as this is an MPD client, no support provided for Mopidy.\n\nIf you would like an music player based on the same interface, try Odyssey (https://gitlab.com/gateship-one/odyssey).</string>
+    <string name="welcome_dialog_text">This application is a remote control for MPD. If you don\'t know MPD this
+        application is probably useless for you, sorry :).\n\nTo use this application add a new profile with a add
+        button in the upper right corner.\nThis application may or may not work with Mopidy as this is an MPD client, no
+        support provided for Mopidy.\n\nIf you would like an music player based on the same interface, try Odyssey
+        (https://gitlab.com/gateship-one/odyssey).
+    </string>
 
     <string name="bulk_download_notice_title">Image download</string>
-    <string name="bulk_download_notice_text">Downloading a large amount of images puts heavy load on the servers of the service you chose. It may occur that a server load prevents downloading of images. The downloader will then cancel its action if it detects an overload.\n\nPlease consider donating to the artwork services.</string>
+    <string name="bulk_download_notice_text">Downloading a large amount of images puts heavy load on the servers of the
+        service you chose. It may occur that a server load prevents downloading of images. The downloader will then
+        cancel its action if it detects an overload.\n\nPlease consider donating to the artwork services.
+    </string>
 
     <!-- About activity -->
     <string name="artwork_provided_by">Artwork provided by:</string>
-    <string name="acknowledgement_text">Big thanks to Frederik Lütkes for his continuous pressure to develop Odyssey, a music player on which this GUI is based on.</string>
-    <string name="license_text">This application is licensed under the GPLv3 license.\nMaterial icons are licensed under the CC-BY license by Google.</string>
+    <string name="acknowledgement_text">Big thanks to Frederik Lütkes for his continuous pressure to develop Odyssey, a
+        music player on which this GUI is based on.
+    </string>
+    <string name="license_text">This application is licensed under the GPLv3 license.\nMaterial icons are licensed under
+        the CC-BY license by Google.
+    </string>
     <string name="sources_text">The source code is available on GitLab:\nhttps://gitlab.com/gateship-one/malp</string>
-    <string name="activity_about_version">Version: </string>
+    <string name="activity_about_version">Version:</string>
 
     <string name="url_musicbrainz" translatable="false">https://www.musicbrainz.org</string>
     <string name="url_lastfm" translatable="false">https://www.last.fm</string>
@@ -455,6 +497,7 @@
     <!-- Bulk downloader service -->
     <string name="downloader_notification_title">Bulk download running</string>
     <string name="downloader_notification_remaining_images">Downloaded images:</string>
+    <string name="downloader_notification_initialize">Initialize download</string>
 
     <string name="notification_channel_name_playback">Playback</string>
     <string name="notification_channel_name_bulk_download">Bulk downloader</string>

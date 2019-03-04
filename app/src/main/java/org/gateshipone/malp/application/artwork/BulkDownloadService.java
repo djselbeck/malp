@@ -33,43 +33,65 @@ import android.os.*;
 import android.util.Log;
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
+import com.android.volley.NetworkResponse;
+import com.android.volley.VolleyError;
 import org.gateshipone.malp.R;
-import org.gateshipone.malp.application.artwork.network.MALPRequestQueue;
+import org.gateshipone.malp.application.artwork.network.ArtworkRequestModel;
+import org.gateshipone.malp.application.artwork.network.InsertImageTask;
+import org.gateshipone.malp.application.artwork.network.artprovider.ArtProvider;
 import org.gateshipone.malp.application.artwork.network.artprovider.HTTPAlbumImageProvider;
 import org.gateshipone.malp.application.artwork.network.artprovider.MPDAlbumImageProvider;
+import org.gateshipone.malp.application.artwork.network.responses.ImageResponse;
+import org.gateshipone.malp.application.artwork.storage.ArtworkDatabaseManager;
+import org.gateshipone.malp.application.artwork.storage.ImageNotFoundException;
+import org.gateshipone.malp.application.utils.FormatHelper;
 import org.gateshipone.malp.application.utils.NetworkUtils;
 import org.gateshipone.malp.mpdservice.ConnectionManager;
 import org.gateshipone.malp.mpdservice.handlers.MPDConnectionStateChangeHandler;
+import org.gateshipone.malp.mpdservice.handlers.responsehandler.MPDResponseAlbumList;
+import org.gateshipone.malp.mpdservice.handlers.responsehandler.MPDResponseArtistList;
+import org.gateshipone.malp.mpdservice.handlers.responsehandler.MPDResponseFileList;
+import org.gateshipone.malp.mpdservice.handlers.serverhandler.MPDQueryHandler;
 import org.gateshipone.malp.mpdservice.mpdprotocol.MPDInterface;
+import org.gateshipone.malp.mpdservice.mpdprotocol.mpdobjects.MPDAlbum;
+import org.gateshipone.malp.mpdservice.mpdprotocol.mpdobjects.MPDArtist;
+import org.gateshipone.malp.mpdservice.mpdprotocol.mpdobjects.MPDFileEntry;
+import org.gateshipone.malp.mpdservice.mpdprotocol.mpdobjects.MPDTrack;
+import org.json.JSONException;
 
 import java.lang.ref.WeakReference;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 
-public class BulkDownloadService extends Service implements ArtworkManager.BulkLoadingProgressCallback {
+public class BulkDownloadService extends Service implements InsertImageTask.ImageSavedCallback, ArtProvider.ArtFetchError {
     private static final String TAG = BulkDownloadService.class.getSimpleName();
 
     private static final int NOTIFICATION_ID = 2;
+
     private static final String NOTIFICATION_CHANNEL_ID = "BulkDownloader";
 
     public static final String ACTION_CANCEL = "org.gateshipone.malp.cancel_download";
+
     public static final String ACTION_START_BULKDOWNLOAD = "org.gateshipone.malp.start_download";
 
     public static final String BUNDLE_KEY_ARTIST_PROVIDER = "org.gateshipone.malp.artist_provider";
+
     public static final String BUNDLE_KEY_ALBUM_PROVIDER = "org.gateshipone.malp.album_provider";
+
     public static final String BUNDLE_KEY_HTTP_COVER_REGEX = "org.gateshipone.malp.http_cover_regex";
+
     public static final String BUNDLE_KEY_MPD_COVER_ENABLED = "org.gateshipone.malp.mpd_cover_enabled";
+
     public static final String BUNDLE_KEY_WIFI_ONLY = "org.gateshipone.malp.wifi_only";
 
     private NotificationManager mNotificationManager;
+
     private NotificationCompat.Builder mBuilder;
 
     private ConnectionStateHandler mConnectionHandler;
 
-    private int mRemainingArtists;
-    private int mRemainingAlbums;
-
-    private int mSumImageDownloads;
-
-    private String mHTTPRegex;
+    private int mSumArtworkRequests;
 
     private ActionReceiver mBroadcastReceiver;
 
@@ -78,6 +100,16 @@ public class BulkDownloadService extends Service implements ArtworkManager.BulkL
     private ConnectionStateReceiver mConnectionStateChangeReceiver;
 
     private boolean mWifiOnly;
+
+    final private LinkedList<ArtworkRequestModel> mArtworkRequestQueue = new LinkedList<>();
+
+    private ArtworkManager mArtworkManager;
+
+    private ArtworkDatabaseManager mDatabaseManager;
+
+    private String mAlbumProvider;
+
+    private String mArtistProvider;
 
     /**
      * Called when the service is created because it is requested by an activity
@@ -91,8 +123,6 @@ public class BulkDownloadService extends Service implements ArtworkManager.BulkL
             Log.v(TAG, "Registering connection state listener");
             MPDInterface.mInstance.addMPDConnectionStateChangeListener(mConnectionHandler);
         }
-
-        mSumImageDownloads = 0;
 
         mConnectionStateChangeReceiver = new ConnectionStateReceiver();
         IntentFilter filter = new IntentFilter();
@@ -122,25 +152,24 @@ public class BulkDownloadService extends Service implements ArtworkManager.BulkL
             Log.v(TAG, "Starting bulk download in service with thread id: " + Thread.currentThread().getId());
 
             // reset counter
-            mRemainingArtists = 0;
-            mRemainingAlbums = 0;
-            mSumImageDownloads = 0;
+            mSumArtworkRequests = 0;
 
-            String artistProvider = getString(R.string.pref_artwork_provider_artist_default);
-            String albumProvider = getString(R.string.pref_artwork_provider_album_default);
+            mArtistProvider = getString(R.string.pref_artwork_provider_artist_default);
+            mAlbumProvider = getString(R.string.pref_artwork_provider_album_default);
             mWifiOnly = true;
 
             // read setting from extras
             Bundle extras = intent.getExtras();
             if (extras != null) {
-                artistProvider = extras.getString(BUNDLE_KEY_ARTIST_PROVIDER, getString(R.string.pref_artwork_provider_artist_default));
-                albumProvider = extras.getString(BUNDLE_KEY_ALBUM_PROVIDER, getString(R.string.pref_artwork_provider_album_default));
+                mArtistProvider = extras.getString(BUNDLE_KEY_ARTIST_PROVIDER, getString(R.string.pref_artwork_provider_artist_default));
+                mAlbumProvider = extras.getString(BUNDLE_KEY_ALBUM_PROVIDER, getString(R.string.pref_artwork_provider_album_default));
                 mWifiOnly = intent.getBooleanExtra(BUNDLE_KEY_WIFI_ONLY, true);
-                mHTTPRegex = intent.getStringExtra(BUNDLE_KEY_HTTP_COVER_REGEX);
+
+                final String mHTTPRegex = intent.getStringExtra(BUNDLE_KEY_HTTP_COVER_REGEX);
                 if (mHTTPRegex != null && !mHTTPRegex.isEmpty()) {
                     HTTPAlbumImageProvider.getInstance(getApplicationContext()).setRegex(mHTTPRegex);
                 }
-                MPDAlbumImageProvider.mInstance.setActive(intent.getBooleanExtra(BUNDLE_KEY_MPD_COVER_ENABLED, false));
+                MPDAlbumImageProvider.getInstance().setActive(intent.getBooleanExtra(BUNDLE_KEY_MPD_COVER_ENABLED, false));
             }
 
             if (!NetworkUtils.isDownloadAllowed(this, mWifiOnly)) {
@@ -148,19 +177,267 @@ public class BulkDownloadService extends Service implements ArtworkManager.BulkL
             }
 
             PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
-            mWakelock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
-                    "MALP_BulkDownloader");
-
-
-            ArtworkManager artworkManager = ArtworkManager.getInstance(getApplicationContext());
-            artworkManager.initialize(artistProvider, albumProvider, mWifiOnly);
+            mWakelock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "malp:wakelock:bulkDownloader");
 
             // FIXME do some timeout checking. e.g. 5 minutes no new image then cancel the process
             mWakelock.acquire();
+
+            mArtworkManager = ArtworkManager.getInstance(getApplicationContext());
+            mArtworkManager.initialize(mArtistProvider, mAlbumProvider, mWifiOnly);
+
+            mDatabaseManager = ArtworkDatabaseManager.getInstance(getApplicationContext());
+
             ConnectionManager.getInstance(getApplicationContext()).reconnectLastServer(this);
+
+            runAsForeground();
         }
         return START_NOT_STICKY;
+    }
 
+    @Override
+    public void onImageSaved(final ArtworkRequestModel artworkRequestModel, final Context applicationContext) {
+        mArtworkManager.onImageSaved(artworkRequestModel, applicationContext);
+
+        performNextRequest();
+    }
+
+    @Override
+    public void fetchJSONException(final ArtworkRequestModel model, final Context context, final JSONException exception) {
+        Log.e(TAG, "JSONException fetching: " + model.getLoggingString());
+        ImageResponse imageResponse = new ImageResponse();
+        imageResponse.model = model;
+        imageResponse.image = null;
+        imageResponse.url = null;
+        new InsertImageTask(context, this).execute(imageResponse);
+    }
+
+    @Override
+    public void fetchVolleyError(final ArtworkRequestModel model, final Context context, final VolleyError error) {
+        Log.e(TAG, "VolleyError for request: " + model.getLoggingString());
+
+        if (error != null) {
+            NetworkResponse networkResponse = error.networkResponse;
+            if (networkResponse != null && networkResponse.statusCode == 503) {
+                finishedLoading();
+                return;
+            }
+        }
+
+        ImageResponse imageResponse = new ImageResponse();
+        imageResponse.model = model;
+        imageResponse.image = null;
+        imageResponse.url = null;
+        new InsertImageTask(context, this).execute(imageResponse);
+    }
+
+    private void runAsForeground() {
+        if (mBroadcastReceiver == null) {
+            mBroadcastReceiver = new ActionReceiver();
+
+            // Create a filter to only handle certain actions
+            IntentFilter intentFilter = new IntentFilter();
+
+            intentFilter.addAction(ACTION_CANCEL);
+
+            registerReceiver(mBroadcastReceiver, intentFilter);
+        }
+
+        mBuilder = new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
+                .setContentTitle(getResources().getString(R.string.downloader_notification_initialize))
+                .setStyle(new NotificationCompat.BigTextStyle()
+                        .bigText(getString(R.string.downloader_notification_remaining_images) + ' ' + 0))
+                .setProgress(0, 0, false)
+                .setSmallIcon(R.drawable.ic_notification_24dp);
+
+        openChannel();
+
+        mBuilder.setOngoing(true);
+
+        // Cancel action
+        Intent nextIntent = new Intent(BulkDownloadService.ACTION_CANCEL);
+        PendingIntent nextPendingIntent = PendingIntent.getBroadcast(getApplicationContext(), 1, nextIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        androidx.core.app.NotificationCompat.Action cancelAction = new androidx.core.app.NotificationCompat.Action.Builder(R.drawable.ic_cancel_24dp, getResources().getString(R.string.dialog_action_cancel), nextPendingIntent).build();
+
+        mBuilder.addAction(cancelAction);
+
+        Notification notification = mBuilder.build();
+        startForeground(NOTIFICATION_ID, notification);
+        mNotificationManager.notify(NOTIFICATION_ID, notification);
+    }
+
+    private void createArtworkRequestQueue() {
+        mArtworkRequestQueue.clear();
+
+        if (HTTPAlbumImageProvider.getInstance(getApplicationContext()).getActive() || MPDAlbumImageProvider.getInstance().getActive()) {
+            Log.v(TAG, "Try to get all tracks from MPD");
+            MPDQueryHandler.getAllTracks(new MPDResponseFileList() {
+                @Override
+                public void handleTracks(List<MPDFileEntry> trackList, int windowstart, int windowend) {
+                    Log.v(TAG, "Received track count: " + trackList.size());
+
+                    final HashMap<String, MPDTrack> albumPaths = new HashMap<>();
+
+                    // Get a list of unique album folders
+                    for (MPDFileEntry track : trackList) {
+                        String dirPath = FormatHelper.getDirectoryFromPath(track.getPath());
+                        if (track instanceof MPDTrack && !albumPaths.containsKey(dirPath)) {
+                            albumPaths.put(FormatHelper.getDirectoryFromPath(track.getPath()), (MPDTrack) track);
+                        }
+                    }
+                    Log.v(TAG, "Unique path count: " + albumPaths.size());
+
+                    for (MPDTrack track : albumPaths.values()) {
+                        mArtworkRequestQueue.add(new ArtworkRequestModel(track));
+                    }
+
+                    fetchAllArtists();
+                }
+            });
+        } else {
+            fetchAllAlbums();
+        }
+
+        mSumArtworkRequests = mArtworkRequestQueue.size();
+
+        mBuilder.setContentTitle(getString(R.string.downloader_notification_remaining_images));
+
+        startBulkDownload();
+    }
+
+    private void fetchAllAlbums() {
+        if (!mAlbumProvider.equals(getApplicationContext().getString((R.string.pref_artwork_provider_none_key)))) {
+            MPDQueryHandler.getAlbums(new MPDResponseAlbumList() {
+                @Override
+                public void handleAlbums(List<MPDAlbum> albumList) {
+                    Log.v(TAG, "Received " + albumList.size() + " albums for bulk loading");
+
+                    for (MPDAlbum album : albumList) {
+                        mArtworkRequestQueue.add(new ArtworkRequestModel(album));
+                    }
+
+                    fetchAllArtists();
+                }
+            });
+        } else {
+            fetchAllArtists();
+        }
+    }
+
+    private void fetchAllArtists() {
+        if (!mArtistProvider.equals(getApplicationContext().getString((R.string.pref_artwork_provider_none_key)))) {
+            MPDQueryHandler.getArtists(new MPDResponseArtistList() {
+                @Override
+                public void handleArtists(List<MPDArtist> artistList) {
+                    Log.v(TAG, "Received " + artistList.size() + " artists for bulk loading");
+
+                    for (MPDArtist artist : artistList) {
+                        mArtworkRequestQueue.add(new ArtworkRequestModel(artist));
+                    }
+
+                    startBulkDownload();
+                }
+            });
+        } else {
+            startBulkDownload();
+        }
+    }
+
+    private void startBulkDownload() {
+        Log.v(TAG, "Bulkloading started with: " + mArtworkRequestQueue.size());
+
+        if (mArtworkRequestQueue.isEmpty()) {
+            finishedLoading();
+        } else {
+            performNextRequest();
+        }
+    }
+
+    private void performNextRequest() {
+        ArtworkRequestModel requestModel;
+        synchronized (mArtworkRequestQueue) {
+            updateNotification(mArtworkRequestQueue.size());
+
+            requestModel = mArtworkRequestQueue.pollFirst();
+        }
+
+        if (requestModel != null) {
+            switch (requestModel.getType()) {
+                case ALBUM:
+                    createAlbumRequest((MPDAlbum) requestModel.getGenericModel());
+                    break;
+                case ARTIST:
+                    createArtistRequest((MPDArtist) requestModel.getGenericModel());
+                    break;
+                case TRACK:
+                    createTrackRequest((MPDTrack) requestModel.getGenericModel());
+                    break;
+            }
+        } else {
+            finishedLoading();
+        }
+    }
+
+    private void createAlbumRequest(final MPDAlbum album) {
+        // Check if image already there
+        try {
+            mDatabaseManager.getAlbumImage(getApplicationContext(), album);
+
+            // If this does not throw the exception it already has an image.
+            performNextRequest();
+        } catch (ImageNotFoundException e) {
+            mArtworkManager.fetchImage(album, this, this);
+        }
+    }
+
+    private void createArtistRequest(final MPDArtist artist) {
+        // Check if image already there
+        try {
+            mDatabaseManager.getArtistImage(getApplicationContext(), artist);
+
+            // If this does not throw the exception it already has an image.
+            performNextRequest();
+        } catch (ImageNotFoundException e) {
+            mArtworkManager.fetchImage(artist, this, this);
+        }
+    }
+
+    private void createTrackRequest(final MPDTrack track) {
+        // Check if image already there
+        try {
+            mDatabaseManager.getTrackImage(getApplicationContext(), track);
+
+            // If this does not throw the exception it already has an image.
+            performNextRequest();
+        } catch (ImageNotFoundException e) {
+            mArtworkManager.fetchImage(track, this, this);
+        }
+    }
+
+    private void finishedLoading() {
+        mArtworkRequestQueue.clear();
+
+        ArtworkManager.getInstance(getApplicationContext()).cancelAllRequests(getApplicationContext());
+
+        mNotificationManager.cancel(NOTIFICATION_ID);
+        stopForeground(true);
+        MPDInterface.mInstance.removeMPDConnectionStateChangeListener(mConnectionHandler);
+        stopSelf();
+        if (mWakelock.isHeld()) {
+            mWakelock.release();
+        }
+    }
+
+    private void updateNotification(final int pendingRequests) {
+        Log.v(TAG, "Remaining requests: " + pendingRequests);
+
+        int finishedRequests = mSumArtworkRequests - pendingRequests;
+
+        if (finishedRequests % 10 == 0) {
+            mBuilder.setProgress(mSumArtworkRequests, finishedRequests, false);
+            mBuilder.setStyle(new NotificationCompat.BigTextStyle()
+                    .bigText(getString(R.string.downloader_notification_remaining_images) + ' ' + String.valueOf(finishedRequests) + '/' + String.valueOf(mSumArtworkRequests)));
+            mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
+        }
     }
 
     private void openChannel() {
@@ -179,90 +456,6 @@ public class BulkDownloadService extends Service implements ArtworkManager.BulkL
         }
     }
 
-    private void runAsForeground() {
-        if (mBroadcastReceiver == null) {
-            mBroadcastReceiver = new ActionReceiver();
-
-            // Create a filter to only handle certain actions
-            IntentFilter intentFilter = new IntentFilter();
-
-            intentFilter.addAction(ACTION_CANCEL);
-
-            registerReceiver(mBroadcastReceiver, intentFilter);
-        }
-
-        openChannel();
-
-        mBuilder = new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
-                .setContentTitle(getResources().getString(R.string.downloader_notification_title))
-                .setStyle(new NotificationCompat.BigTextStyle()
-                        .bigText(getResources().getString(R.string.downloader_notification_remaining_images) + ' ' + String.valueOf(mSumImageDownloads - (mRemainingArtists + mRemainingAlbums)) + '/' + String.valueOf(mSumImageDownloads)))
-                .setProgress(mSumImageDownloads, mSumImageDownloads - (mRemainingArtists + mRemainingAlbums), false)
-                .setSmallIcon(R.drawable.ic_notification_24dp);
-
-        mBuilder.setOngoing(true);
-
-        // Cancel action
-        Intent nextIntent = new Intent(BulkDownloadService.ACTION_CANCEL);
-        PendingIntent nextPendingIntent = PendingIntent.getBroadcast(getApplicationContext(), 1, nextIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-        androidx.core.app.NotificationCompat.Action cancelAction = new androidx.core.app.NotificationCompat.Action.Builder(R.drawable.ic_cancel_24dp, getResources().getString(R.string.dialog_action_cancel), nextPendingIntent).build();
-
-        mBuilder.addAction(cancelAction);
-
-        Notification notification = mBuilder.build();
-        startForeground(NOTIFICATION_ID, notification);
-        mNotificationManager.notify(NOTIFICATION_ID, notification);
-
-    }
-
-    @Override
-    public void startAlbumLoading(int albumCount) {
-        Log.v(TAG, "Albumloading started with: " + albumCount + " albums");
-        mSumImageDownloads += albumCount;
-        mRemainingAlbums = albumCount;
-        runAsForeground();
-    }
-
-    @Override
-    public void startArtistLoading(int artistCount) {
-        Log.v(TAG, "Artistloading started with: " + artistCount + " artists");
-        mSumImageDownloads += artistCount;
-        mRemainingArtists = artistCount;
-        runAsForeground();
-    }
-
-    @Override
-    public void albumsRemaining(int remainingAlbums) {
-        mRemainingAlbums = remainingAlbums;
-        updateNotification();
-    }
-
-    @Override
-    public void artistsRemaining(int remainingArtists) {
-        mRemainingArtists = remainingArtists;
-        updateNotification();
-    }
-
-    @Override
-    public void finishedLoading() {
-        mNotificationManager.cancel(NOTIFICATION_ID);
-        stopForeground(true);
-        MPDInterface.mInstance.removeMPDConnectionStateChangeListener(mConnectionHandler);
-        stopSelf();
-        if (mWakelock.isHeld()) {
-            mWakelock.release();
-        }
-    }
-
-    private void updateNotification() {
-        if ((mSumImageDownloads - (mRemainingArtists + mRemainingAlbums)) % 10 == 0) {
-            mBuilder.setProgress(mSumImageDownloads, mSumImageDownloads - (mRemainingArtists + mRemainingAlbums), false);
-            mBuilder.setStyle(new NotificationCompat.BigTextStyle()
-                    .bigText(getResources().getString(R.string.downloader_notification_remaining_images) + ' ' + String.valueOf(mSumImageDownloads - (mRemainingArtists + mRemainingAlbums)) + '/' + String.valueOf(mSumImageDownloads)));
-            mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
-        }
-    }
-
     private static class ConnectionStateHandler extends MPDConnectionStateChangeHandler {
         private final WeakReference<BulkDownloadService> mService;
 
@@ -274,16 +467,13 @@ public class BulkDownloadService extends Service implements ArtworkManager.BulkL
         @Override
         public void onConnected() {
             Log.v(TAG, "Connected to mpd host");
-            mService.get().mSumImageDownloads = 0;
-            mService.get().mRemainingArtists = 0;
-            mService.get().mRemainingAlbums = 0;
 
             // Disable MPD albumart provider if no support is available on at the server side
-            if (MPDAlbumImageProvider.mInstance.getActive() && !MPDInterface.mInstance.getServerCapabilities().hasAlbumArt()) {
-                MPDAlbumImageProvider.mInstance.setActive(false);
+            if (MPDAlbumImageProvider.getInstance().getActive() && !MPDInterface.mInstance.getServerCapabilities().hasAlbumArt()) {
+                MPDAlbumImageProvider.getInstance().setActive(false);
             }
 
-            ArtworkManager.getInstance(mService.get().getApplicationContext()).bulkLoadImages(mService.get());
+            mService.get().createArtworkRequestQueue();
         }
 
         @Override
@@ -297,13 +487,9 @@ public class BulkDownloadService extends Service implements ArtworkManager.BulkL
         @Override
         public void onReceive(Context context, Intent intent) {
             Log.e(TAG, "Broadcast requested");
-            if (intent.getAction().equals(ACTION_CANCEL)) {
+            if (ACTION_CANCEL.equals(intent.getAction())) {
                 Log.e(TAG, "Cancel requested");
-                ArtworkManager.getInstance(getApplicationContext()).cancelAllRequests();
-                mNotificationManager.cancel(NOTIFICATION_ID);
-                stopForeground(true);
-                MPDInterface.mInstance.removeMPDConnectionStateChangeListener(mConnectionHandler);
-                stopSelf();
+                finishedLoading();
             }
         }
     }
@@ -315,7 +501,7 @@ public class BulkDownloadService extends Service implements ArtworkManager.BulkL
             if (!NetworkUtils.isDownloadAllowed(context, mWifiOnly)) {
                 // Cancel all downloads
                 Log.v(TAG, "Cancel all downloads because of connection change");
-                MALPRequestQueue.getInstance(BulkDownloadService.this).cancelAll(request -> true);
+                finishedLoading();
             }
 
         }

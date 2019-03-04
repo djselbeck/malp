@@ -22,41 +22,36 @@
 
 package org.gateshipone.malp.application.artwork.network.requests;
 
+import androidx.annotation.Nullable;
 import com.android.volley.NetworkResponse;
 import com.android.volley.Response;
+import org.gateshipone.malp.application.artwork.network.ArtworkRequestModel;
+import org.gateshipone.malp.application.artwork.network.responses.ImageResponse;
 
-import org.gateshipone.malp.application.artwork.network.responses.AlbumImageResponse;
-import org.gateshipone.malp.mpdservice.mpdprotocol.mpdobjects.MPDAlbum;
+public class MALPByteRequest extends MALPRequest<ImageResponse> {
 
+    private final Response.Listener<ImageResponse> mListener;
 
-public class AlbumImageByteRequest extends MALPRequest<AlbumImageResponse> {
+    private ArtworkRequestModel mModel;
 
-    private final Response.Listener<AlbumImageResponse> mListener;
-
-    private MPDAlbum mAlbum;
-    private String mUrl;
-
-
-    public AlbumImageByteRequest(String url, MPDAlbum album, Response.Listener<AlbumImageResponse> listener, Response.ErrorListener errorListener) {
+    public MALPByteRequest(ArtworkRequestModel model, String url, Response.Listener<ImageResponse> listener, @Nullable Response.ErrorListener errorListener) {
         super(Method.GET, url, errorListener);
 
+        mModel = model;
         mListener = listener;
-        mAlbum = album;
-        mUrl = url;
     }
 
     @Override
-    protected Response<AlbumImageResponse> parseNetworkResponse(NetworkResponse response) {
-        AlbumImageResponse imageResponse = new AlbumImageResponse();
-        imageResponse.album = mAlbum;
+    protected Response<ImageResponse> parseNetworkResponse(NetworkResponse response) {
+        ImageResponse imageResponse = new ImageResponse();
+        imageResponse.model = mModel;
+        imageResponse.url = getUrl();
         imageResponse.image = response.data;
-        imageResponse.url = mUrl;
         return Response.success(imageResponse, null);
     }
 
     @Override
-    protected void deliverResponse(AlbumImageResponse response) {
+    protected void deliverResponse(ImageResponse response) {
         mListener.onResponse(response);
     }
-
 }

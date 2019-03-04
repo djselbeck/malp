@@ -25,8 +25,6 @@ package org.gateshipone.malp.application.utils;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.util.Pair;
-
-
 import org.gateshipone.malp.application.adapters.ScrollSpeedAdapter;
 import org.gateshipone.malp.application.artwork.ArtworkManager;
 import org.gateshipone.malp.application.artwork.storage.ImageNotFoundException;
@@ -61,6 +59,7 @@ public class AsyncLoader extends AsyncTask<AsyncLoader.CoverViewHolder, Void, Bi
 
     /**
      * Asynchronous task in parallel to the GUI thread.
+     *
      * @param params Input parameter containing all the necessary informaton to fetch the image.
      * @return Bitmap loaded from the database.
      */
@@ -72,44 +71,44 @@ public class AsyncLoader extends AsyncTask<AsyncLoader.CoverViewHolder, Void, Bi
         Bitmap image = null;
         // Check if model item is artist or album
         if (mCover.modelItem instanceof MPDArtist) {
-            MPDArtist artist = (MPDArtist)mCover.modelItem;
+            MPDArtist artist = (MPDArtist) mCover.modelItem;
             try {
                 // Check if image is available. If it is not yet fetched it will throw an exception
                 // If it was already searched for and not found, this will be null.
-                image = mCover.artworkManager.getArtistImage(artist, mCover.imageDimension.first, mCover.imageDimension.second, false);
+                image = mCover.artworkManager.getImage(artist, mCover.imageDimension.first, mCover.imageDimension.second, false);
             } catch (ImageNotFoundException e) {
                 // Check if fetching for this item is already ongoing
                 if (!artist.getFetching()) {
                     // If not set it as ongoing and request the image fetch.
-                    mCover.artworkManager.fetchArtistImage(artist);
+                    mCover.artworkManager.fetchImage(artist);
                     artist.setFetching(true);
                 }
             }
         } else if (mCover.modelItem instanceof MPDAlbum) {
-            MPDAlbum album = (MPDAlbum)mCover.modelItem;
+            MPDAlbum album = (MPDAlbum) mCover.modelItem;
             try {
                 // Check if image is available. If it is not yet fetched it will throw an exception.
                 // If it was already searched for and not found, this will be null.
-                image = mCover.artworkManager.getAlbumImage(album, mCover.imageDimension.first, mCover.imageDimension.second, false);
+                image = mCover.artworkManager.getImage(album, mCover.imageDimension.first, mCover.imageDimension.second, false);
             } catch (ImageNotFoundException e) {
                 // Check if fetching for this item is already ongoing
                 if (!album.getFetching()) {
                     // If not set it as ongoing and request the image fetch.
-                    mCover.artworkManager.fetchAlbumImage(album);
+                    mCover.artworkManager.fetchImage(album);
                     album.setFetching(true);
                 }
             }
         } else if (mCover.modelItem instanceof MPDTrack) {
-            MPDTrack track = (MPDTrack)mCover.modelItem;
+            MPDTrack track = (MPDTrack) mCover.modelItem;
             try {
                 // Check if image is available. If it is not yet fetched it will throw an exception.
                 // If it was already searched for and not found, this will be null.
-                image = mCover.artworkManager.getAlbumImageForTrack(track, mCover.imageDimension.first, mCover.imageDimension.second, false);
+                image = mCover.artworkManager.getImage(track, mCover.imageDimension.first, mCover.imageDimension.second, false);
             } catch (ImageNotFoundException e) {
                 // Check if fetching for this item is already ongoing
                 if (!track.getFetching()) {
                     // If not set it as ongoing and request the image fetch.
-                    mCover.artworkManager.fetchAlbumImage(track);
+                    mCover.artworkManager.fetchImage(track);
                     track.setFetching(true);
                 }
             }
@@ -120,6 +119,7 @@ public class AsyncLoader extends AsyncTask<AsyncLoader.CoverViewHolder, Void, Bi
 
     /**
      * Called when the asynchronous task finishes. This is called inside the GUI context.
+     *
      * @param result Bitmap that was loaded.
      */
     @Override
@@ -127,9 +127,9 @@ public class AsyncLoader extends AsyncTask<AsyncLoader.CoverViewHolder, Void, Bi
         super.onPostExecute(result);
 
         // set mCover if exists
-        if ( null != result ) {
+        if (null != result) {
             // Check how long image loading took and notify the adapter about the time.
-            if ( mCover.mAdapter != null) {
+            if (mCover.mAdapter != null) {
                 mCover.mAdapter.addImageLoadTime(System.currentTimeMillis() - mStartTime);
             }
 

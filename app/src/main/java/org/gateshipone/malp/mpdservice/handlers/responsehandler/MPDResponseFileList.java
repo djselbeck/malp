@@ -25,10 +25,9 @@ package org.gateshipone.malp.mpdservice.handlers.responsehandler;
 
 import android.os.Bundle;
 import android.os.Message;
+import org.gateshipone.malp.mpdservice.mpdprotocol.mpdobjects.MPDFileEntry;
 
 import java.util.List;
-
-import org.gateshipone.malp.mpdservice.mpdprotocol.mpdobjects.MPDFileEntry;
 
 public abstract class MPDResponseFileList extends MPDResponseHandler {
     public static final String EXTRA_WINDOW_START = "windowstart";
@@ -41,6 +40,7 @@ public abstract class MPDResponseFileList extends MPDResponseHandler {
     /**
      * Handle function for the track list. This only calls the abstract method
      * which needs to get implemented by the user of this class.
+     *
      * @param msg Message object containing a list of MPDTrack items.
      */
     @Override
@@ -52,7 +52,7 @@ public abstract class MPDResponseFileList extends MPDResponseHandler {
         int windowEnd = msg.getData().getInt(EXTRA_WINDOW_END);
 
         /* Call album response handler */
-        List<MPDFileEntry> trackList = (List<MPDFileEntry>)msg.obj;
+        List<MPDFileEntry> trackList = (List<MPDFileEntry>) msg.obj;
         handleTracks(trackList, windowStart, windowEnd);
     }
 
@@ -76,6 +76,7 @@ public abstract class MPDResponseFileList extends MPDResponseHandler {
      * Abstract method to be implemented by the user of the MPD implementation.
      * This should be a callback for the UI thread and run in the UI thread.
      * This can be used for updating lists of adapters and views.
+     *
      * @param fileList List of MPDTrack objects containing a list of mpds tracks response.
      */
     abstract public void handleTracks(List<MPDFileEntry> fileList, int windowstart, int windowend);

@@ -24,7 +24,6 @@ package org.gateshipone.malp.application.utils;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-
 import org.gateshipone.malp.application.artwork.ArtworkManager;
 import org.gateshipone.malp.application.artwork.BitmapCache;
 import org.gateshipone.malp.application.artwork.storage.ImageNotFoundException;
@@ -115,19 +114,19 @@ public class CoverBitmapLoader {
 
             // At first get image independent of resolution (can be replaced later with higher resolution)
             Bitmap image = BitmapCache.getInstance().requestAlbumBitmap(tempAlbum);
-            if(image != null) {
+            if (image != null) {
                 mListener.receiveBitmap(image, IMAGE_TYPE.ALBUM_IMAGE);
             }
 
             try {
                 // If image was to small get it in the right resolution
                 if (image == null || !(mWidth <= image.getWidth() && mHeight <= image.getHeight())) {
-                    Bitmap albumImage = ArtworkManager.getInstance(mContext.getApplicationContext()).getAlbumImageForTrack(mTrack, mWidth, mHeight, true);
+                    Bitmap albumImage = ArtworkManager.getInstance(mContext.getApplicationContext()).getImage(mTrack, mWidth, mHeight, true);
                     mListener.receiveBitmap(albumImage, IMAGE_TYPE.ALBUM_IMAGE);
                 }
             } catch (ImageNotFoundException e) {
                 if (mFetchImage) {
-                    ArtworkManager.getInstance(mContext.getApplicationContext()).fetchAlbumImage(mTrack);
+                    ArtworkManager.getInstance(mContext.getApplicationContext()).fetchImage(mTrack);
                 }
             }
         }
@@ -153,19 +152,19 @@ public class CoverBitmapLoader {
         public void run() {
             // At first get image independent of resolution (can be replaced later with higher resolution)
             Bitmap image = BitmapCache.getInstance().requestArtistImage(mArtist);
-            if(image != null) {
+            if (image != null) {
                 mListener.receiveBitmap(image, IMAGE_TYPE.ARTIST_IMAGE);
             }
 
             try {
                 // If image was to small get it in the right resolution
                 if (image == null || !(mWidth <= image.getWidth() && mHeight <= image.getHeight())) {
-                    image = ArtworkManager.getInstance(mContext.getApplicationContext()).getArtistImage(mArtist, mWidth, mHeight, true);
+                    image = ArtworkManager.getInstance(mContext.getApplicationContext()).getImage(mArtist, mWidth, mHeight, true);
                     mListener.receiveBitmap(image, IMAGE_TYPE.ARTIST_IMAGE);
                 }
             } catch (ImageNotFoundException e) {
                 if (mFetchImage) {
-                    ArtworkManager.getInstance(mContext.getApplicationContext()).fetchArtistImage(mArtist);
+                    ArtworkManager.getInstance(mContext.getApplicationContext()).fetchImage(mArtist);
                 }
             }
         }
@@ -179,7 +178,7 @@ public class CoverBitmapLoader {
 
         public TrackArtistImageRunner(MPDTrack track, boolean fetchImage, int width, int height) {
             mArtist = new MPDArtist(track.getTrackArtist());
-            if ( !track.getTrackArtistMBID().isEmpty()) {
+            if (!track.getTrackArtistMBID().isEmpty()) {
                 mArtist.addMBID(track.getTrackArtistMBID());
             }
             mFetchImage = fetchImage;
@@ -194,19 +193,19 @@ public class CoverBitmapLoader {
         public void run() {
             // At first get image independent of resolution (can be replaced later with higher resolution)
             Bitmap image = BitmapCache.getInstance().requestArtistImage(mArtist);
-            if(image != null) {
+            if (image != null) {
                 mListener.receiveBitmap(image, IMAGE_TYPE.ARTIST_IMAGE);
             }
 
             try {
                 // If image was to small get it in the right resolution
                 if (image == null || !(mWidth <= image.getWidth() && mHeight <= image.getHeight())) {
-                    image = ArtworkManager.getInstance(mContext.getApplicationContext()).getArtistImage(mArtist, mWidth, mHeight, true);
+                    image = ArtworkManager.getInstance(mContext.getApplicationContext()).getImage(mArtist, mWidth, mHeight, true);
                     mListener.receiveBitmap(image, IMAGE_TYPE.ARTIST_IMAGE);
                 }
             } catch (ImageNotFoundException e) {
                 if (mFetchImage) {
-                    ArtworkManager.getInstance(mContext.getApplicationContext()).fetchArtistImage(mArtist);
+                    ArtworkManager.getInstance(mContext.getApplicationContext()).fetchImage(mArtist);
                 }
             }
         }
@@ -232,19 +231,19 @@ public class CoverBitmapLoader {
         public void run() {
             // At first get image independent of resolution (can be replaced later with higher resolution)
             Bitmap image = BitmapCache.getInstance().requestAlbumBitmap(mAlbum);
-            if(image != null) {
+            if (image != null) {
                 mListener.receiveBitmap(image, IMAGE_TYPE.ALBUM_IMAGE);
             }
 
             try {
                 // If image was to small get it in the right resolution
                 if (image == null || !(mWidth <= image.getWidth() && mHeight <= image.getHeight())) {
-                    Bitmap albumImage = ArtworkManager.getInstance(mContext.getApplicationContext()).getAlbumImage(mAlbum, mWidth, mHeight, true);
+                    Bitmap albumImage = ArtworkManager.getInstance(mContext.getApplicationContext()).getImage(mAlbum, mWidth, mHeight, true);
                     mListener.receiveBitmap(albumImage, IMAGE_TYPE.ALBUM_IMAGE);
                 }
             } catch (ImageNotFoundException e) {
                 if (mFetchImage) {
-                    ArtworkManager.getInstance(mContext.getApplicationContext()).fetchAlbumImage(mAlbum);
+                    ArtworkManager.getInstance(mContext.getApplicationContext()).fetchImage(mAlbum);
                 }
             }
         }

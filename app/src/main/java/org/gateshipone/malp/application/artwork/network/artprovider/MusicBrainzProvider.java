@@ -23,38 +23,29 @@
 package org.gateshipone.malp.application.artwork.network.artprovider;
 
 import android.content.Context;
-import android.net.Uri;
 import android.util.Log;
-
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
-
-
-import org.gateshipone.malp.application.artwork.network.responses.AlbumFetchError;
-import org.gateshipone.malp.application.artwork.network.responses.AlbumImageResponse;
-import org.gateshipone.malp.application.artwork.network.responses.ArtistFetchError;
-import org.gateshipone.malp.application.artwork.network.requests.AlbumImageByteRequest;
-import org.gateshipone.malp.application.artwork.network.requests.MALPJsonObjectRequest;
+import org.gateshipone.malp.application.artwork.network.ArtworkRequestModel;
 import org.gateshipone.malp.application.artwork.network.MALPRequestQueue;
-import org.gateshipone.malp.application.artwork.network.responses.ArtistImageResponse;
+import org.gateshipone.malp.application.artwork.network.requests.MALPByteRequest;
+import org.gateshipone.malp.application.artwork.network.requests.MALPJsonObjectRequest;
+import org.gateshipone.malp.application.artwork.network.responses.ImageResponse;
 import org.gateshipone.malp.application.utils.FormatHelper;
 import org.gateshipone.malp.mpdservice.mpdprotocol.mpdobjects.MPDAlbum;
-import org.gateshipone.malp.mpdservice.mpdprotocol.mpdobjects.MPDArtist;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-/**
- * FIXME:
- * ArtistImageProvider currently NOT IMPLEMENTED!!!
- */
-public class MusicBrainzProvider implements AlbumImageProvider {
+public class MusicBrainzProvider extends ArtProvider {
+
     private static final String TAG = MusicBrainzProvider.class.getSimpleName();
 
     private static final String LUCENE_SPECIAL_CHARACTERS_REGEX = "([+\\-\\!\\(\\)\\{\\}\\[\\]\\^\\\"\\~\\*\\?\\:\\\\\\/])";
 
     private static final String MUSICBRAINZ_API_URL = "https://musicbrainz.org/ws/2";
+
     private static final String COVERART_ARCHIVE_API_URL = "https://coverartarchive.org";
 
     private RequestQueue mRequestQueue;
@@ -63,7 +54,8 @@ public class MusicBrainzProvider implements AlbumImageProvider {
 
     private static final String MUSICBRAINZ_FORMAT_JSON = "&fmt=json";
 
-    private static final int MUSICBRAINZ_LIMIT_RESULT_COUNT = 3;
+    private static final int MUSICBRAINZ_LIMIT_RESULT_COUNT = 10;
+
     private static final String MUSICBRAINZ_LIMIT_RESULT = "&limit=" + String.valueOf(MUSICBRAINZ_LIMIT_RESULT_COUNT);
 
     private MusicBrainzProvider(Context context) {
@@ -77,184 +69,98 @@ public class MusicBrainzProvider implements AlbumImageProvider {
         return mInstance;
     }
 
-
-    /**
-     * Fetch an image for an given {@link MPDArtist}. Make sure to provide response and error listener.
-     * @param artist Artist to try to get an image for.
-     * @param listener ResponseListener that reacts on successful retrieval of an image.
-     * @param errorListener Error listener that is called when an error occurs.
-     */
-    public void fetchArtistImage(final MPDArtist artist, final Response.Listener<ArtistImageResponse> listener, final ArtistFetchError errorListener) {
-
-        String artistURLName = Uri.encode(artist.getArtistName());
-
-        getArtists(artistURLName, response -> {
-            JSONArray artists = null;
-            try {
-                artists = response.getJSONArray("artists");
-
-                if (!artists.isNull(0)) {
-                    JSONObject artist1 = artists.getJSONObject(0);
-                    String artistMBID = artist1.getString("id");
-
-                    getArtistImageURL(artistMBID, response1 -> {
-                        JSONArray relations = null;
-                        try {
-                            relations = response1.getJSONArray("relations");
-                            for (int i = 0; i < relations.length(); i++) {
-                                JSONObject obj = relations.getJSONObject(i);
-
-                                if (obj.getString("type").equals("image")) {
-                                    JSONObject url = obj.getJSONObject("url");
-
-                                    getArtistImage(url.getString("resource"), listener, error -> {
-                                        // FIXME error handling
-                                    });
-                                }
-                            }
-                        } catch (JSONException e) {
-                            e.printStackTrace();
+    @Override
+    public void fetchImage(final ArtworkRequestModel model, final Context context,
+                           final Response.Listener<ImageResponse> listener, final ArtFetchError errorListener) {
+        switch (model.getType()) {
+            case ALBUM:
+                if (model.getMBID().isEmpty()) {
+                    resolveAlbumMBID(model, context, listener, errorListener);
+                } else {
+                    String url = COVERART_ARCHIVE_API_URL + "/" + "release/" + model.getMBID() + "/front-500";
+                    getAlbumImage(url, model, listener, error -> {
+                        if (error.networkResponse != null && error.networkResponse.statusCode == 404) {
+                            // Try without MBID from MPD
+                            resolveAlbumMBID(model, context, listener, errorListener);
+                        } else {
+                            errorListener.fetchVolleyError(model, context, error);
                         }
-                    }, error -> {
-
                     });
                 }
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }, error -> {
-            // FIXME error handling
-        });
-    }
-
-    /**
-     * Searches for the artist with the given artist name and tries to manually get an MBID
-     * @param artistName Artist name to search for
-     * @param listener Callback to handle the response
-     * @param errorListener Callback to handle errors
-     */
-    private void getArtists(String artistName, Response.Listener<JSONObject> listener, Response.ErrorListener errorListener) {
-
-        Log.v(MusicBrainzProvider.class.getSimpleName(), artistName);
-
-        String url = MUSICBRAINZ_API_URL + "/" + "artist/?query=artist:" + artistName + MUSICBRAINZ_FORMAT_JSON;
-
-        MALPJsonObjectRequest jsonObjectRequest = new MALPJsonObjectRequest(Request.Method.GET, url, null, listener, errorListener);
-
-        mRequestQueue.add(jsonObjectRequest);
-    }
-
-    /**
-     * Fetches the image URL for the raw image blob.
-     * @param artistMBID Artist mbid to look for an image
-     * @param listener Callback listener to handle the response
-     * @param errorListener Callback to handle a fetch error
-     */
-    private void getArtistImageURL(String artistMBID, Response.Listener<JSONObject> listener, Response.ErrorListener errorListener) {
-
-        Log.v(MusicBrainzProvider.class.getSimpleName(), artistMBID);
-
-        String url = MUSICBRAINZ_API_URL + "/" + "artist/" + artistMBID + "?inc=url-rels" + MUSICBRAINZ_FORMAT_JSON;
-
-        MALPJsonObjectRequest jsonObjectRequest = new MALPJsonObjectRequest(Request.Method.GET, url, null, listener, errorListener);
-
-        mRequestQueue.add(jsonObjectRequest);
-    }
-
-    /**
-     * Raw download for an image
-     * @param url Final image URL to download
-     * @param listener Response listener to receive the image as a byte array
-     * @param errorListener Error listener
-     */
-    private void getArtistImage(String url, Response.Listener<ArtistImageResponse> listener, Response.ErrorListener errorListener) {
-        Log.v(MusicBrainzProvider.class.getSimpleName(), url);
-
-//        Request<byte[]> byteResponse = new ArtistImageByteRequest(url, listener, errorListener);
-
-//        addToRequestQueue(byteResponse);
-    }
-
-    /**
-     * Public interface to get an image for an album.
-     * @param album Album to check for an image
-     * @param listener Callback to handle the fetched image
-     * @param errorListener Callback to handle errors
-     */
-    @Override
-    public void fetchAlbumImage(final MPDAlbum album, final Response.Listener<AlbumImageResponse> listener, final AlbumFetchError errorListener) {
-
-        if ( album.getMBID().isEmpty()) {
-            resolveAlbumMBID(album, listener, errorListener);
-        } else {
-            String url = COVERART_ARCHIVE_API_URL + "/" + "release/" + album.getMBID() + "/front-500";
-            getAlbumImage(url, album, listener, error -> {
-                if(error.networkResponse != null && error.networkResponse.statusCode == 404) {
-                    // Try without MBID from MPD
-                    resolveAlbumMBID(album, listener, errorListener);
-                } else {
-                    errorListener.fetchVolleyError(album, error);
-                }
-            });
+                break;
+            case ARTIST:
+                // not used for this provider
+                break;
+            case TRACK:
+                // not used for this provider
+                break;
         }
     }
 
     /**
      * Wrapper to manually get an MBID for an {@link MPDAlbum} without an MBID already set
-     * @param album Album to search
-     * @param listener Callback listener to handle the response
+     *
+     * @param album         Album to search
+     * @param listener      Callback listener to handle the response
      * @param errorListener Callback to handle lookup errors
      */
-    private void resolveAlbumMBID( final MPDAlbum album, final Response.Listener<AlbumImageResponse> listener, final AlbumFetchError errorListener ) {
-        getAlbumMBID(album, response -> parseMusicBrainzReleaseJSON(album, 0, response, listener, errorListener), error -> errorListener.fetchVolleyError(album, error));
+    private void resolveAlbumMBID(final ArtworkRequestModel album, final Context context,
+                                  final Response.Listener<ImageResponse> listener, final ArtFetchError errorListener) {
+        getAlbumMBID(album,
+                response -> parseMusicBrainzReleaseJSON(album, 0, response, context, listener, errorListener),
+                error -> errorListener.fetchVolleyError(album, context, error));
     }
 
     /**
      * Parses the JSON response and searches the image URL
-     * @param album Album to check for an image
-     * @param releaseIndex Index of the requested release to check for an image
-     * @param response Response to check use to search for an image
-     * @param listener Callback to handle the response
+     *
+     * @param model         Album to check for an image
+     * @param releaseIndex  Index of the requested release to check for an image
+     * @param response      Response to check use to search for an image
+     * @param context       Context used for lookup
+     * @param listener      Callback to handle the response
      * @param errorListener Callback to handle errors
      */
-    private void parseMusicBrainzReleaseJSON(final MPDAlbum album, final int releaseIndex, final JSONObject response, final Response.Listener<AlbumImageResponse> listener, final AlbumFetchError errorListener) {
-        if (releaseIndex >= MUSICBRAINZ_LIMIT_RESULT_COUNT ) {
-            errorListener.fetchVolleyError(album, null);
+    private void parseMusicBrainzReleaseJSON(final ArtworkRequestModel model, final int releaseIndex, final JSONObject response, final Context context,
+                                             final Response.Listener<ImageResponse> listener, final ArtFetchError errorListener) {
+        if (releaseIndex >= MUSICBRAINZ_LIMIT_RESULT_COUNT) {
+            errorListener.fetchVolleyError(model, context, null);
             return;
         }
+
         try {
             final JSONArray releases = response.getJSONArray("releases");
+            if (releases.length() > releaseIndex) {
+                final String mbid = releases.getJSONObject(releaseIndex).getString("id");
+                final String url = COVERART_ARCHIVE_API_URL + "/" + "release/" + mbid + "/front-500";
 
-
-            if ( releases.length() > releaseIndex) {
-                String mbid = releases.getJSONObject(releaseIndex).getString("id");
-                String url = COVERART_ARCHIVE_API_URL + "/" + "release/" + mbid + "/front-500";
-
-                getAlbumImage(url, album, listener, error -> {
-                    if ( releaseIndex + 1 < releases.length() && (error.networkResponse != null && error.networkResponse.statusCode == 404) ) {
-                        parseMusicBrainzReleaseJSON(album, releaseIndex + 1, response, listener, errorListener);
+                getAlbumImage(url, model, listener, error -> {
+                    Log.v(TAG, "No image found for: " + model.getAlbumName() + " with release index: " + releaseIndex);
+                    if (releaseIndex + 1 < releases.length()) {
+                        parseMusicBrainzReleaseJSON(model, releaseIndex + 1, response, context, listener, errorListener);
                     } else {
-                        errorListener.fetchVolleyError(album, error);
+                        errorListener.fetchVolleyError(model, context, error);
                     }
                 });
             } else {
-                errorListener.fetchVolleyError(album, null);
+                errorListener.fetchVolleyError(model, context, null);
             }
         } catch (JSONException e) {
-            errorListener.fetchJSONException(album,e);
+            errorListener.fetchJSONException(model, context, e);
         }
-
     }
 
     /**
-     * Wrapper to get an MBID out of an {@link MPDAlbum}.
-     * @param album Album to get the MBID for
-     * @param listener Response listener
+     * Wrapper to get an MBID out of an {@link ArtworkRequestModel}.
+     *
+     * @param model         Album to get the MBID for
+     * @param listener      Response listener
      * @param errorListener Error listener
      */
-    private void getAlbumMBID(MPDAlbum album, Response.Listener<JSONObject> listener, Response.ErrorListener errorListener) {
-        String albumName = Uri.encode(FormatHelper.escapeSpecialCharsLucene(album.getName()));
-        String artistName = Uri.encode(FormatHelper.escapeSpecialCharsLucene(album.getArtistName()));
+    private void getAlbumMBID(final ArtworkRequestModel model, final Response.Listener<JSONObject> listener, final Response.ErrorListener errorListener) {
+        final String albumName = FormatHelper.escapeSpecialCharsLucene(model.getEncodedAlbumName());
+        final String artistName = FormatHelper.escapeSpecialCharsLucene(model.getEncodedArtistName());
+
         String url;
         if (!artistName.isEmpty()) {
             url = MUSICBRAINZ_API_URL + "/" + "release/?query=release:" + albumName + "%20AND%20artist:" + artistName + MUSICBRAINZ_LIMIT_RESULT + MUSICBRAINZ_FORMAT_JSON;
@@ -264,23 +170,24 @@ public class MusicBrainzProvider implements AlbumImageProvider {
 
         Log.v(TAG, "Requesting release mbid for: " + url);
 
-        MALPJsonObjectRequest jsonObjectRequest = new MALPJsonObjectRequest(Request.Method.GET, url, null, listener, errorListener);
+        MALPJsonObjectRequest jsonObjectRequest = new MALPJsonObjectRequest(url, null, listener, errorListener);
 
         mRequestQueue.add(jsonObjectRequest);
     }
 
     /**
      * Raw download for an image
-     * @param url Final image URL to download
-     * @param album Album associated with the image to download
-     * @param listener Response listener to receive the image as a byte array
+     *
+     * @param url           Final image URL to download
+     * @param model         Album associated with the image to download
+     * @param listener      Response listener to receive the image as a byte array
      * @param errorListener Error listener
      */
-    private void getAlbumImage(String url, MPDAlbum album, Response.Listener<AlbumImageResponse> listener, Response.ErrorListener errorListener) {
-        Request<AlbumImageResponse> byteResponse = new AlbumImageByteRequest(url, album, listener, errorListener);
-        Log.v(TAG,"Get image: " + url + " for album: " + album.getName());
+    private void getAlbumImage(final String url, final ArtworkRequestModel model,
+                               final Response.Listener<ImageResponse> listener,
+                               final Response.ErrorListener errorListener) {
+        Request<ImageResponse> byteResponse = new MALPByteRequest(model, url, listener, errorListener);
+        Log.v(TAG, "Get image: " + url);
         mRequestQueue.add(byteResponse);
     }
-
-
 }
