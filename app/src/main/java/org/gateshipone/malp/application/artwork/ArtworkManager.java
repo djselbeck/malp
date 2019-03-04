@@ -22,11 +22,7 @@
 
 package org.gateshipone.malp.application.artwork;
 
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.SharedPreferences;
+import android.content.*;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.ConnectivityManager;
@@ -35,23 +31,12 @@ import android.os.AsyncTask;
 import android.os.Looper;
 import android.preference.PreferenceManager;
 import android.util.Log;
-
 import com.android.volley.NetworkResponse;
 import com.android.volley.VolleyError;
-
 import org.gateshipone.malp.R;
 import org.gateshipone.malp.application.artwork.network.MALPRequestQueue;
-import org.gateshipone.malp.application.artwork.network.artprovider.FanartTVManager;
-import org.gateshipone.malp.application.artwork.network.artprovider.HTTPAlbumImageProvider;
-import org.gateshipone.malp.application.artwork.network.artprovider.LastFMManager;
-import org.gateshipone.malp.application.artwork.network.artprovider.MPDAlbumImageProvider;
-import org.gateshipone.malp.application.artwork.network.artprovider.MusicBrainzManager;
-import org.gateshipone.malp.application.artwork.network.responses.AlbumFetchError;
-import org.gateshipone.malp.application.artwork.network.responses.AlbumImageResponse;
-import org.gateshipone.malp.application.artwork.network.responses.ArtistFetchError;
-import org.gateshipone.malp.application.artwork.network.responses.ArtistImageResponse;
-import org.gateshipone.malp.application.artwork.network.responses.TrackAlbumFetchError;
-import org.gateshipone.malp.application.artwork.network.responses.TrackAlbumImageResponse;
+import org.gateshipone.malp.application.artwork.network.artprovider.*;
+import org.gateshipone.malp.application.artwork.network.responses.*;
 import org.gateshipone.malp.application.artwork.storage.ArtworkDatabaseManager;
 import org.gateshipone.malp.application.artwork.storage.ImageNotFoundException;
 import org.gateshipone.malp.application.utils.BitmapUtils;
@@ -87,7 +72,7 @@ public class ArtworkManager implements ArtistFetchError, AlbumFetchError {
     /**
      * Maximum size of an image blob to insert in SQLite database. (1MB)
      */
-    private static final int MAXIMUM_IMAGE_SIZE = 1024*1024;
+    private static final int MAXIMUM_IMAGE_SIZE = 1024 * 1024;
 
     /**
      * Manager for the SQLite database handling
@@ -291,7 +276,7 @@ public class ArtworkManager implements ArtistFetchError, AlbumFetchError {
             return null;
         }
 
-        if(!skipCache) {
+        if (!skipCache) {
             // Try cache first
             Bitmap cacheBitmap = BitmapCache.getInstance().requestArtistImage(artist);
             if (cacheBitmap != null && width <= cacheBitmap.getWidth() && height <= cacheBitmap.getWidth()) {
@@ -299,19 +284,7 @@ public class ArtworkManager implements ArtistFetchError, AlbumFetchError {
             }
         }
 
-
-        String image = null;
-
-        /**
-         * If no artist id is set for the album (possible with data set of Odyssey) check
-         * the artist with name instead of id.
-         */
-        if (artist.getMBIDCount() != 0) {
-            image = mDBManager.getArtistImage(mContext, artist);
-        } else if (!artist.getArtistName().isEmpty()) {
-            image = mDBManager.getArtistImage(mContext, artist.getArtistName());
-        }
-
+        final String image = mDBManager.getArtistImage(mContext, artist);
 
         // Checks if the database has an image for the requested artist
         if (null != image) {
@@ -319,100 +292,6 @@ public class ArtworkManager implements ArtistFetchError, AlbumFetchError {
             Bitmap bm = BitmapUtils.decodeSampledBitmapFromFile(image, width, height);
             BitmapCache.getInstance().putArtistImage(artist, bm);
             return bm;
-        }
-        return null;
-    }
-
-    /**
-     * Returns an album image for the given album.
-     *
-     * @param mbid MusicBrainzID for the given album.
-     * @return The image if found or null if it is not available and has been tried to download before.
-     * @throws ImageNotFoundException If the image is not found and was not searched before.
-     */
-    public Bitmap getAlbumImageFromMBID(final String mbid, int width, int height, boolean skipCache) throws ImageNotFoundException {
-        if (null == mbid) {
-            return null;
-        }
-
-        if(!skipCache) {
-            // Try cache first
-            Bitmap cacheBitmap = BitmapCache.getInstance().requestAlbumBitmapMBID(mbid);
-            if (cacheBitmap != null && width <= cacheBitmap.getWidth() && height <= cacheBitmap.getWidth()) {
-                return cacheBitmap;
-            }
-        }
-
-        String image;
-
-        image = mDBManager.getAlbumImageFromMBID(mContext, mbid);
-
-        // Checks if the database has an image for the requested album
-        if (null != image) {
-            // Create a bitmap from the data blob in the database
-            Bitmap bm = BitmapUtils.decodeSampledBitmapFromFile(image, width, height);
-            BitmapCache.getInstance().putAlbumBitmapMBID(mbid,bm);
-            return bm;
-        }
-        return null;
-    }
-
-    /**
-     * Returns an album image for the given album name and artist name.
-     *
-     * @param albumName  Name of the album to look for
-     * @param artistName Name of the albums artists
-     * @return The image if found or null if it is not available and has been tried to download before.
-     * @throws ImageNotFoundException If the image is not found and was not searched before.
-     */
-    public Bitmap getAlbumImageFromAlbumNameArtistName(final String albumName, final String artistName, int width, int height, boolean skipCache) throws ImageNotFoundException {
-        if (null == albumName || null == artistName) {
-            return null;
-        }
-
-        if(!skipCache) {
-            // Try cache first
-            Bitmap cacheBitmap = BitmapCache.getInstance().requestAlbumBitmap(albumName, artistName);
-            if (cacheBitmap != null && width <= cacheBitmap.getWidth() && height <= cacheBitmap.getWidth()) {
-                return cacheBitmap;
-            }
-        }
-
-        String image;
-
-
-        image = mDBManager.getAlbumImage(mContext, albumName, artistName);
-
-        // Checks if the database has an image for the requested album
-        if (null != image) {
-            // Create a bitmap from the data blob in the database
-            Bitmap bm = BitmapUtils.decodeSampledBitmapFromFile(image, width, height);
-            BitmapCache.getInstance().putAlbumBitmap(albumName, artistName, bm);
-            return bm;
-        }
-        return null;
-    }
-
-    /**
-     * Returns an album image for the given album name.
-     *
-     * @param albumName Name of the album to look for
-     * @return The image if found or null if it is not available and has been tried to download before.
-     * @throws ImageNotFoundException If the image is not found and was not searched before.
-     */
-    public Bitmap getAlbumImageFromName(final String albumName, int width, int height) throws ImageNotFoundException {
-        if (null == albumName) {
-            return null;
-        }
-
-        String image;
-
-        image = mDBManager.getAlbumImage(mContext, albumName);
-
-        // Checks if the database has an image for the requested album
-        if (null != image) {
-            // Create a bitmap from the data blob in the database
-            return BitmapUtils.decodeSampledBitmapFromFile(image, width, height);
         }
         return null;
     }
@@ -428,43 +307,25 @@ public class ArtworkManager implements ArtistFetchError, AlbumFetchError {
         if (null == track) {
             return null;
         }
-        Bitmap image = null;
-        if (!track.getTrackAlbumMBID().isEmpty()) {
-            try {
-                image = getAlbumImageFromMBID(track.getTrackAlbumMBID(), width, height, skipCache);
-            } catch (ImageNotFoundException e) {
-            }
-            if (null != image) {
-                return image;
+
+        if (!skipCache) {
+            // Try cache first
+            Bitmap cacheBitmap = BitmapCache.getInstance().requestTrackBitmap(track);
+            if (null != cacheBitmap && width <= cacheBitmap.getWidth() && height <= cacheBitmap.getWidth()) {
+                return cacheBitmap;
             }
         }
 
-        // Try to get image from Albumname/Album artistname
-        try {
-            image = getAlbumImageFromAlbumNameArtistName(track.getTrackAlbum(), track.getTrackAlbumArtist(), width, height, skipCache);
-        } catch (ImageNotFoundException e) {
-        }
+        final String image = mDBManager.getTrackImage(mContext, track);
+
+        // Checks if the database has an image for the requested album
         if (null != image) {
-            return image;
+            // Create a bitmap from the data blob in the database
+            Bitmap bm = BitmapUtils.decodeSampledBitmapFromFile(image, width, height);
+            BitmapCache.getInstance().putTrackBitmap(track, bm);
+            return bm;
         }
-
-        try {
-            image = getAlbumImageFromAlbumNameArtistName(track.getTrackAlbum(), track.getTrackArtist(), width, height, skipCache);
-        } catch (ImageNotFoundException e) {
-        }
-        if (null != image) {
-            return image;
-        }
-
-        // Last resort, try just the name
-        image = getAlbumImageFromName(track.getTrackAlbum(), width, height);
-
-        if (null != image) {
-            return image;
-        } else {
-            return null;
-        }
-
+        return null;
     }
 
     /**
@@ -479,7 +340,7 @@ public class ArtworkManager implements ArtistFetchError, AlbumFetchError {
             return null;
         }
 
-        if(!skipCache) {
+        if (!skipCache) {
             // Try cache first
             Bitmap cacheBitmap = BitmapCache.getInstance().requestAlbumBitmap(album);
             if (null != cacheBitmap && width <= cacheBitmap.getWidth() && height <= cacheBitmap.getWidth()) {
@@ -487,17 +348,7 @@ public class ArtworkManager implements ArtistFetchError, AlbumFetchError {
             }
         }
 
-        String image;
-
-        if (album.getMBID().isEmpty()) {
-            // Check if ID is available (should be the case). If not use the album name for
-            // lookup.
-            // FIXME use artistname also
-            image = mDBManager.getAlbumImage(mContext, album.getName());
-        } else {
-            // If id is available use it.
-            image = mDBManager.getAlbumImage(mContext, album);
-        }
+        final String image = mDBManager.getAlbumImage(mContext, album);
 
         // Checks if the database has an image for the requested album
         if (null != image) {
@@ -813,16 +664,16 @@ public class ArtworkManager implements ArtistFetchError, AlbumFetchError {
             options.inJustDecodeBounds = true;
             BitmapFactory.decodeByteArray(response.image, 0, response.image.length, options);
             if ((options.outHeight > MAXIMUM_IMAGE_RESOLUTION || options.outWidth > MAXIMUM_IMAGE_RESOLUTION)) {
-                float factor = Math.min((float)MAXIMUM_IMAGE_RESOLUTION / (float)options.outHeight, (float)MAXIMUM_IMAGE_RESOLUTION / (float)options.outWidth);
+                float factor = Math.min((float) MAXIMUM_IMAGE_RESOLUTION / (float) options.outHeight, (float) MAXIMUM_IMAGE_RESOLUTION / (float) options.outWidth);
 
                 options.inJustDecodeBounds = false;
                 Bitmap bm = BitmapFactory.decodeByteArray(response.image, 0, response.image.length, options);
                 ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
-                Bitmap.createScaledBitmap(bm, (int)(options.outWidth * factor), (int)(options.outHeight * factor), true).compress(Bitmap.CompressFormat.JPEG, IMAGE_COMPRESSION_SETTING, byteStream);
+                Bitmap.createScaledBitmap(bm, (int) (options.outWidth * factor), (int) (options.outHeight * factor), true).compress(Bitmap.CompressFormat.JPEG, IMAGE_COMPRESSION_SETTING, byteStream);
 
                 mDBManager.insertArtistImage(mContext, response.artist, byteStream.toByteArray());
             } else {
-                if(response.image.length <= MAXIMUM_IMAGE_SIZE) {
+                if (response.image.length <= MAXIMUM_IMAGE_SIZE) {
                     mDBManager.insertArtistImage(mContext, response.artist, response.image);
                 }
             }
@@ -876,16 +727,16 @@ public class ArtworkManager implements ArtistFetchError, AlbumFetchError {
             BitmapFactory.decodeByteArray(response.image, 0, response.image.length, options);
             if ((options.outHeight > MAXIMUM_IMAGE_RESOLUTION || options.outWidth > MAXIMUM_IMAGE_RESOLUTION)) {
                 // Calculate rescaling ratio
-                float factor = Math.min((float)MAXIMUM_IMAGE_RESOLUTION / (float)options.outHeight, (float)MAXIMUM_IMAGE_RESOLUTION / (float)options.outWidth);
+                float factor = Math.min((float) MAXIMUM_IMAGE_RESOLUTION / (float) options.outHeight, (float) MAXIMUM_IMAGE_RESOLUTION / (float) options.outWidth);
 
                 options.inJustDecodeBounds = false;
                 Bitmap bm = BitmapFactory.decodeByteArray(response.image, 0, response.image.length, options);
                 ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
-                Bitmap.createScaledBitmap(bm, (int)(options.outWidth * factor), (int)(options.outHeight * factor), true).compress(Bitmap.CompressFormat.JPEG, IMAGE_COMPRESSION_SETTING, byteStream);
+                Bitmap.createScaledBitmap(bm, (int) (options.outWidth * factor), (int) (options.outHeight * factor), true).compress(Bitmap.CompressFormat.JPEG, IMAGE_COMPRESSION_SETTING, byteStream);
 
                 mDBManager.insertAlbumImage(mContext, response.album, byteStream.toByteArray());
             } else {
-                if(response.image.length <= MAXIMUM_IMAGE_SIZE) {
+                if (response.image.length <= MAXIMUM_IMAGE_SIZE) {
                     mDBManager.insertAlbumImage(mContext, response.album, response.image);
                 }
             }
@@ -933,17 +784,16 @@ public class ArtworkManager implements ArtistFetchError, AlbumFetchError {
             fakeAlbum.setMBID(response.track.getTrackAlbumMBID());
 
 
-
             // Rescale them if to big
             BitmapFactory.Options options = new BitmapFactory.Options();
             options.inJustDecodeBounds = true;
             BitmapFactory.decodeByteArray(response.image, 0, response.image.length, options);
             if ((options.outHeight > MAXIMUM_IMAGE_RESOLUTION || options.outWidth > MAXIMUM_IMAGE_RESOLUTION)) {
-                float factor = Math.min((float)MAXIMUM_IMAGE_RESOLUTION / (float)options.outHeight, (float)MAXIMUM_IMAGE_RESOLUTION / (float)options.outWidth);
+                float factor = Math.min((float) MAXIMUM_IMAGE_RESOLUTION / (float) options.outHeight, (float) MAXIMUM_IMAGE_RESOLUTION / (float) options.outWidth);
                 options.inJustDecodeBounds = false;
                 Bitmap bm = BitmapFactory.decodeByteArray(response.image, 0, response.image.length, options);
                 ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
-                Bitmap.createScaledBitmap(bm, (int)(options.outWidth * factor), (int)(options.outHeight * factor), true).compress(Bitmap.CompressFormat.JPEG, IMAGE_COMPRESSION_SETTING, byteStream);
+                Bitmap.createScaledBitmap(bm, (int) (options.outWidth * factor), (int) (options.outHeight * factor), true).compress(Bitmap.CompressFormat.JPEG, IMAGE_COMPRESSION_SETTING, byteStream);
 
                 mDBManager.insertAlbumImage(mContext, fakeAlbum, byteStream.toByteArray());
             } else {
@@ -1057,7 +907,8 @@ public class ArtworkManager implements ArtistFetchError, AlbumFetchError {
      * Clears the old list and starts to download album images.
      */
     private class ParseMPDTrackListTask extends AsyncTask<List<MPDFileEntry>, Object, Object> {
-        private HashMap<String,MPDTrack> mAlbumPaths;
+        private HashMap<String, MPDTrack> mAlbumPaths;
+
         @SafeVarargs
         @Override
         protected final Object doInBackground(List<MPDFileEntry>... lists) {
@@ -1065,13 +916,13 @@ public class ArtworkManager implements ArtistFetchError, AlbumFetchError {
             List<MPDFileEntry> tracks = lists[0];
 
             // Get a list of unique album folders
-            for(MPDFileEntry track: tracks) {
+            for (MPDFileEntry track : tracks) {
                 String dirPath = FormatHelper.getDirectoryFromPath(track.getPath());
                 if (track instanceof MPDTrack && !mAlbumPaths.containsKey(dirPath)) {
-                    mAlbumPaths.put(FormatHelper.getDirectoryFromPath(track.getPath()),(MPDTrack)track);
+                    mAlbumPaths.put(FormatHelper.getDirectoryFromPath(track.getPath()), (MPDTrack) track);
                 }
             }
-            Log.v(TAG,"Unique path count: " + mAlbumPaths.size());
+            Log.v(TAG, "Unique path count: " + mAlbumPaths.size());
 
             int count = mAlbumPaths.size();
             mBulkProgressCallback.startAlbumLoading(count);
@@ -1101,12 +952,12 @@ public class ArtworkManager implements ArtistFetchError, AlbumFetchError {
         mBulkLoadArtistsReady = false;
         Log.v(TAG, "Start bulk loading");
 
-        if(HTTPAlbumImageProvider.getInstance(mContext).getActive() || MPDAlbumImageProvider.mInstance.getActive()) {
-            Log.v(TAG,"Try to get all tracks from MPD");
+        if (HTTPAlbumImageProvider.getInstance(mContext).getActive() || MPDAlbumImageProvider.mInstance.getActive()) {
+            Log.v(TAG, "Try to get all tracks from MPD");
             MPDQueryHandler.getAllTracks(new MPDResponseFileList() {
                 @Override
                 public void handleTracks(List<MPDFileEntry> fileList, int windowstart, int windowend) {
-                    Log.v(TAG,"Received track count: " + fileList.size());
+                    Log.v(TAG, "Received track count: " + fileList.size());
                     new ParseMPDTrackListTask().execute(fileList);
                 }
             });
@@ -1152,15 +1003,8 @@ public class ArtworkManager implements ArtistFetchError, AlbumFetchError {
 
             // Check if image already there
             try {
-                if (album.getMBID().isEmpty()) {
-                    // Check if ID is available (should be the case). If not use the album name for
-                    // lookup.
-                    // FIXME use artistname also
-                    mDBManager.getAlbumImage(mContext, album.getName());
-                } else {
-                    // If id is available use it.
-                    mDBManager.getAlbumImage(mContext, album);
-                }
+                mDBManager.getAlbumImage(mContext, album);
+
                 // If this does not throw the exception it already has an image.
             } catch (ImageNotFoundException e) {
                 fetchAlbumImage(album);
@@ -1181,7 +1025,7 @@ public class ArtworkManager implements ArtistFetchError, AlbumFetchError {
      * Iterates over the list of artists and downloads images for them.
      */
     private void fetchNextBulkArtist() {
-        Log.v(TAG,"fetchNextBulkArtist");
+        Log.v(TAG, "fetchNextBulkArtist");
 
         boolean isEmpty;
         synchronized (mArtistList) {
@@ -1189,7 +1033,7 @@ public class ArtworkManager implements ArtistFetchError, AlbumFetchError {
         }
 
         while (!isEmpty) {
-            Log.v(TAG,"Next artist");
+            Log.v(TAG, "Next artist");
 
             MPDArtist artist;
             synchronized (mArtistList) {
@@ -1222,7 +1066,7 @@ public class ArtworkManager implements ArtistFetchError, AlbumFetchError {
      * Iterates over the list of artists and downloads images for them.
      */
     private void fetchNextBulkTrackAlbum() {
-        Log.v(TAG,"fetchNextBulkTrackAlbum");
+        Log.v(TAG, "fetchNextBulkTrackAlbum");
 
         boolean isEmpty;
         synchronized (mTrackList) {
@@ -1230,7 +1074,7 @@ public class ArtworkManager implements ArtistFetchError, AlbumFetchError {
         }
 
         while (!isEmpty) {
-            Log.v(TAG,"Next track album");
+            Log.v(TAG, "Next track album");
 
             MPDTrack track;
             synchronized (mTrackList) {
@@ -1241,7 +1085,7 @@ public class ArtworkManager implements ArtistFetchError, AlbumFetchError {
 
             // Check if image already there
             try {
-                getAlbumImageForTrack(track,-1,-1, true);
+                getAlbumImageForTrack(track, -1, -1, true);
                 // If this does not throw the exception it already has an image.
             } catch (ImageNotFoundException e) {
                 fetchAlbumImage(track);

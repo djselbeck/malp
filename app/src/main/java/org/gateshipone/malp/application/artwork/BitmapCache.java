@@ -23,11 +23,12 @@
 package org.gateshipone.malp.application.artwork;
 
 import android.graphics.Bitmap;
-import androidx.collection.LruCache;
 import android.util.Log;
-
+import androidx.annotation.NonNull;
+import androidx.collection.LruCache;
 import org.gateshipone.malp.mpdservice.mpdprotocol.mpdobjects.MPDAlbum;
 import org.gateshipone.malp.mpdservice.mpdprotocol.mpdobjects.MPDArtist;
+import org.gateshipone.malp.mpdservice.mpdprotocol.mpdobjects.MPDTrack;
 
 /**
  * Simple LRU-based caching for album & artist images. This could reduce CPU usage
@@ -36,7 +37,7 @@ import org.gateshipone.malp.mpdservice.mpdprotocol.mpdobjects.MPDArtist;
 public class BitmapCache {
     private static final String TAG = BitmapCache.class.getSimpleName();
 
-    private static final int mMaxMemory = (int)(Runtime.getRuntime().maxMemory() / 1024);
+    private static final int mMaxMemory = (int) (Runtime.getRuntime().maxMemory() / 1024);
 
     /**
      * Maximum size of the cache in kilobytes
@@ -66,7 +67,7 @@ public class BitmapCache {
     private BitmapCache() {
         mCache = new LruCache<String, Bitmap>(mCacheSize) {
             @Override
-            protected int sizeOf(String key, Bitmap bitmap) {
+            protected int sizeOf(@NonNull String key, @NonNull Bitmap bitmap) {
                 // The cache size will be measured in kilobytes rather than
                 // number of items.
                 return bitmap.getByteCount() / 1024;
@@ -88,9 +89,19 @@ public class BitmapCache {
      * @param album Album object to try
      * @return Bitmap if cache hit, null otherwise
      */
-    public synchronized Bitmap requestAlbumBitmap(MPDAlbum album) {
-        Bitmap bitmap = mCache.get(getAlbumHash(album));
-        return bitmap;
+    public synchronized Bitmap requestAlbumBitmap(final MPDAlbum album) {
+        return mCache.get(getAlbumHash(album));
+    }
+
+    /**
+     * Tries to get an track image from the cache
+     * Track images will be treated as album images.
+     *
+     * @param track Track object to use for cache key
+     * @return Bitmap if cache hit, null otherwise
+     */
+    public synchronized Bitmap requestTrackBitmap(final MPDTrack track) {
+        return mCache.get(getAlbumHash(track));
     }
 
     /**
@@ -99,55 +110,22 @@ public class BitmapCache {
      * @param album Album object to use for cache key
      * @param bm    Bitmap to store in cache
      */
-    public synchronized void putAlbumBitmap(MPDAlbum album, Bitmap bm) {
+    synchronized void putAlbumBitmap(final MPDAlbum album, final Bitmap bm) {
         if (bm != null) {
             mCache.put(getAlbumHash(album), bm);
         }
     }
 
     /**
-     * Tries to get an album image from the cache
+     * Puts a track image to the cache.
+     * Track images will be treated as album images.
      *
-     * @param albumName  Album name used as key
-     * @param artistName Albumartist name used as key
-     * @return Bitmap if cache hit, null otherwise
+     * @param track Track object to use for cache key
+     * @param bm    Bitmap to store in cache
      */
-    public synchronized Bitmap requestAlbumBitmap(String albumName, String artistName) {
-        return mCache.get(getAlbumHash(albumName, artistName));
-    }
-
-    /**
-     * Puts an album image to the cache
-     *
-     * @param albumName  Album name used as key
-     * @param artistName Albumartist name used as key
-     * @param bm         Bitmap to store in cache
-     */
-    public synchronized void putAlbumBitmap(String albumName, String artistName, Bitmap bm) {
+    public synchronized void putTrackBitmap(final MPDTrack track, final Bitmap bm) {
         if (bm != null) {
-            mCache.put(getAlbumHash(albumName, artistName), bm);
-        }
-    }
-
-    /**
-     * Tries to get an album image from the cache
-     *
-     * @param mbid MBID used as key
-     * @return Bitmap if cache hit, null otherwise
-     */
-    public synchronized Bitmap requestAlbumBitmapMBID(final String mbid) {
-        return mCache.get(getAlbumHashMBID(mbid));
-    }
-
-    /**
-     * Puts an album image to the cache
-     *
-     * @param mbid MBID used as key
-     * @param bm   Bitmap to store in cache
-     */
-    public synchronized void putAlbumBitmapMBID(String mbid, Bitmap bm) {
-        if (bm != null) {
-            mCache.put(getAlbumHashMBID(mbid), bm);
+            mCache.put(getAlbumHash(track), bm);
         }
     }
 
@@ -156,7 +134,7 @@ public class BitmapCache {
      *
      * @param album Album object to use for cache key
      */
-    public synchronized void removeAlbumBitmap(MPDAlbum album) {
+    synchronized void removeAlbumBitmap(final MPDAlbum album) {
         mCache.remove(getAlbumHash(album));
     }
 
@@ -166,7 +144,7 @@ public class BitmapCache {
      * @param album Album to calculate the key from
      * @return Hash string for cache key
      */
-    private String getAlbumHash(MPDAlbum album) {
+    private String getAlbumHash(final MPDAlbum album) {
         final String albumMBID = album.getMBID();
 
         if (!albumMBID.isEmpty()) {
@@ -179,11 +157,29 @@ public class BitmapCache {
     /**
      * Private hash method for cache key
      *
+     * @param track Track to calculate the key from
+     * @return Hash string for cache key
+     */
+    private String getAlbumHash(final MPDTrack track) {
+        final String mbid = track.getTrackAlbumMBID();
+        final String albumName = track.getTrackAlbum();
+        final String artistName = track.getTrackAlbumArtist().isEmpty() ? track.getTrackArtist() : track.getTrackAlbumArtist();
+
+        if (!mbid.isEmpty()) {
+            return getAlbumHashMBID(mbid);
+        } else {
+            return getAlbumHash(albumName, artistName);
+        }
+    }
+
+    /**
+     * Private hash method for cache key
+     *
      * @param albumName  Album name to calculate key from
      * @param artistName Album artist name to calculate key from
      * @return Hash string for cache key
      */
-    private String getAlbumHash(String albumName, String artistName) {
+    private String getAlbumHash(final String albumName, final String artistName) {
         return ALBUM_PREFIX + artistName + '_' + albumName;
     }
 
@@ -193,13 +189,9 @@ public class BitmapCache {
      * @param mbid MBID used as cache key
      * @return Hash string for cache key
      */
-    private String getAlbumHashMBID(String mbid) {
+    private String getAlbumHashMBID(final String mbid) {
         return ALBUM_PREFIX + mbid;
     }
-
-    /*
-     * Begin of artist image handling
-     */
 
     /**
      * Tries to get an artist image from the cache
@@ -207,7 +199,7 @@ public class BitmapCache {
      * @param artist Artist object to check in cache
      * @return Bitmap if cache hit, null otherwise
      */
-    public synchronized Bitmap requestArtistImage(MPDArtist artist) {
+    public synchronized Bitmap requestArtistImage(final MPDArtist artist) {
         return mCache.get(getArtistHash(artist));
     }
 
@@ -217,7 +209,7 @@ public class BitmapCache {
      * @param artist Artist used as cache key
      * @param bm     Bitmap to store in cache
      */
-    public synchronized void putArtistImage(MPDArtist artist, Bitmap bm) {
+    synchronized void putArtistImage(final MPDArtist artist, final Bitmap bm) {
         if (bm != null) {
             mCache.put(getArtistHash(artist), bm);
         }
@@ -228,7 +220,7 @@ public class BitmapCache {
      *
      * @param artist Artist used as cache key
      */
-    public synchronized void removeArtistImage(MPDArtist artist) {
+    synchronized void removeArtistImage(final MPDArtist artist) {
         mCache.remove(getArtistHash(artist));
     }
 
@@ -238,7 +230,7 @@ public class BitmapCache {
      * @param artist Artist used as cache key
      * @return Hash string for cache key
      */
-    private String getArtistHash(MPDArtist artist) {
+    private String getArtistHash(final MPDArtist artist) {
         String hashString = ARTIST_PREFIX;
         if (artist.getMBIDCount() > 0) {
             hashString += artist.getMBID(0);
@@ -257,7 +249,7 @@ public class BitmapCache {
         int missCount = mCache.missCount();
         int hitCount = mCache.hitCount();
         if (missCount > 0) {
-            Log.v(TAG, "Cache hit count: " + hitCount + " miss count: " + missCount + " Miss rate: " + ((hitCount * 100) / missCount)+ '%');
+            Log.v(TAG, "Cache hit count: " + hitCount + " miss count: " + missCount + " Miss rate: " + ((hitCount * 100) / missCount) + '%');
         }
     }
 }
