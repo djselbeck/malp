@@ -44,8 +44,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class LastFMManager implements ArtistImageProvider, AlbumImageProvider {
-    private static final String TAG = LastFMManager.class.getSimpleName();
+public class LastFMProvider implements ArtistImageProvider, AlbumImageProvider {
+    private static final String TAG = LastFMProvider.class.getSimpleName();
 
     /**
      * Last.fm API url used for requests
@@ -76,15 +76,15 @@ public class LastFMManager implements ArtistImageProvider, AlbumImageProvider {
     /**
      * Singleton instance
      */
-    private static LastFMManager mInstance;
+    private static LastFMProvider mInstance;
 
-    private LastFMManager(Context context) {
+    private LastFMProvider(Context context) {
         mRequestQueue = MALPRequestQueue.getInstance(context);
     }
 
-    public static synchronized LastFMManager getInstance(Context context) {
+    public static synchronized LastFMProvider getInstance(Context context) {
         if (mInstance == null) {
-            mInstance = new LastFMManager(context);
+            mInstance = new LastFMProvider(context);
         }
         return mInstance;
     }
@@ -148,7 +148,7 @@ public class LastFMManager implements ArtistImageProvider, AlbumImageProvider {
      * @param errorListener Error listener
      */
     private void getArtistImage(String url, MPDArtist artist, Response.Listener<ArtistImageResponse> listener, Response.ErrorListener errorListener) {
-        Log.v(LastFMManager.class.getSimpleName(), url);
+        Log.v(LastFMProvider.class.getSimpleName(), url);
 
         Request<ArtistImageResponse> byteResponse = new ArtistImageByteRequest(url, artist, listener, errorListener);
 
@@ -218,7 +218,7 @@ public class LastFMManager implements ArtistImageProvider, AlbumImageProvider {
      * @param errorListener Error listener
      */
     private void getAlbumImage(String url, MPDAlbum album, Response.Listener<AlbumImageResponse> listener, Response.ErrorListener errorListener) {
-        Log.v(LastFMManager.class.getSimpleName(), url);
+        Log.v(LastFMProvider.class.getSimpleName(), url);
 
         Request<AlbumImageResponse> byteResponse = new AlbumImageByteRequest(url, album, listener, errorListener);
 

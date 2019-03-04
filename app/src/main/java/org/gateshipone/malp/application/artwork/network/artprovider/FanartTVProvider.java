@@ -50,8 +50,8 @@ import java.util.List;
  * Artwork downloading class for http://fanart.tv. This class provides an interface
  * to download artist images and artist fanart images.
  */
-public class FanartTVManager implements ArtistImageProvider, FanartProvider {
-    private static final String TAG = FanartTVManager.class.getSimpleName();
+public class FanartTVProvider implements ArtistImageProvider, FanartProvider {
+    private static final String TAG = FanartTVProvider.class.getSimpleName();
 
     /**
      * API-URL for MusicBrainz database. Used to resolve artist names to MBIDs
@@ -71,7 +71,7 @@ public class FanartTVManager implements ArtistImageProvider, FanartProvider {
     /**
      * Singleton instance
      */
-    private static FanartTVManager mInstance;
+    private static FanartTVProvider mInstance;
 
     /**
      * constant API url part to instruct MB to return json format
@@ -99,13 +99,13 @@ public class FanartTVManager implements ArtistImageProvider, FanartProvider {
      */
     private static final String API_KEY = "c0cc5d1b6e807ce93e49d75e0e5d371b";
 
-    private FanartTVManager(Context context) {
+    private FanartTVProvider(Context context) {
         mRequestQueue = MALPRequestQueue.getInstance(context);
     }
 
-    public static synchronized FanartTVManager getInstance(Context context) {
+    public static synchronized FanartTVProvider getInstance(Context context) {
         if (mInstance == null) {
-            mInstance = new FanartTVManager(context);
+            mInstance = new FanartTVProvider(context);
         }
         return mInstance;
     }

@@ -370,11 +370,10 @@ public class ArtworkManager implements ArtistFetchError, AlbumFetchError {
             return;
         }
 
-
         if (mArtistProvider.equals(mContext.getString(R.string.pref_artwork_provider_lastfm_key))) {
-            LastFMManager.getInstance(mContext).fetchArtistImage(artist, response -> new InsertArtistImageTask().execute(response), this);
+            LastFMProvider.getInstance(mContext).fetchArtistImage(artist, response -> new InsertArtistImageTask().execute(response), this);
         } else if (mArtistProvider.equals(mContext.getString(R.string.pref_artwork_provider_fanarttv_key))) {
-            FanartTVManager.getInstance(mContext).fetchArtistImage(artist, response -> new InsertArtistImageTask().execute(response), this);
+            FanartTVProvider.getInstance(mContext).fetchArtistImage(artist, response -> new InsertArtistImageTask().execute(response), this);
         }
     }
 
@@ -389,9 +388,9 @@ public class ArtworkManager implements ArtistFetchError, AlbumFetchError {
         }
 
         if (mAlbumProvider.equals(mContext.getString(R.string.pref_artwork_provider_musicbrainz_key))) {
-            MusicBrainzManager.getInstance(mContext).fetchAlbumImage(album, response -> new InsertAlbumImageTask().execute(response), this);
+            MusicBrainzProvider.getInstance(mContext).fetchAlbumImage(album, response -> new InsertAlbumImageTask().execute(response), this);
         } else if (mAlbumProvider.equals(mContext.getString(R.string.pref_artwork_provider_lastfm_key))) {
-            LastFMManager.getInstance(mContext).fetchAlbumImage(album, response -> new InsertAlbumImageTask().execute(response), this);
+            LastFMProvider.getInstance(mContext).fetchAlbumImage(album, response -> new InsertAlbumImageTask().execute(response), this);
         }
     }
 

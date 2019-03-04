@@ -42,7 +42,7 @@ import android.widget.ViewSwitcher;
 
 import org.gateshipone.malp.R;
 import org.gateshipone.malp.application.artwork.network.responses.FanartFetchError;
-import org.gateshipone.malp.application.artwork.network.artprovider.FanartTVManager;
+import org.gateshipone.malp.application.artwork.network.artprovider.FanartTVProvider;
 import org.gateshipone.malp.application.artwork.network.MALPRequestQueue;
 import org.gateshipone.malp.application.artwork.FanartCacheManager;
 import org.gateshipone.malp.application.utils.ThemeUtils;
@@ -370,7 +370,7 @@ public class FanartActivity extends GenericActivity {
     private void checkTracksMBID() {
         // Check if this track has an MBID otherwise try to get one.
         if ((mLastTrack.getTrackArtistMBID() == null || mLastTrack.getTrackArtistMBID().isEmpty()) && downloadAllowed()) {
-            FanartTVManager.getInstance(getApplicationContext()).getTrackArtistMBID(mLastTrack, response -> {
+            FanartTVProvider.getInstance(getApplicationContext()).getTrackArtistMBID(mLastTrack, response -> {
                 mLastTrack.setTrackArtistMBID(response);
                 if (mLastTrack == mLastTrack) {
                     checkFanartAvailable();
@@ -416,7 +416,7 @@ public class FanartActivity extends GenericActivity {
         if (!downloadAllowed()) {
             return;
         }
-        FanartTVManager.getInstance(getApplicationContext()).getArtistFanartURLs(track.getTrackArtistMBID(), response -> {
+        FanartTVProvider.getInstance(getApplicationContext()).getArtistFanartURLs(track.getTrackArtistMBID(), response -> {
             for (final String url : response) {
                 // Check if the given image is in the cache already.
                 if (mFanartCache.inCache(track.getTrackArtistMBID(), String.valueOf(url.hashCode()))) {
@@ -424,7 +424,7 @@ public class FanartActivity extends GenericActivity {
                 }
 
                 // If not try to download the image.
-                FanartTVManager.getInstance(getApplicationContext()).getFanartImage(track, url, response1 -> {
+                FanartTVProvider.getInstance(getApplicationContext()).getFanartImage(track, url, response1 -> {
                     mFanartCache.addFanart(track.getTrackArtistMBID(), String.valueOf(response1.url.hashCode()), response1.image);
 
                     int fanartCount = mFanartCache.getFanartCount(response1.track.getTrackArtistMBID());

@@ -49,8 +49,8 @@ import org.json.JSONObject;
  * FIXME:
  * ArtistImageProvider currently NOT IMPLEMENTED!!!
  */
-public class MusicBrainzManager implements AlbumImageProvider {
-    private static final String TAG = MusicBrainzManager.class.getSimpleName();
+public class MusicBrainzProvider implements AlbumImageProvider {
+    private static final String TAG = MusicBrainzProvider.class.getSimpleName();
 
     private static final String LUCENE_SPECIAL_CHARACTERS_REGEX = "([+\\-\\!\\(\\)\\{\\}\\[\\]\\^\\\"\\~\\*\\?\\:\\\\\\/])";
 
@@ -59,20 +59,20 @@ public class MusicBrainzManager implements AlbumImageProvider {
 
     private RequestQueue mRequestQueue;
 
-    private static MusicBrainzManager mInstance;
+    private static MusicBrainzProvider mInstance;
 
     private static final String MUSICBRAINZ_FORMAT_JSON = "&fmt=json";
 
     private static final int MUSICBRAINZ_LIMIT_RESULT_COUNT = 3;
     private static final String MUSICBRAINZ_LIMIT_RESULT = "&limit=" + String.valueOf(MUSICBRAINZ_LIMIT_RESULT_COUNT);
 
-    private MusicBrainzManager(Context context) {
+    private MusicBrainzProvider(Context context) {
         mRequestQueue = MALPRequestQueue.getInstance(context);
     }
 
-    public static synchronized MusicBrainzManager getInstance(Context context) {
+    public static synchronized MusicBrainzProvider getInstance(Context context) {
         if (mInstance == null) {
-            mInstance = new MusicBrainzManager(context);
+            mInstance = new MusicBrainzProvider(context);
         }
         return mInstance;
     }
@@ -135,7 +135,7 @@ public class MusicBrainzManager implements AlbumImageProvider {
      */
     private void getArtists(String artistName, Response.Listener<JSONObject> listener, Response.ErrorListener errorListener) {
 
-        Log.v(MusicBrainzManager.class.getSimpleName(), artistName);
+        Log.v(MusicBrainzProvider.class.getSimpleName(), artistName);
 
         String url = MUSICBRAINZ_API_URL + "/" + "artist/?query=artist:" + artistName + MUSICBRAINZ_FORMAT_JSON;
 
@@ -152,7 +152,7 @@ public class MusicBrainzManager implements AlbumImageProvider {
      */
     private void getArtistImageURL(String artistMBID, Response.Listener<JSONObject> listener, Response.ErrorListener errorListener) {
 
-        Log.v(MusicBrainzManager.class.getSimpleName(), artistMBID);
+        Log.v(MusicBrainzProvider.class.getSimpleName(), artistMBID);
 
         String url = MUSICBRAINZ_API_URL + "/" + "artist/" + artistMBID + "?inc=url-rels" + MUSICBRAINZ_FORMAT_JSON;
 
@@ -168,7 +168,7 @@ public class MusicBrainzManager implements AlbumImageProvider {
      * @param errorListener Error listener
      */
     private void getArtistImage(String url, Response.Listener<ArtistImageResponse> listener, Response.ErrorListener errorListener) {
-        Log.v(MusicBrainzManager.class.getSimpleName(), url);
+        Log.v(MusicBrainzProvider.class.getSimpleName(), url);
 
 //        Request<byte[]> byteResponse = new ArtistImageByteRequest(url, listener, errorListener);
 
