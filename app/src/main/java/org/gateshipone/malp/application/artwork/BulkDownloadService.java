@@ -23,33 +23,21 @@
 package org.gateshipone.malp.application.artwork;
 
 
-import android.app.Notification;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
-
-import android.app.PendingIntent;
-import android.app.Service;
+import android.app.*;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
-import android.os.Build;
-import android.os.Bundle;
-import android.os.IBinder;
-import android.os.Looper;
-import android.os.PowerManager;
-import android.preference.PreferenceManager;
+import android.os.*;
+import android.util.Log;
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
-import android.util.Log;
-
 import org.gateshipone.malp.R;
 import org.gateshipone.malp.application.artwork.network.MALPRequestQueue;
 import org.gateshipone.malp.application.artwork.network.artprovider.HTTPAlbumImageProvider;
 import org.gateshipone.malp.application.artwork.network.artprovider.MPDAlbumImageProvider;
+import org.gateshipone.malp.application.utils.NetworkUtils;
 import org.gateshipone.malp.mpdservice.ConnectionManager;
 import org.gateshipone.malp.mpdservice.handlers.MPDConnectionStateChangeHandler;
 import org.gateshipone.malp.mpdservice.mpdprotocol.MPDInterface;
@@ -98,7 +86,7 @@ public class BulkDownloadService extends Service implements ArtworkManager.BulkL
     public void onCreate() {
         super.onCreate();
         mNotificationManager = (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
-        if ( null == mConnectionHandler ) {
+        if (null == mConnectionHandler) {
             mConnectionHandler = new ConnectionStateHandler(this, getMainLooper());
             Log.v(TAG, "Registering connection state listener");
             MPDInterface.mInstance.addMPDConnectionStateChangeListener(mConnectionHandler);
@@ -155,17 +143,7 @@ public class BulkDownloadService extends Service implements ArtworkManager.BulkL
                 MPDAlbumImageProvider.mInstance.setActive(intent.getBooleanExtra(BUNDLE_KEY_MPD_COVER_ENABLED, false));
             }
 
-
-            ConnectivityManager cm =
-                    (ConnectivityManager) this.getSystemService(Context.CONNECTIVITY_SERVICE);
-
-            NetworkInfo netInfo = cm.getActiveNetworkInfo();
-            if (null == netInfo) {
-                return START_NOT_STICKY;
-            }
-            boolean isWifi = netInfo.getType() == ConnectivityManager.TYPE_WIFI || netInfo.getType() == ConnectivityManager.TYPE_ETHERNET;
-
-            if (mWifiOnly && !isWifi) {
+            if (!NetworkUtils.isDownloadAllowed(this, mWifiOnly)) {
                 return START_NOT_STICKY;
             }
 
@@ -215,7 +193,7 @@ public class BulkDownloadService extends Service implements ArtworkManager.BulkL
 
         openChannel();
 
-        mBuilder = new NotificationCompat.Builder(this,NOTIFICATION_CHANNEL_ID)
+        mBuilder = new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
                 .setContentTitle(getResources().getString(R.string.downloader_notification_title))
                 .setStyle(new NotificationCompat.BigTextStyle()
                         .bigText(getResources().getString(R.string.downloader_notification_remaining_images) + ' ' + String.valueOf(mSumImageDownloads - (mRemainingArtists + mRemainingAlbums)) + '/' + String.valueOf(mSumImageDownloads)))
@@ -271,7 +249,7 @@ public class BulkDownloadService extends Service implements ArtworkManager.BulkL
         stopForeground(true);
         MPDInterface.mInstance.removeMPDConnectionStateChangeListener(mConnectionHandler);
         stopSelf();
-        if ( mWakelock.isHeld() ) {
+        if (mWakelock.isHeld()) {
             mWakelock.release();
         }
     }
@@ -301,7 +279,7 @@ public class BulkDownloadService extends Service implements ArtworkManager.BulkL
             mService.get().mRemainingAlbums = 0;
 
             // Disable MPD albumart provider if no support is available on at the server side
-            if(MPDAlbumImageProvider.mInstance.getActive() && !MPDInterface.mInstance.getServerCapabilities().hasAlbumArt()) {
+            if (MPDAlbumImageProvider.mInstance.getActive() && !MPDInterface.mInstance.getServerCapabilities().hasAlbumArt()) {
                 MPDAlbumImageProvider.mInstance.setActive(false);
             }
 
@@ -334,19 +312,7 @@ public class BulkDownloadService extends Service implements ArtworkManager.BulkL
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(BulkDownloadService.this);
-
-            ConnectivityManager cm =
-                    (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-
-            NetworkInfo netInfo = cm.getActiveNetworkInfo();
-            if (null == netInfo) {
-                return;
-            }
-            boolean wifiOnly = sharedPref.getBoolean(getString(R.string.pref_download_wifi_only_key), getResources().getBoolean(R.bool.pref_download_wifi_default));
-            boolean isWifi = netInfo.getType() == ConnectivityManager.TYPE_WIFI || netInfo.getType() == ConnectivityManager.TYPE_ETHERNET;
-
-            if (wifiOnly && !isWifi) {
+            if (!NetworkUtils.isDownloadAllowed(context, mWifiOnly)) {
                 // Cancel all downloads
                 Log.v(TAG, "Cancel all downloads because of connection change");
                 MALPRequestQueue.getInstance(BulkDownloadService.this).cancelAll(request -> true);

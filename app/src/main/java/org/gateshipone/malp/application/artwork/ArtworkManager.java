@@ -26,7 +26,6 @@ import android.content.*;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Looper;
 import android.preference.PreferenceManager;
@@ -41,6 +40,7 @@ import org.gateshipone.malp.application.artwork.storage.ArtworkDatabaseManager;
 import org.gateshipone.malp.application.artwork.storage.ImageNotFoundException;
 import org.gateshipone.malp.application.utils.BitmapUtils;
 import org.gateshipone.malp.application.utils.FormatHelper;
+import org.gateshipone.malp.application.utils.NetworkUtils;
 import org.gateshipone.malp.mpdservice.handlers.responsehandler.MPDResponseAlbumList;
 import org.gateshipone.malp.mpdservice.handlers.responsehandler.MPDResponseArtistList;
 import org.gateshipone.malp.mpdservice.handlers.responsehandler.MPDResponseFileList;
@@ -366,16 +366,7 @@ public class ArtworkManager implements ArtistFetchError, AlbumFetchError {
      * @param artist Artist to fetch an image for.
      */
     public void fetchArtistImage(final MPDArtist artist) {
-        ConnectivityManager cm =
-                (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
-
-        NetworkInfo networkInfo = cm.getActiveNetworkInfo();
-        if (networkInfo == null) {
-            return;
-        }
-        boolean isWifi = networkInfo.getType() == ConnectivityManager.TYPE_WIFI || networkInfo.getType() == ConnectivityManager.TYPE_ETHERNET;
-
-        if (mWifiOnly && !isWifi) {
+        if (!NetworkUtils.isDownloadAllowed(mContext, mWifiOnly)) {
             return;
         }
 
@@ -393,16 +384,7 @@ public class ArtworkManager implements ArtistFetchError, AlbumFetchError {
      * @param album Album to fetch an image for.
      */
     public void fetchAlbumImage(final MPDAlbum album) {
-        ConnectivityManager cm =
-                (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
-
-        NetworkInfo networkInfo = cm.getActiveNetworkInfo();
-        if (networkInfo == null) {
-            return;
-        }
-        boolean isWifi = networkInfo.getType() == ConnectivityManager.TYPE_WIFI || networkInfo.getType() == ConnectivityManager.TYPE_ETHERNET;
-
-        if (mWifiOnly && !isWifi) {
+        if (!NetworkUtils.isDownloadAllowed(mContext, mWifiOnly)) {
             return;
         }
 
@@ -1128,22 +1110,11 @@ public class ArtworkManager implements ArtistFetchError, AlbumFetchError {
 
         @Override
         public void onReceive(Context context, Intent intent) {
-
-            ConnectivityManager cm =
-                    (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-
-            NetworkInfo netInfo = cm.getActiveNetworkInfo();
-            if (null == netInfo) {
-                return;
-            }
-            boolean isWifi = netInfo.getType() == ConnectivityManager.TYPE_WIFI || netInfo.getType() == ConnectivityManager.TYPE_ETHERNET;
-
-            if (mWifiOnly && !isWifi) {
+            if (!NetworkUtils.isDownloadAllowed(context, mWifiOnly)) {
                 // Cancel all downloads
                 Log.v(TAG, "Cancel all downloads because of connection change");
                 cancelAllRequests();
             }
-
         }
     }
 
