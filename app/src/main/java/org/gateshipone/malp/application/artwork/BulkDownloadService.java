@@ -187,9 +187,9 @@ public class BulkDownloadService extends Service implements InsertImageTask.Imag
 
             mDatabaseManager = ArtworkDatabaseManager.getInstance(getApplicationContext());
 
-            ConnectionManager.getInstance(getApplicationContext()).reconnectLastServer(this);
-
             runAsForeground();
+
+            ConnectionManager.getInstance(getApplicationContext()).reconnectLastServer(this);
         }
         return START_NOT_STICKY;
     }
@@ -296,12 +296,6 @@ public class BulkDownloadService extends Service implements InsertImageTask.Imag
         } else {
             fetchAllAlbums();
         }
-
-        mSumArtworkRequests = mArtworkRequestQueue.size();
-
-        mBuilder.setContentTitle(getString(R.string.downloader_notification_remaining_images));
-
-        startBulkDownload();
     }
 
     private void fetchAllAlbums() {
@@ -344,6 +338,10 @@ public class BulkDownloadService extends Service implements InsertImageTask.Imag
 
     private void startBulkDownload() {
         Log.v(TAG, "Bulkloading started with: " + mArtworkRequestQueue.size());
+
+        mSumArtworkRequests = mArtworkRequestQueue.size();
+
+        mBuilder.setContentTitle(getString(R.string.downloader_notification_remaining_images));
 
         if (mArtworkRequestQueue.isEmpty()) {
             finishedLoading();
