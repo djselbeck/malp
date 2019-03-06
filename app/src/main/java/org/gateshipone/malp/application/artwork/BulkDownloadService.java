@@ -448,8 +448,8 @@ public class BulkDownloadService extends Service implements InsertImageTask.Imag
             channel.enableLights(false);
             channel.setVibrationPattern(null);
 
-            // Allow lockscreen playback control
-            channel.setLockscreenVisibility(NotificationCompat.VISIBILITY_PRIVATE);
+            // Allow lockscreen control
+            channel.setLockscreenVisibility(NotificationCompat.VISIBILITY_PUBLIC);
 
             // Register the channel
             mNotificationManager.createNotificationChannel(channel);
