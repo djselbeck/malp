@@ -467,7 +467,7 @@ public class ArtworkManager implements ArtProvider.ArtFetchError, InsertImageTas
                 album.setArtistName(track.getTrackAlbumArtist());
                 synchronized (mAlbumListeners) {
                     for (onNewAlbumImageListener albumListener : mAlbumListeners) {
-                        albumListener.newAlbumImage(((MPDAlbum) artworkRequestModel.getGenericModel()));
+                        albumListener.newAlbumImage(album);
                     }
                 }
                 break;

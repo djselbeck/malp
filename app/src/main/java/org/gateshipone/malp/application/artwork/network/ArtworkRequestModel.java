@@ -50,7 +50,7 @@ public class ArtworkRequestModel {
     }
 
     public ArtworkRequestModel(MPDTrack trackModel) {
-        this(trackModel, ArtworkRequestType.ALBUM);
+        this(trackModel, ArtworkRequestType.TRACK);
     }
 
     private ArtworkRequestModel(MPDGenericItem model, ArtworkRequestType type) {
@@ -139,6 +139,8 @@ public class ArtworkRequestModel {
                 break;
             case ARTIST:
                 break;
+            case TRACK:
+                break;
         }
 
         return Uri.encode(escapedAlbumName);
@@ -170,6 +172,8 @@ public class ArtworkRequestModel {
                 break;
             case ARTIST:
                 escapedArtistName = FormatHelper.escapeSpecialCharsLucene(((MPDArtist) mModel).getArtistName());
+                break;
+            case TRACK:
                 break;
         }
 
