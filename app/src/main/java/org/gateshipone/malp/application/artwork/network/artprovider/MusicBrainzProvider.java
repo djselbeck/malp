@@ -42,8 +42,6 @@ public class MusicBrainzProvider extends ArtProvider {
 
     private static final String TAG = MusicBrainzProvider.class.getSimpleName();
 
-    private static final String LUCENE_SPECIAL_CHARACTERS_REGEX = "([+\\-\\!\\(\\)\\{\\}\\[\\]\\^\\\"\\~\\*\\?\\:\\\\\\/])";
-
     private static final String MUSICBRAINZ_API_URL = "https://musicbrainz.org/ws/2";
 
     private static final String COVERART_ARCHIVE_API_URL = "https://coverartarchive.org";
