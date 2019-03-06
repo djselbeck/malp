@@ -23,6 +23,7 @@
 package org.gateshipone.malp.application.artwork.network;
 
 import android.net.Uri;
+import org.gateshipone.malp.application.utils.FormatHelper;
 import org.gateshipone.malp.mpdservice.mpdprotocol.mpdobjects.MPDAlbum;
 import org.gateshipone.malp.mpdservice.mpdprotocol.mpdobjects.MPDArtist;
 import org.gateshipone.malp.mpdservice.mpdprotocol.mpdobjects.MPDGenericItem;
@@ -129,6 +130,20 @@ public class ArtworkRequestModel {
         return encodedAlbumName;
     }
 
+    public String getLuceneEscapedEncodedAlbumName() {
+        String escapedAlbumName = null;
+
+        switch (mType) {
+            case ALBUM:
+                escapedAlbumName = FormatHelper.escapeSpecialCharsLucene(((MPDAlbum) mModel).getName());
+                break;
+            case ARTIST:
+                break;
+        }
+
+        return Uri.encode(escapedAlbumName);
+    }
+
     public String getEncodedArtistName() {
         String encodedArtistName = null;
 
@@ -145,6 +160,22 @@ public class ArtworkRequestModel {
 
         return encodedArtistName;
     }
+
+    public String getLuceneEscapedEncodedArtistName() {
+        String escapedArtistName = null;
+
+        switch (mType) {
+            case ALBUM:
+                escapedArtistName = FormatHelper.escapeSpecialCharsLucene(((MPDAlbum) mModel).getArtistName());
+                break;
+            case ARTIST:
+                escapedArtistName = FormatHelper.escapeSpecialCharsLucene(((MPDArtist) mModel).getArtistName());
+                break;
+        }
+
+        return Uri.encode(escapedArtistName);
+    }
+
 
     public String getLoggingString() {
         String loggingString = "";

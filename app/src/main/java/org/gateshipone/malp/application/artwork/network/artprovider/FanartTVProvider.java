@@ -156,11 +156,11 @@ public class FanartTVProvider extends ArtProvider implements FanartProvider {
             }, error -> errorListener.fetchVolleyError(model, context, error));
         } else {
             // If no MBID is set at this point try to resolve one with musicbrainz database.
-            String artistURLName = model.getEncodedArtistName();
+            final String artistURLName = model.getLuceneEscapedEncodedArtistName();
 
             // Get the list of artists "matching" the name.
             getArtists(artistURLName, response -> {
-                JSONArray artists = null;
+                JSONArray artists;
                 try {
                     artists = response.getJSONArray("artists");
 
@@ -268,8 +268,10 @@ public class FanartTVProvider extends ArtProvider implements FanartProvider {
             artist.addMBID(track.getTrackAlbumArtistMBID());
         }
 
-        getArtists(Uri.encode(artist.getArtistName()), response -> {
-            JSONArray artists = null;
+        final String artistURLName = Uri.encode(FormatHelper.escapeSpecialCharsLucene((artist.getArtistName())));
+
+        getArtists(artistURLName, response -> {
+            JSONArray artists;
             try {
                 artists = response.getJSONArray("artists");
 

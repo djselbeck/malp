@@ -158,8 +158,8 @@ public class MusicBrainzProvider extends ArtProvider {
      * @param errorListener Error listener
      */
     private void getAlbumMBID(final ArtworkRequestModel model, final Response.Listener<JSONObject> listener, final Response.ErrorListener errorListener) {
-        final String albumName = FormatHelper.escapeSpecialCharsLucene(model.getEncodedAlbumName());
-        final String artistName = FormatHelper.escapeSpecialCharsLucene(model.getEncodedArtistName());
+        final String albumName = FormatHelper.escapeSpecialCharsLucene(model.getLuceneEscapedEncodedAlbumName());
+        final String artistName = FormatHelper.escapeSpecialCharsLucene(model.getLuceneEscapedEncodedArtistName());
 
         String url;
         if (!artistName.isEmpty()) {
