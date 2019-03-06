@@ -203,9 +203,7 @@ public class FanartTVProvider extends ArtProvider implements FanartProvider {
 
         Log.v(FanartTVProvider.class.getSimpleName(), artistName);
 
-        String queryArtistname = FormatHelper.escapeSpecialCharsLucene(artistName);
-
-        String url = MUSICBRAINZ_API_URL + "/" + "artist/?query=artist:" + queryArtistname + MUSICBRAINZ_LIMIT_RESULT + MUSICBRAINZ_FORMAT_JSON;
+        String url = MUSICBRAINZ_API_URL + "/" + "artist/?query=artist:" + artistName + MUSICBRAINZ_LIMIT_RESULT + MUSICBRAINZ_FORMAT_JSON;
 
         MALPJsonObjectRequest jsonObjectRequest = new MALPJsonObjectRequest(url, null, listener, errorListener);
 
