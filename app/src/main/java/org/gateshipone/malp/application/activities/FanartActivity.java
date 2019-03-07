@@ -23,13 +23,9 @@
 package org.gateshipone.malp.application.activities;
 
 
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.view.View;
@@ -41,10 +37,9 @@ import android.widget.TextView;
 import android.widget.ViewSwitcher;
 
 import org.gateshipone.malp.R;
-import org.gateshipone.malp.application.artwork.network.responses.FanartFetchError;
-import org.gateshipone.malp.application.artwork.network.artprovider.FanartTVProvider;
+import org.gateshipone.malp.application.artwork.FanartManager;
 import org.gateshipone.malp.application.artwork.network.MALPRequestQueue;
-import org.gateshipone.malp.application.artwork.FanartCacheManager;
+import org.gateshipone.malp.application.artwork.network.requests.FanartImageRequest;
 import org.gateshipone.malp.application.utils.ThemeUtils;
 import org.gateshipone.malp.application.utils.VolumeButtonLongClickListener;
 import org.gateshipone.malp.mpdservice.handlers.MPDStatusChangeHandler;
@@ -54,11 +49,10 @@ import org.gateshipone.malp.mpdservice.mpdprotocol.MPDException;
 import org.gateshipone.malp.mpdservice.mpdprotocol.mpdobjects.MPDCurrentStatus;
 import org.gateshipone.malp.mpdservice.mpdprotocol.mpdobjects.MPDTrack;
 
-import java.io.File;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class FanartActivity extends GenericActivity {
+public class FanartActivity extends GenericActivity implements FanartManager.OnFanartCacheChangeListener {
     private static final String TAG = FanartActivity.class.getSimpleName();
 
     private static final String STATE_ARTWORK_POINTER = "artwork_pointer";
@@ -120,11 +114,9 @@ public class FanartActivity extends GenericActivity {
     private LinearLayout mVolumeSeekbarLayout;
     private LinearLayout mVolumeButtonLayout;
 
-
-    private FanartCacheManager mFanartCache;
-
     private int mVolumeStepSize = 1;
 
+    private FanartManager mFanartManager;
 
     View mDecorView;
 
@@ -167,7 +159,7 @@ public class FanartActivity extends GenericActivity {
             mStateListener = new ServerStatusListener();
         }
 
-
+        // TODO remove me?
         mInfoLayout.setOnClickListener(view -> {
 
         });
@@ -203,8 +195,8 @@ public class FanartActivity extends GenericActivity {
         mVolumePlus.setOnClickListener(v -> MPDCommandHandler.increaseVolume(mVolumeStepSize));
 
         /* Create two listeners that start a repeating timer task to repeat the volume plus/minus action */
-        mPlusListener = new VolumeButtonLongClickListener(VolumeButtonLongClickListener.LISTENER_ACTION.VOLUME_UP,mVolumeStepSize);
-        mMinusListener = new VolumeButtonLongClickListener(VolumeButtonLongClickListener.LISTENER_ACTION.VOLUME_DOWN,mVolumeStepSize);
+        mPlusListener = new VolumeButtonLongClickListener(VolumeButtonLongClickListener.LISTENER_ACTION.VOLUME_UP, mVolumeStepSize);
+        mMinusListener = new VolumeButtonLongClickListener(VolumeButtonLongClickListener.LISTENER_ACTION.VOLUME_DOWN, mVolumeStepSize);
 
         /* Set the listener to the plus/minus button */
         mVolumeMinus.setOnLongClickListener(mMinusListener);
@@ -216,7 +208,7 @@ public class FanartActivity extends GenericActivity {
         mVolumeSeekbarLayout = findViewById(R.id.volume_seekbar_layout);
         mVolumeButtonLayout = findViewById(R.id.volume_button_layout);
 
-        mFanartCache = new FanartCacheManager(getApplicationContext());
+        mFanartManager = FanartManager.getInstance(getApplicationContext());
     }
 
     @Override
@@ -285,6 +277,17 @@ public class FanartActivity extends GenericActivity {
         mLastTrack = savedInstanceState.getParcelable(STATE_LAST_TRACK);
     }
 
+    @Override
+    public void fanartCacheChanged(final MPDTrack track, final int count) {
+        if (count == 1) {
+            mNextFanart = 0;
+            updateFanartViews();
+        }
+
+        if (mCurrentFanart == (count - 2)) {
+            mNextFanart = (mCurrentFanart + 1) % count;
+        }
+    }
 
     private void updateMPDStatus(MPDCurrentStatus status) {
         MPDCurrentStatus.MPD_PLAYBACK_STATE state = status.getPlaybackState();
@@ -307,10 +310,10 @@ public class FanartActivity extends GenericActivity {
         if (volume >= 70) {
             mVolumeIcon.setImageResource(R.drawable.ic_volume_high_black_48dp);
             mVolumeIconButtons.setImageResource(R.drawable.ic_volume_high_black_48dp);
-        } else if (volume >= 30 && volume < 70) {
+        } else if (volume >= 30) {
             mVolumeIcon.setImageResource(R.drawable.ic_volume_medium_black_48dp);
             mVolumeIconButtons.setImageResource(R.drawable.ic_volume_medium_black_48dp);
-        } else if (volume > 0 && volume < 30) {
+        } else if (volume > 0) {
             mVolumeIcon.setImageResource(R.drawable.ic_volume_low_black_48dp);
             mVolumeIconButtons.setImageResource(R.drawable.ic_volume_low_black_48dp);
         } else {
@@ -342,113 +345,21 @@ public class FanartActivity extends GenericActivity {
         mTrackAlbum.setText(track.getTrackAlbum());
         mTrackArtist.setText(track.getTrackArtist());
         if (null == mLastTrack || !track.getTrackArtist().equals(mLastTrack.getTrackArtist())) {
-            // FIXME only cancel fanart requests
-            MALPRequestQueue.getInstance(getApplicationContext()).cancelAll(request -> true);
+            // only cancel fanart requests
+            MALPRequestQueue.getInstance(getApplicationContext()).cancelAll(request -> request instanceof FanartImageRequest);
 
             cancelSwitching();
             mFanartView0.setImageBitmap(null);
             mFanartView1.setImageBitmap(null);
             mNextFanart = 0;
 
-
             // FIXME refresh artwork shown
             mCurrentFanart = -1;
             mLastTrack = track;
 
-
             // Initiate the actual Fanart fetching
-            checkFanartAvailable();
+            mFanartManager.syncFanart(mLastTrack, this);
         }
-
-
-    }
-
-    /**
-     * Checks if the currently playing track already has a MBID or not. If not it tries to resolve
-     * one from the MusicBrainz database.
-     */
-    private void checkTracksMBID() {
-        // Check if this track has an MBID otherwise try to get one.
-        if ((mLastTrack.getTrackArtistMBID() == null || mLastTrack.getTrackArtistMBID().isEmpty()) && downloadAllowed()) {
-            FanartTVProvider.getInstance(getApplicationContext()).getTrackArtistMBID(mLastTrack, response -> {
-                mLastTrack.setTrackArtistMBID(response);
-                if (mLastTrack == mLastTrack) {
-                    checkFanartAvailable();
-                }
-            }, new FanartFetchError() {
-                @Override
-                public void imageListFetchError() {
-                }
-
-                @Override
-                public void fanartFetchError(MPDTrack track) {
-
-                }
-            });
-        }
-    }
-
-    /**
-     * Checks if fanart is already available for this artists MBIDs and shows the first image if.
-     * <p>
-     * After this it syncs fanart with the server (or downloads it if no fanart was available before).
-     */
-    private void checkFanartAvailable() {
-        // Make sure the track contain an MBID
-        checkTracksMBID();
-        if (mFanartCache.getFanartCount(mLastTrack.getTrackArtistMBID()) != 0) {
-            mNextFanart = 0;
-            updateFanartViews();
-        }
-
-        // Sync/download fanart here.
-        syncFanart(mLastTrack);
-    }
-
-    /**
-     * Checks if new fanart is available for the given artist. This ensures that the user
-     * gets new images from time to time if they have old images in cache.
-     *
-     * @param track Track to check for new fanart for.
-     */
-    private void syncFanart(final MPDTrack track) {
-        // Get a list of fanart urls for the current artist
-        if (!downloadAllowed()) {
-            return;
-        }
-        FanartTVProvider.getInstance(getApplicationContext()).getArtistFanartURLs(track.getTrackArtistMBID(), response -> {
-            for (final String url : response) {
-                // Check if the given image is in the cache already.
-                if (mFanartCache.inCache(track.getTrackArtistMBID(), String.valueOf(url.hashCode()))) {
-                    continue;
-                }
-
-                // If not try to download the image.
-                FanartTVProvider.getInstance(getApplicationContext()).getFanartImage(track, url, response1 -> {
-                    mFanartCache.addFanart(track.getTrackArtistMBID(), String.valueOf(response1.url.hashCode()), response1.image);
-
-                    int fanartCount = mFanartCache.getFanartCount(response1.track.getTrackArtistMBID());
-                    if (fanartCount == 1) {
-                        updateFanartViews();
-                    }
-                    if (mCurrentFanart == (fanartCount - 2)) {
-                        mNextFanart = (mCurrentFanart + 1) % fanartCount;
-                    }
-                }, error -> {
-
-                });
-            }
-        }, new FanartFetchError() {
-            @Override
-            public void imageListFetchError() {
-
-            }
-
-            @Override
-            public void fanartFetchError(MPDTrack track) {
-
-            }
-        });
     }
 
     /**
@@ -494,6 +405,7 @@ public class FanartActivity extends GenericActivity {
 
     // This snippet shows the system bars. It does this by removing all the flags
 // except for the ones that make the content appear under the system bars.
+    // TODO remove me?
     private void showSystemUI() {
         mDecorView.setSystemUiVisibility(
                 View.SYSTEM_UI_FLAG_LAYOUT_STABLE
@@ -507,42 +419,40 @@ public class FanartActivity extends GenericActivity {
      */
     private void updateFanartViews() {
         // Check if a track is available, cancel otherwise
-        if (mLastTrack == null || mLastTrack.getTrackArtistMBID() == null || mLastTrack.getTrackArtistMBID().isEmpty()) {
+        if (mLastTrack == null || mLastTrack.getTrackArtistMBID().isEmpty()) {
             return;
         }
-        int fanartCount = mFanartCache.getFanartCount(mLastTrack.getTrackArtistMBID());
 
-        String mbid = mLastTrack.getTrackArtistMBID();
+        final String mbid = mLastTrack.getTrackArtistMBID();
+        final int fanartCount = mFanartManager.getFanartCount(mbid);
 
         if (mSwitcher.getDisplayedChild() == 0) {
             if (mNextFanart < fanartCount) {
                 mCurrentFanart = mNextFanart;
-                File fanartFile = mFanartCache.getFanart(mbid, mNextFanart);
-                if (null == fanartFile) {
-                    return;
-                }
-                Bitmap image = BitmapFactory.decodeFile(fanartFile.getPath());
+
+                final Bitmap image = mFanartManager.getFanartImage(mbid, mNextFanart);
                 if (image != null) {
                     mFanartView1.setImageBitmap(image);
 
                     // Move pointer with wraparound
                     mNextFanart = (mNextFanart + 1) % fanartCount;
+                } else {
+                    return;
                 }
             }
             mSwitcher.setDisplayedChild(1);
         } else {
             if (mNextFanart < fanartCount) {
                 mCurrentFanart = mNextFanart;
-                File fanartFile = mFanartCache.getFanart(mbid, mNextFanart);
-                if (null == fanartFile) {
-                    return;
-                }
-                Bitmap image = BitmapFactory.decodeFile(fanartFile.getPath());
+
+                final Bitmap image = mFanartManager.getFanartImage(mbid, mNextFanart);
                 if (image != null) {
                     mFanartView0.setImageBitmap(image);
 
                     // Move pointer with wraparound
                     mNextFanart = (mNextFanart + 1) % fanartCount;
+                } else {
+                    return;
                 }
             }
             mSwitcher.setDisplayedChild(0);
@@ -566,27 +476,6 @@ public class FanartActivity extends GenericActivity {
     }
 
     /**
-     * Checks if downloading of images is allowed by the users policy.
-     *
-     * @return True if internet downloads are allowed. False otherwise.
-     */
-    private boolean downloadAllowed() {
-        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        ConnectivityManager cm =
-                (ConnectivityManager) getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
-
-        NetworkInfo netInfo = cm.getActiveNetworkInfo();
-        if (null == netInfo) {
-            return false;
-        }
-        boolean wifiOnly = sharedPref.getBoolean(getString(R.string.pref_download_wifi_only_key), getResources().getBoolean(R.bool.pref_download_wifi_default));
-        String artistProvider = sharedPref.getString(getString(R.string.pref_artist_provider_key), getString(R.string.pref_artwork_provider_artist_default));
-        boolean artistDownloadEnabled = !artistProvider.equals(getString(R.string.provider_off));
-        boolean isWifi = netInfo.getType() == ConnectivityManager.TYPE_WIFI || netInfo.getType() == ConnectivityManager.TYPE_ETHERNET;
-        return (isWifi || !wifiOnly) && artistDownloadEnabled;
-    }
-
-    /**
      * Listener class for the volume seekbar.
      */
     private class VolumeSeekBarListener implements SeekBar.OnSeekBarChangeListener {
@@ -605,9 +494,9 @@ public class FanartActivity extends GenericActivity {
 
                 if (progress >= 70) {
                     mVolumeIcon.setImageResource(R.drawable.ic_volume_high_black_48dp);
-                } else if (progress >= 30 && progress < 70) {
+                } else if (progress >= 30) {
                     mVolumeIcon.setImageResource(R.drawable.ic_volume_medium_black_48dp);
-                } else if (progress > 0 && progress < 30) {
+                } else if (progress > 0) {
                     mVolumeIcon.setImageResource(R.drawable.ic_volume_low_black_48dp);
                 } else {
                     mVolumeIcon.setImageResource(R.drawable.ic_volume_mute_black_48dp);

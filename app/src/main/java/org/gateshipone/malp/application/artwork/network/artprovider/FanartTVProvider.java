@@ -34,7 +34,6 @@ import org.gateshipone.malp.application.artwork.network.MALPRequestQueue;
 import org.gateshipone.malp.application.artwork.network.requests.FanartImageRequest;
 import org.gateshipone.malp.application.artwork.network.requests.MALPByteRequest;
 import org.gateshipone.malp.application.artwork.network.requests.MALPJsonObjectRequest;
-import org.gateshipone.malp.application.artwork.network.responses.FanartFetchError;
 import org.gateshipone.malp.application.artwork.network.responses.FanartResponse;
 import org.gateshipone.malp.application.artwork.network.responses.ImageResponse;
 import org.gateshipone.malp.application.utils.FormatHelper;
@@ -256,19 +255,12 @@ public class FanartTVProvider extends ArtProvider implements FanartProvider {
      */
     @Override
     public void getTrackArtistMBID(final MPDTrack track, final Response.Listener<String> listener, final FanartFetchError errorListener) {
-        // Create a dummy artist
-        final MPDArtist artist;
-        if (!track.getTrackAlbumArtist().isEmpty()) {
-            artist = new MPDArtist(track.getTrackAlbumArtist());
-        } else {
-            artist = new MPDArtist(track.getTrackArtist());
+        String artistName = track.getTrackAlbumArtist();
+        if (artistName.isEmpty()) {
+            artistName = track.getTrackArtist();
         }
 
-        if (!track.getTrackAlbumArtistMBID().isEmpty()) {
-            artist.addMBID(track.getTrackAlbumArtistMBID());
-        }
-
-        final String artistURLName = Uri.encode(FormatHelper.escapeSpecialCharsLucene((artist.getArtistName())));
+        final String artistURLName = Uri.encode(FormatHelper.escapeSpecialCharsLucene(artistName));
 
         getArtists(artistURLName, response -> {
             JSONArray artists;
@@ -278,7 +270,6 @@ public class FanartTVProvider extends ArtProvider implements FanartProvider {
                 if (!artists.isNull(0)) {
                     JSONObject artistObj = artists.getJSONObject(0);
                     final String artistMBID = artistObj.getString("id");
-                    artist.addMBID(artistMBID);
                     listener.onResponse(artistMBID);
                 }
             } catch (JSONException e) {

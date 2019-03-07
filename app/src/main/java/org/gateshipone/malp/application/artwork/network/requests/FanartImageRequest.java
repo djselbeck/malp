@@ -33,21 +33,19 @@ public class FanartImageRequest extends MALPRequest<FanartResponse> {
 
     private final Response.Listener<FanartResponse> mListener;
 
-    private String mURL;
     private MPDTrack mTrack;
 
     public FanartImageRequest(String url, MPDTrack track, Response.Listener<FanartResponse> listener, Response.ErrorListener errorListener) {
         super(Request.Method.GET, url, errorListener);
 
         mListener = listener;
-        mURL = url;
         mTrack = track;
     }
 
     @Override
     protected Response<FanartResponse> parseNetworkResponse(NetworkResponse response) {
         FanartResponse fanart = new FanartResponse();
-        fanart.url = mURL;
+        fanart.url = getUrl();
         fanart.image = response.data;
         fanart.track = mTrack;
         return Response.success(fanart, null);

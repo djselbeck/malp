@@ -34,8 +34,9 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-public class FanartCacheManager {
-    private static final String TAG = FanartCacheManager.class.getSimpleName();
+public class FanartCache {
+    private static final String TAG = FanartCache.class.getSimpleName();
+
     private static final String FANART_CACHE_SUFFIX = "/fanart";
 
     private static final int SESSION_LRU_MAX = 10;
@@ -50,11 +51,20 @@ public class FanartCacheManager {
 
     private List<String> mLastAccessedMBIDs;
 
-    public FanartCacheManager(Context context) {
+    private static FanartCache mInstance;
+
+    private FanartCache(Context context) {
         String cachePath = context.getCacheDir().getPath();
         mCacheBasePath = cachePath + FANART_CACHE_SUFFIX;
 
         mLastAccessedMBIDs = new LinkedList<>();
+    }
+
+    public static synchronized FanartCache getInstance(final Context context) {
+        if (null == mInstance) {
+            mInstance = new FanartCache(context);
+        }
+        return mInstance;
     }
 
     /**
@@ -63,7 +73,7 @@ public class FanartCacheManager {
      * @param mbid MBID to check for cached entries
      * @return number of cached entries for mbid
      */
-    public synchronized int getFanartCount(String mbid) {
+    synchronized int getFanartCount(String mbid) {
         File artistDir = new File(mCacheBasePath + "/" + mbid);
         if (!artistDir.exists()) {
             return 0;
@@ -80,7 +90,7 @@ public class FanartCacheManager {
      * @param index Index of the fanart that is requested
      * @return File object that contains the image
      */
-    public synchronized File getFanart(String mbid, int index) {
+    synchronized File getFanart(String mbid, int index) {
         if (index >= getFanartCount(mbid)) {
             return null;
         }
@@ -100,7 +110,7 @@ public class FanartCacheManager {
      * @param mbid
      * @param image
      */
-    public synchronized void addFanart(String mbid, String name, byte[] image) {
+    synchronized void addFanart(String mbid, String name, byte[] image) {
         int newIndex = getFanartCount(mbid);
         Log.v(TAG, "Add fanart: " + newIndex + "for mbid: " + mbid);
 
@@ -138,7 +148,7 @@ public class FanartCacheManager {
         }
     }
 
-    public synchronized boolean inCache(String mbid, String name) {
+    synchronized boolean inCache(String mbid, String name) {
         Log.v(TAG, "Check if exists: " + mCacheBasePath + "/" + mbid + "/" + name);
         File checkFile = new File(mCacheBasePath + "/" + mbid + "/" + name);
         return checkFile.exists();
