@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2018 Team Gateship-One
+ *  Copyright (C) 2019 Team Gateship-One
  *  (Hendrik Borghorst & Frederik Luetkes)
  *
  *  The AUTHORS.md file contains a detailed contributors list:
@@ -54,8 +54,8 @@ public class MusicBrainzManager implements AlbumImageProvider {
 
     private static final String LUCENE_SPECIAL_CHARACTERS_REGEX = "([+\\-\\!\\(\\)\\{\\}\\[\\]\\^\\\"\\~\\*\\?\\:\\\\\\/])";
 
-    private static final String MUSICBRAINZ_API_URL = "http://musicbrainz.org/ws/2";
-    private static final String COVERART_ARCHIVE_API_URL = "http://coverartarchive.org";
+    private static final String MUSICBRAINZ_API_URL = "https://musicbrainz.org/ws/2";
+    private static final String COVERART_ARCHIVE_API_URL = "https://coverartarchive.org";
 
     private RequestQueue mRequestQueue;
 

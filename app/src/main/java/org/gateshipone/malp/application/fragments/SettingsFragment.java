@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2018 Team Gateship-One
+ *  Copyright (C) 2019 Team Gateship-One
  *  (Hendrik Borghorst & Frederik Luetkes)
  *
  *  The AUTHORS.md file contains a detailed contributors list:
@@ -27,8 +27,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.v7.preference.Preference;
-import android.support.v7.preference.PreferenceFragmentCompat;
+import androidx.preference.Preference;
+import androidx.preference.PreferenceFragmentCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;

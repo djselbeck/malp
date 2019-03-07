@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2018 Team Gateship-One
+ *  Copyright (C) 2019 Team Gateship-One
  *  (Hendrik Borghorst & Frederik Luetkes)
  *
  *  The AUTHORS.md file contains a detailed contributors list:
@@ -27,59 +27,39 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.annotation.NonNull;
-import android.support.design.widget.AppBarLayout;
-import android.support.design.widget.CollapsingToolbarLayout;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v4.view.ViewCompat;
-import android.support.v7.app.AlertDialog;
 import android.transition.Slide;
-import android.view.ContextMenu;
-import android.view.Gravity;
-import android.view.MenuInflater;
-import android.view.View;
-import android.support.design.widget.NavigationView;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.widget.Toolbar;
-import android.view.MenuItem;
+import android.view.*;
 import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-
-
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.view.GravityCompat;
+import androidx.core.view.ViewCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
+import com.google.android.material.appbar.AppBarLayout;
+import com.google.android.material.appbar.CollapsingToolbarLayout;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.navigation.NavigationView;
+import com.google.android.material.snackbar.Snackbar;
 import org.gateshipone.malp.R;
 import org.gateshipone.malp.application.adapters.CurrentPlaylistAdapter;
-import org.gateshipone.malp.application.fragments.ArtworkSettingsFragment;
-import org.gateshipone.malp.application.fragments.InformationSettingsFragment;
-import org.gateshipone.malp.application.fragments.serverfragments.ServerPropertiesFragment;
-import org.gateshipone.malp.mpdservice.ConnectionManager;
 import org.gateshipone.malp.application.callbacks.AddPathToPlaylist;
 import org.gateshipone.malp.application.callbacks.FABFragmentCallback;
 import org.gateshipone.malp.application.callbacks.PlaylistCallback;
 import org.gateshipone.malp.application.callbacks.ProfileManageCallbacks;
-import org.gateshipone.malp.application.fragments.EditProfileFragment;
-import org.gateshipone.malp.application.fragments.ProfilesFragment;
-import org.gateshipone.malp.application.fragments.SettingsFragment;
-import org.gateshipone.malp.application.fragments.serverfragments.AlbumTracksFragment;
-import org.gateshipone.malp.application.fragments.serverfragments.AlbumsFragment;
-import org.gateshipone.malp.application.fragments.serverfragments.ArtistsFragment;
-import org.gateshipone.malp.application.fragments.serverfragments.ChoosePlaylistDialog;
-import org.gateshipone.malp.application.fragments.serverfragments.FilesFragment;
-import org.gateshipone.malp.application.fragments.serverfragments.MyMusicTabsFragment;
-import org.gateshipone.malp.application.fragments.serverfragments.PlaylistTracksFragment;
-import org.gateshipone.malp.application.fragments.serverfragments.SavedPlaylistsFragment;
-import org.gateshipone.malp.application.fragments.serverfragments.SearchFragment;
-import org.gateshipone.malp.application.fragments.serverfragments.SongDetailsDialog;
+import org.gateshipone.malp.application.fragments.*;
+import org.gateshipone.malp.application.fragments.serverfragments.*;
 import org.gateshipone.malp.application.utils.ThemeUtils;
 import org.gateshipone.malp.application.views.CurrentPlaylistView;
 import org.gateshipone.malp.application.views.NowPlayingView;
+import org.gateshipone.malp.mpdservice.ConnectionManager;
 import org.gateshipone.malp.mpdservice.handlers.serverhandler.MPDQueryHandler;
 import org.gateshipone.malp.mpdservice.handlers.serverhandler.MPDStateMonitoringHandler;
 import org.gateshipone.malp.mpdservice.mpdprotocol.MPDException;
@@ -169,7 +149,7 @@ public class MainActivity extends GenericActivity
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         // enable back navigation
-        final android.support.v7.app.ActionBar actionBar = getSupportActionBar();
+        final androidx.appcompat.app.ActionBar actionBar = getSupportActionBar();
 
         if (actionBar != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -422,7 +402,7 @@ public class MainActivity extends GenericActivity
         FragmentManager fragmentManager = getSupportFragmentManager();
 
         // clear backstack
-        fragmentManager.popBackStackImmediate("", FragmentManager.POP_BACK_STACK_INCLUSIVE);
+        fragmentManager.popBackStackImmediate(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
 
         Fragment fragment = null;
         String fragmentTag = "";
@@ -551,7 +531,7 @@ public class MainActivity extends GenericActivity
             Snackbar sb = Snackbar.make(layout, errorText, Snackbar.LENGTH_LONG);
 
             // style the snackbar text
-            TextView sbText = sb.getView().findViewById(android.support.design.R.id.snackbar_text);
+            TextView sbText = sb.getView().findViewById(com.google.android.material.R.id.snackbar_text);
             sbText.setTextColor(ThemeUtils.getThemeColor(this, R.attr.malp_color_text_accent));
             sb.show();
         }
@@ -566,7 +546,7 @@ public class MainActivity extends GenericActivity
             Snackbar sb = Snackbar.make(layout, errorText, Snackbar.LENGTH_LONG);
 
             // style the snackbar text
-            TextView sbText = sb.getView().findViewById(android.support.design.R.id.snackbar_text);
+            TextView sbText = sb.getView().findViewById(com.google.android.material.R.id.snackbar_text);
             sbText.setTextColor(ThemeUtils.getThemeColor(this, R.attr.malp_color_text_accent));
             sb.show();
         }
@@ -604,7 +584,7 @@ public class MainActivity extends GenericActivity
 
         newFragment.setArguments(args);
 
-        android.support.v4.app.FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         // Replace whatever is in the fragment_container view with this
         // fragment,
         // and add the transaction to the back stack so the user can navigate
@@ -645,7 +625,7 @@ public class MainActivity extends GenericActivity
 
         newFragment.setArguments(args);
 
-        android.support.v4.app.FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         newFragment.setEnterTransition(new Slide(Gravity.BOTTOM));
         newFragment.setExitTransition(new Slide(Gravity.TOP));
         // Replace whatever is in the fragment_container view with this
@@ -716,7 +696,7 @@ public class MainActivity extends GenericActivity
 
         newFragment.setArguments(args);
 
-        android.support.v4.app.FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         newFragment.setEnterTransition(new Slide(GravityCompat.getAbsoluteGravity(GravityCompat.START, getResources().getConfiguration().getLayoutDirection())));
         newFragment.setExitTransition(new Slide(GravityCompat.getAbsoluteGravity(GravityCompat.END, getResources().getConfiguration().getLayoutDirection())));
         // Replace whatever is in the fragment_container view with this
@@ -742,7 +722,7 @@ public class MainActivity extends GenericActivity
 
         newFragment.setArguments(args);
 
-        android.support.v4.app.FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         newFragment.setEnterTransition(new Slide(GravityCompat.getAbsoluteGravity(GravityCompat.START, getResources().getConfiguration().getLayoutDirection())));
         newFragment.setExitTransition(new Slide(GravityCompat.getAbsoluteGravity(GravityCompat.END, getResources().getConfiguration().getLayoutDirection())));
         // Replace whatever is in the fragment_container view with this
@@ -861,7 +841,7 @@ public class MainActivity extends GenericActivity
 
         FragmentManager fragmentManager = getSupportFragmentManager();
 
-        android.support.v4.app.FragmentTransaction transaction = fragmentManager.beginTransaction();
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
 
         newFragment.setEnterTransition(new Slide(GravityCompat.getAbsoluteGravity(GravityCompat.START, getResources().getConfiguration().getLayoutDirection())));
         newFragment.setExitTransition(new Slide(GravityCompat.getAbsoluteGravity(GravityCompat.END, getResources().getConfiguration().getLayoutDirection())));
@@ -892,7 +872,7 @@ public class MainActivity extends GenericActivity
 
         newFragment.setArguments(args);
 
-        android.support.v4.app.FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         newFragment.setEnterTransition(new Slide(GravityCompat.getAbsoluteGravity(GravityCompat.START, getResources().getConfiguration().getLayoutDirection())));
         newFragment.setExitTransition(new Slide(GravityCompat.getAbsoluteGravity(GravityCompat.END, getResources().getConfiguration().getLayoutDirection())));
         // Replace whatever is in the fragment_container view with this
@@ -929,7 +909,7 @@ public class MainActivity extends GenericActivity
 
         FragmentManager fragmentManager = getSupportFragmentManager();
 
-        android.support.v4.app.FragmentTransaction transaction = fragmentManager.beginTransaction();
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
 
         newFragment.setEnterTransition(new Slide(GravityCompat.getAbsoluteGravity(GravityCompat.START, getResources().getConfiguration().getLayoutDirection())));
         newFragment.setExitTransition(new Slide(GravityCompat.getAbsoluteGravity(GravityCompat.END, getResources().getConfiguration().getLayoutDirection())));

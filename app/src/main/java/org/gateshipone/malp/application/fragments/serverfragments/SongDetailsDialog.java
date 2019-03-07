@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2018 Team Gateship-One
+ *  Copyright (C) 2019 Team Gateship-One
  *  (Hendrik Borghorst & Frederik Luetkes)
  *
  *  The AUTHORS.md file contains a detailed contributors list:
@@ -22,15 +22,18 @@
 
 package org.gateshipone.malp.application.fragments.serverfragments;
 
+import android.app.Dialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v4.app.DialogFragment;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.fragment.app.DialogFragment;
+
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.TextView;
 
 import org.gateshipone.malp.R;
@@ -42,53 +45,38 @@ public class SongDetailsDialog extends DialogFragment {
 
     public static final String EXTRA_FILE = "file";
 
-
     private MPDTrack mFile;
 
-    private TextView mTrackTitle;
-    private TextView mTrackAlbum;
-    private TextView mTrackArtist;
-    private TextView mTrackAlbumArtist;
-
-    private TextView mTrackNo;
-    private TextView mTrackDisc;
-    private TextView mTrackDate;
-    private TextView mTrackDuration;
-
-    private TextView mTrackTitleMBID;
-    private TextView mTrackAlbumMBID;
-    private TextView mTrackArtistMBID;
-    private TextView mTrackAlbumArtistMBID;
-
-    private TextView mTrackURI;
-
+    @NonNull
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        View rootView = inflater.inflate(R.layout.fragment_song_details, container, false);
-
+    public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
         /* Check if an artistname/albumame was given in the extras */
         Bundle args = getArguments();
         if (null != args) {
             mFile = args.getParcelable(EXTRA_FILE);
         }
 
-        mTrackTitle = rootView.findViewById(R.id.now_playing_text_track_title);
-        mTrackAlbum = rootView.findViewById(R.id.now_playing_text_track_album);
-        mTrackArtist = rootView.findViewById(R.id.now_playing_text_track_artist);
-        mTrackAlbumArtist = rootView.findViewById(R.id.now_playing_text_album_artist);
+        final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 
-        mTrackNo = rootView.findViewById(R.id.now_playing_text_track_no);
-        mTrackDisc = rootView.findViewById(R.id.now_playing_text_disc_no);
-        mTrackDate = rootView.findViewById(R.id.now_playing_text_date);
-        mTrackDuration = rootView.findViewById(R.id.now_playing_text_song_duration);
+        final LayoutInflater inflater = getActivity().getLayoutInflater();
+        final View rootView = inflater.inflate(R.layout.fragment_song_details, null);
 
-        mTrackTitleMBID = rootView.findViewById(R.id.now_playing_text_track_mbid);
-        mTrackAlbumMBID = rootView.findViewById(R.id.now_playing_text_album_mbid);
-        mTrackArtistMBID = rootView.findViewById(R.id.now_playing_text_artist_mbid);
-        mTrackAlbumArtistMBID = rootView.findViewById(R.id.now_playing_text_album_artist_mbid);
+        TextView mTrackTitle = rootView.findViewById(R.id.now_playing_text_track_title);
+        TextView mTrackAlbum = rootView.findViewById(R.id.now_playing_text_track_album);
+        TextView mTrackArtist = rootView.findViewById(R.id.now_playing_text_track_artist);
+        TextView mTrackAlbumArtist = rootView.findViewById(R.id.now_playing_text_album_artist);
 
-        mTrackURI = rootView.findViewById(R.id.now_playing_text_track_uri);
+        TextView mTrackNo = rootView.findViewById(R.id.now_playing_text_track_no);
+        TextView mTrackDisc = rootView.findViewById(R.id.now_playing_text_disc_no);
+        TextView mTrackDate = rootView.findViewById(R.id.now_playing_text_date);
+        TextView mTrackDuration = rootView.findViewById(R.id.now_playing_text_song_duration);
+
+        TextView mTrackTitleMBID = rootView.findViewById(R.id.now_playing_text_track_mbid);
+        TextView mTrackAlbumMBID = rootView.findViewById(R.id.now_playing_text_album_mbid);
+        TextView mTrackArtistMBID = rootView.findViewById(R.id.now_playing_text_artist_mbid);
+        TextView mTrackAlbumArtistMBID = rootView.findViewById(R.id.now_playing_text_album_artist_mbid);
+
+        TextView mTrackURI = rootView.findViewById(R.id.now_playing_text_track_uri);
 
         TextView artistSort = rootView.findViewById(R.id.now_playing_text_track_artist_sort);
         TextView albumArtistSort = rootView.findViewById(R.id.now_playing_text_album_artist_sort);
@@ -147,16 +135,16 @@ public class SongDetailsDialog extends DialogFragment {
             });
         }
 
-        rootView.findViewById(R.id.button_enqueue).setOnClickListener(view -> {
+        builder.setView(rootView);
+
+        builder.setPositiveButton(R.string.action_add, (dialog, which) -> {
             if (null != mFile) {
                 MPDQueryHandler.addPath(mFile.getPath());
             }
             dismiss();
         });
+        builder.setNegativeButton(R.string.dialog_action_cancel, (dialog, which) -> dismiss());
 
-        rootView.findViewById(R.id.button_cancel).setOnClickListener(view -> dismiss());
-
-        // Return the ready inflated and configured fragment view.
-        return rootView;
+        return builder.create();
     }
 }

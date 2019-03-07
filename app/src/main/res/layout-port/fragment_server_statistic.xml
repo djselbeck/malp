@@ -1,5 +1,6 @@
-<?xml version="1.0" encoding="utf-8"?><!--
-  ~  Copyright (C) 2018 Team Gateship-One
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~  Copyright (C) 2019 Team Gateship-One
   ~  (Hendrik Borghorst & Frederik Luetkes)
   ~
   ~  The AUTHORS.md file contains a detailed contributors list:
@@ -21,6 +22,7 @@
   -->
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
@@ -32,9 +34,9 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:orientation="vertical"
             android:paddingStart="@dimen/material_screen_edge_spacing"
-            android:paddingEnd="@dimen/material_screen_edge_spacing"
-            android:orientation="vertical">
+            android:paddingEnd="@dimen/material_screen_edge_spacing">
 
             <TextView
                 android:layout_width="match_parent"
@@ -155,22 +157,25 @@
                 android:textColor="?attr/malp_color_text_background_primary"
                 android:textSize="@dimen/material_font_style_size_body_2" />
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/server_statistic_update_db_btn"
+                style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/server_statistic_update_database" />
+                android:text="@string/server_statistic_update_database"
+                android:textColor="?attr/malp_color_text_background_primary"
+                app:backgroundTint="?attr/malp_color_background_selected"
+                app:rippleColor="?attr/malp_color_text_background_secondary" />
 
             <TextView
                 android:id="@+id/server_statistic_updateing_db"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:visibility="gone"
                 android:fontFamily="sans-serif-medium"
+                android:text="@string/server_statistic_updateing_database"
                 android:textColor="#ff4444"
                 android:textSize="@dimen/material_font_style_size_body_2"
-                android:text="@string/server_statistic_updateing_database"
-                />
+                android:visibility="gone" />
 
             <TextView
                 android:layout_width="match_parent"

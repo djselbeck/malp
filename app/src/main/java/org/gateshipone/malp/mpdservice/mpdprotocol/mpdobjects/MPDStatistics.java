@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2018 Team Gateship-One
+ *  Copyright (C) 2019 Team Gateship-One
  *  (Hendrik Borghorst & Frederik Luetkes)
  *
  *  The AUTHORS.md file contains a detailed contributors list:
@@ -22,7 +22,6 @@
 
 package org.gateshipone.malp.mpdservice.mpdprotocol.mpdobjects;
 
-
 public class MPDStatistics {
     private int mArtistsCount;
     private int mAlbumCount;
@@ -42,7 +41,7 @@ public class MPDStatistics {
         mServerUptime = 0;
         mAllSongDuration = 0;
 
-        mLastDBUpdate = System.currentTimeMillis();
+        mLastDBUpdate = 0;
         mPlayDuration = 0;
     }
 

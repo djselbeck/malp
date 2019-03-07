@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2018 Team Gateship-One
+ *  Copyright (C) 2019 Team Gateship-One
  *  (Hendrik Borghorst & Frederik Luetkes)
  *
  *  The AUTHORS.md file contains a detailed contributors list:
@@ -25,9 +25,10 @@ package org.gateshipone.malp.application.fragments.serverfragments;
 import android.app.Dialog;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v4.content.Loader;
-import android.support.v7.app.AlertDialog;
+import androidx.annotation.NonNull;
+import androidx.loader.app.LoaderManager;
+import androidx.loader.content.Loader;
+import androidx.appcompat.app.AlertDialog;
 
 
 import java.util.List;
@@ -133,7 +134,7 @@ public class ChoosePlaylistDialog extends GenericMPDFragment<List<MPDFileEntry>>
         });
 
         // Prepare loader ( start new one or reuse old )
-        getLoaderManager().initLoader(0, getArguments(), this);
+        LoaderManager.getInstance(this).initLoader(0, getArguments(), this);
 
         // set divider
         AlertDialog dlg = builder.create();

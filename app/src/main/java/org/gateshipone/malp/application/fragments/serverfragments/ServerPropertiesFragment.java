@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2018 Team Gateship-One
+ *  Copyright (C) 2019 Team Gateship-One
  *  (Hendrik Borghorst & Frederik Luetkes)
  *
  *  The AUTHORS.md file contains a detailed contributors list:
@@ -28,13 +28,13 @@ import android.content.res.ColorStateList;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.design.widget.TabLayout;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentStatePagerAdapter;
-import android.support.v4.graphics.drawable.DrawableCompat;
-import android.support.v4.view.ViewPager;
+import androidx.annotation.NonNull;
+import com.google.android.material.tabs.TabLayout;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentStatePagerAdapter;
+import androidx.core.graphics.drawable.DrawableCompat;
+import androidx.viewpager.widget.ViewPager;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -67,7 +67,7 @@ public class ServerPropertiesFragment extends Fragment implements TabLayout.OnTa
         mTabAdapter = new ServerPropertiesTabAdapter(getChildFragmentManager());
         mViewPager.setAdapter(mTabAdapter);
         mViewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
-        tabLayout.setOnTabSelectedListener(this);
+        tabLayout.addOnTabSelectedListener(this);
 
         // Icons
         final ColorStateList tabColors = tabLayout.getTabTextColors();

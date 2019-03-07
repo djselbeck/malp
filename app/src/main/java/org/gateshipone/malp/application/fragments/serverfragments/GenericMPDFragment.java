@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2018 Team Gateship-One
+ *  Copyright (C) 2019 Team Gateship-One
  *  (Hendrik Borghorst & Frederik Luetkes)
  *
  *  The AUTHORS.md file contains a detailed contributors list:
@@ -25,10 +25,10 @@ package org.gateshipone.malp.application.fragments.serverfragments;
 
 import android.app.Activity;
 import android.os.Looper;
-import android.support.v4.app.DialogFragment;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.Loader;
-import android.support.v4.widget.SwipeRefreshLayout;
+import androidx.fragment.app.DialogFragment;
+import androidx.loader.app.LoaderManager;
+import androidx.loader.content.Loader;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import java.lang.ref.WeakReference;
 
@@ -60,7 +60,7 @@ public abstract class GenericMPDFragment<T extends Object> extends DialogFragmen
     public void onPause() {
         super.onPause();
         synchronized (this) {
-            getLoaderManager().destroyLoader(0);
+            LoaderManager.getInstance(this).destroyLoader(0);
             MPDInterface.mInstance.removeMPDConnectionStateChangeListener(mConnectionStateListener);
             mConnectionStateListener = null;
         }
@@ -72,7 +72,7 @@ public abstract class GenericMPDFragment<T extends Object> extends DialogFragmen
             mSwipeRefreshLayout.post(() -> mSwipeRefreshLayout.setRefreshing(true));
         }
         if ( !isDetached()) {
-            getLoaderManager().restartLoader(0, getArguments(), this);
+            LoaderManager.getInstance(this).restartLoader(0, getArguments(), this);
         }
     }
 
@@ -98,8 +98,8 @@ public abstract class GenericMPDFragment<T extends Object> extends DialogFragmen
             }
             synchronized (fragment) {
                 if (!fragment.isDetached()) {
-                    if(fragment.getLoaderManager().hasRunningLoaders()) {
-                        fragment.getLoaderManager().destroyLoader(0);
+                    if(LoaderManager.getInstance(fragment).hasRunningLoaders()) {
+                        LoaderManager.getInstance(fragment).destroyLoader(0);
                         fragment.finishedLoading();
                     }
                 }

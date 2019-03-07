@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2018 Team Gateship-One
+ *  Copyright (C) 2019 Team Gateship-One
  *  (Hendrik Borghorst & Frederik Luetkes)
  *
  *  The AUTHORS.md file contains a detailed contributors list:
@@ -22,7 +22,7 @@
 
 package org.gateshipone.malp.mpdservice.mpdprotocol.mpdobjects;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import java.text.DateFormat;
 import java.text.ParseException;

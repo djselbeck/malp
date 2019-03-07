@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2018 Team Gateship-One
+ *  Copyright (C) 2019 Team Gateship-One
  *  (Hendrik Borghorst & Frederik Luetkes)
  *
  *  The AUTHORS.md file contains a detailed contributors list:
@@ -28,8 +28,8 @@ import android.os.Bundle;
 import android.webkit.WebView;
 
 
-import android.support.annotation.NonNull;
-import android.support.v7.app.AlertDialog;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 
 import org.gateshipone.malp.R;
 

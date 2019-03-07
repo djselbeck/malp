@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~  Copyright (C) 2018 Team Gateship-One
+  ~  Copyright (C) 2019 Team Gateship-One
   ~  (Hendrik Borghorst & Frederik Luetkes)
   ~
   ~  The AUTHORS.md file contains a detailed contributors list:
@@ -38,61 +38,61 @@
             android:paddingEnd="@dimen/material_screen_edge_spacing"
             android:orientation="vertical">
 
-            <android.support.design.widget.TextInputLayout
+            <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"
                 android:layout_marginTop="8dp">
 
-                <android.support.design.widget.TextInputEditText
+                <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/fragment_profile_profilename"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/fragment_profile_profilename"
                     android:inputType="textNoSuggestions" />
-            </android.support.design.widget.TextInputLayout>
+            </com.google.android.material.textfield.TextInputLayout>
 
-            <android.support.design.widget.TextInputLayout
+            <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"
                 android:layout_marginTop="8dp">
 
-                <android.support.design.widget.TextInputEditText
+                <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/fragment_profile_hostname"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/fragment_profile_hostname"
                     android:inputType="textNoSuggestions" />
-            </android.support.design.widget.TextInputLayout>
+            </com.google.android.material.textfield.TextInputLayout>
 
-            <android.support.design.widget.TextInputLayout
+            <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"
                 android:layout_marginTop="8dp">
 
-                <android.support.design.widget.TextInputEditText
+                <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/fragment_profile_port"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/fragment_profile_port"
                     android:inputType="number" />
-            </android.support.design.widget.TextInputLayout>
+            </com.google.android.material.textfield.TextInputLayout>
 
-            <android.support.design.widget.TextInputLayout
+            <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"
                 android:layout_marginTop="8dp">
 
-                <android.support.design.widget.TextInputEditText
+                <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/fragment_profile_password"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/fragment_profile_password"
                     android:inputType="textPassword" />
-            </android.support.design.widget.TextInputLayout>
+            </com.google.android.material.textfield.TextInputLayout>
             <Switch
                 android:id="@+id/fragment_profile_use_mpd_cover"
                 android:text="@string/fragment_profile_use_mpd_covers"
@@ -104,37 +104,37 @@
                 android:text="@string/fragment_profile_streaming_enabled"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
-            <android.support.design.widget.TextInputLayout
+            <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"
                 android:layout_marginTop="8dp">
 
-            <android.support.design.widget.TextInputEditText
+            <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/fragment_profile_streaming_url"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/fragment_profile_streaming_url"
                 android:inputType="textNoSuggestions" />
-            </android.support.design.widget.TextInputLayout>
+            </com.google.android.material.textfield.TextInputLayout>
             <Switch
                 android:id="@+id/fragment_profile_http_covers_enabled"
                 android:text="@string/fragment_profile_http_cover_enabled"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
-            <android.support.design.widget.TextInputLayout
+            <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"
                 android:layout_marginTop="8dp">
 
-                <android.support.design.widget.TextInputEditText
+                <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/fragment_profile_cover_regex"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/fragment_profile_http_cover_regex"
                     android:inputType="textNoSuggestions" />
-            </android.support.design.widget.TextInputLayout>
+            </com.google.android.material.textfield.TextInputLayout>
         </LinearLayout>
     </ScrollView>
 </LinearLayout>

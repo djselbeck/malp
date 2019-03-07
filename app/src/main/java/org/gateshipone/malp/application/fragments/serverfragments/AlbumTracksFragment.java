@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2018 Team Gateship-One
+ *  Copyright (C) 2019 Team Gateship-One
  *  (Hendrik Borghorst & Frederik Luetkes)
  *
  *  The AUTHORS.md file contains a detailed contributors list:
@@ -28,12 +28,12 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.annotation.NonNull;
-import android.support.v4.app.FragmentActivity;
-import android.support.v4.content.Loader;
-import android.support.v4.graphics.drawable.DrawableCompat;
-import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.app.AppCompatActivity;
+import androidx.annotation.NonNull;
+import androidx.fragment.app.FragmentActivity;
+import androidx.loader.app.LoaderManager;
+import androidx.loader.content.Loader;
+import androidx.core.graphics.drawable.DrawableCompat;
+import androidx.appcompat.app.AppCompatActivity;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -379,9 +379,9 @@ public class AlbumTracksFragment extends GenericMPDFragment<List<MPDFileEntry>> 
             case R.id.action_show_all_tracks:
                 mAlbum.setMBID("");
                 mAlbum.setArtistName("");
-                getLoaderManager().destroyLoader(0);
+                LoaderManager.getInstance(this).destroyLoader(0);
 
-                getLoaderManager().initLoader(0, getArguments(), this);
+                LoaderManager.getInstance(this).initLoader(0, getArguments(), this);
                 return true;
         }
 

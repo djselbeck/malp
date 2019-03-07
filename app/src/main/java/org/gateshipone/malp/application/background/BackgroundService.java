@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2018 Team Gateship-One
+ *  Copyright (C) 2019 Team Gateship-One
  *  (Hendrik Borghorst & Frederik Luetkes)
  *
  *  The AUTHORS.md file contains a detailed contributors list:
@@ -32,7 +32,7 @@ import android.media.AudioManager;
 import android.os.IBinder;
 import android.os.Looper;
 import android.os.Process;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 import android.util.Log;
 
 import org.gateshipone.malp.mpdservice.ConnectionManager;

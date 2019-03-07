@@ -1,10 +1,10 @@
 /*
- *  Copyright (C) 2018 Team Gateship-One
+ *  Copyright (C) 2019 Team Gateship-One
  *  (Hendrik Borghorst & Frederik Luetkes)
- *  
+ *
  *  The AUTHORS.md file contains a detailed contributors list:
  *  <https://gitlab.com/gateship-one/malp/blob/master/AUTHORS.md>
- *  
+ *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -28,7 +28,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.2.1'
+        classpath 'com.android.tools.build:gradle:3.3.2'
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files

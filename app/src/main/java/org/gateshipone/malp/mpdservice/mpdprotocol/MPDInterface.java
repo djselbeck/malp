@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2018 Team Gateship-One
+ *  Copyright (C) 2019 Team Gateship-One
  *  (Hendrik Borghorst & Frederik Luetkes)
  *
  *  The AUTHORS.md file contains a detailed contributors list:
@@ -23,8 +23,7 @@
 package org.gateshipone.malp.mpdservice.mpdprotocol;
 
 
-import android.support.annotation.Nullable;
-import android.util.Log;
+import androidx.annotation.Nullable;
 
 import org.gateshipone.malp.mpdservice.handlers.MPDConnectionStateChangeHandler;
 import org.gateshipone.malp.mpdservice.handlers.MPDIdleChangeHandler;

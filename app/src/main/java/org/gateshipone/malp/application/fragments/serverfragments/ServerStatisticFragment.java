@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2018 Team Gateship-One
+ *  Copyright (C) 2019 Team Gateship-One
  *  (Hendrik Borghorst & Frederik Luetkes)
  *
  *  The AUTHORS.md file contains a detailed contributors list:
@@ -26,12 +26,11 @@ package org.gateshipone.malp.application.fragments.serverfragments;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v4.app.Fragment;
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.TextView;
 
 import org.gateshipone.malp.R;
@@ -99,9 +98,11 @@ public class ServerStatisticFragment extends Fragment {
     public void onResume() {
         super.onResume();
 
-        MPDQueryHandler.getStatistics(new StatisticResponseHandler());
+        MPDQueryHandler.getStatistics(new StatisticResponseHandler(this));
 
         MPDStateMonitoringHandler.getHandler().registerStatusListener(mServerStatusHandler);
+
+        mServerStatusHandler.onNewStatusReady(MPDStateMonitoringHandler.getHandler().getLastStatus());
     }
 
     @Override
@@ -117,6 +118,8 @@ public class ServerStatisticFragment extends Fragment {
             return;
         }
         activity.runOnUiThread(() -> {
+            // If state is changed, update statistics to show current timestamp
+            MPDQueryHandler.getStatistics(new StatisticResponseHandler(this));
             if (show) {
                 mDBUpdating.setVisibility(View.VISIBLE);
             } else {
@@ -127,27 +130,34 @@ public class ServerStatisticFragment extends Fragment {
     }
 
 
-    private class StatisticResponseHandler extends MPDResponseServerStatistics {
+    private static class StatisticResponseHandler extends MPDResponseServerStatistics {
+        WeakReference<ServerStatisticFragment> mFragment;
+        StatisticResponseHandler(ServerStatisticFragment fragment) {
+            mFragment = new WeakReference<>(fragment);
+        }
+
 
         @Override
         public void handleStatistic(MPDStatistics statistics) {
-            mArtistCount.setText(String.valueOf(statistics.getArtistsCount()));
-            mAlbumsCount.setText(String.valueOf(statistics.getAlbumCount()));
-            mSongsCount.setText(String.valueOf(statistics.getSongCount()));
+            mFragment.get().mArtistCount.setText(String.valueOf(statistics.getArtistsCount()));
+            mFragment.get().mAlbumsCount.setText(String.valueOf(statistics.getAlbumCount()));
+            mFragment.get().mSongsCount.setText(String.valueOf(statistics.getSongCount()));
 
             // Context could be null already because of asynchronous back call
-            Context context = getContext();
+            Context context = mFragment.get().getContext();
             if (context != null) {
-                mUptime.setText(FormatHelper.formatTracktimeFromSWithDays(statistics.getServerUptime(), context));
-                mPlaytime.setText(FormatHelper.formatTracktimeFromSWithDays(statistics.getPlayDuration(), context));
-                mDBLength.setText(FormatHelper.formatTracktimeFromSWithDays(statistics.getAllSongDuration(), context));
+                mFragment.get().mUptime.setText(FormatHelper.formatTracktimeFromSWithDays(statistics.getServerUptime(), context));
+                mFragment.get().mPlaytime.setText(FormatHelper.formatTracktimeFromSWithDays(statistics.getPlayDuration(), context));
+                mFragment.get().mDBLength.setText(FormatHelper.formatTracktimeFromSWithDays(statistics.getAllSongDuration(), context));
             }
 
-            mLastUpdate.setText(FormatHelper.formatTimeStampToString(statistics.getLastDBUpdate() * 1000));
+            if (statistics.getLastDBUpdate() != 0) {
+                mFragment.get().mLastUpdate.setText(FormatHelper.formatTimeStampToString(statistics.getLastDBUpdate() * 1000));
+            }
 
             MPDCapabilities capabilities = MPDInterface.mInstance.getServerCapabilities();
             if (null != capabilities) {
-                mServerFeatures.setText(capabilities.getServerFeatures());
+                mFragment.get().mServerFeatures.setText(capabilities.getServerFeatures());
             }
         }
     }

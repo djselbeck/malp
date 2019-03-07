@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2018 Team Gateship-One
+ *  Copyright (C) 2019 Team Gateship-One
  *  (Hendrik Borghorst & Frederik Luetkes)
  *
  *  The AUTHORS.md file contains a detailed contributors list:
@@ -26,11 +26,11 @@ package org.gateshipone.malp.application.fragments;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.Loader;
-import android.support.v4.graphics.drawable.DrawableCompat;
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+import androidx.loader.app.LoaderManager;
+import androidx.loader.content.Loader;
+import androidx.core.graphics.drawable.DrawableCompat;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -207,7 +207,7 @@ public class ProfilesFragment extends Fragment implements LoaderManager.LoaderCa
         MPDProfileManager.getInstance(getActivity()).addObserver(this);
 
         // Prepare loader ( start new one or reuse old )
-        getLoaderManager().restartLoader(0, getArguments(), this);
+        LoaderManager.getInstance(this).restartLoader(0, getArguments(), this);
 
         if ( null != mFABCallback ) {
             mFABCallback.setupFAB(false,null);
@@ -255,7 +255,7 @@ public class ProfilesFragment extends Fragment implements LoaderManager.LoaderCa
             ConnectionManager.getInstance(getContext().getApplicationContext()).removeProfile((MPDServerProfile)mAdapter.getItem(index),getContext());
             mAdapter.swapModel(null);
             // Prepare loader ( start new one or reuse old )
-            getLoaderManager().restartLoader(0, getArguments(), this);
+            LoaderManager.getInstance(this).restartLoader(0, getArguments(), this);
         }
     }
 
@@ -270,6 +270,6 @@ public class ProfilesFragment extends Fragment implements LoaderManager.LoaderCa
     @Override
     public void update(Observable o, Object arg) {
         // Prepare loader ( start new one or reuse old )
-        getLoaderManager().restartLoader(0, getArguments(), this);
+        LoaderManager.getInstance(this).restartLoader(0, getArguments(), this);
     }
 }

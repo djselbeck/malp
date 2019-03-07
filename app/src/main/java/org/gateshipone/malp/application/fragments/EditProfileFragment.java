@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2018 Team Gateship-One
+ *  Copyright (C) 2019 Team Gateship-One
  *  (Hendrik Borghorst & Frederik Luetkes)
  *
  *  The AUTHORS.md file contains a detailed contributors list:
@@ -26,10 +26,10 @@ package org.gateshipone.malp.application.fragments;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.design.widget.TextInputEditText;
-import android.support.v4.app.Fragment;
-import android.support.v4.graphics.drawable.DrawableCompat;
+import androidx.annotation.NonNull;
+import com.google.android.material.textfield.TextInputEditText;
+import androidx.fragment.app.Fragment;
+import androidx.core.graphics.drawable.DrawableCompat;
 import android.text.InputFilter;
 import android.text.Spanned;
 import android.view.LayoutInflater;

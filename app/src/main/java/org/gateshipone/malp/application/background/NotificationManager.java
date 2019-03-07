@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2018 Team Gateship-One
+ *  Copyright (C) 2019 Team Gateship-One
  *  (Hendrik Borghorst & Frederik Luetkes)
  *
  *  The AUTHORS.md file contains a detailed contributors list:
@@ -36,11 +36,11 @@ import android.graphics.PaintFlagsDrawFilter;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.support.v4.media.MediaMetadataCompat;
-import android.support.v4.media.VolumeProviderCompat;
+import androidx.media.VolumeProviderCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.media.app.NotificationCompat.MediaStyle;
+import androidx.core.app.NotificationCompat;
+import androidx.media.app.NotificationCompat.MediaStyle;
 
 import org.gateshipone.malp.R;
 import org.gateshipone.malp.application.activities.MainActivity;

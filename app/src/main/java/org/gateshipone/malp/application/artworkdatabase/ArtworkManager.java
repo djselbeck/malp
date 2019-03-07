@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2018 Team Gateship-One
+ *  Copyright (C) 2019 Team Gateship-One
  *  (Hendrik Borghorst & Frederik Luetkes)
  *
  *  The AUTHORS.md file contains a detailed contributors list:
@@ -249,6 +249,9 @@ public class ArtworkManager implements ArtistFetchError, AlbumFetchError {
         // Clear the old image
         mDBManager.removeAlbumImage(mContext, album);
 
+        // Clear the old image from the cache
+        BitmapCache.getInstance().removeAlbumBitmap(album);
+
         // Reload the image from the internet
         fetchAlbumImage(album);
     }
@@ -266,6 +269,9 @@ public class ArtworkManager implements ArtistFetchError, AlbumFetchError {
 
         // Clear the old image
         mDBManager.removeArtistImage(mContext, artist);
+
+        // Clear the old image from the cache
+        BitmapCache.getInstance().removeArtistImage(artist);
 
         // Reload the image from the internet
         fetchArtistImage(artist);
@@ -805,14 +811,14 @@ public class ArtworkManager implements ArtistFetchError, AlbumFetchError {
             options.inJustDecodeBounds = true;
             BitmapFactory.decodeByteArray(response.image, 0, response.image.length, options);
             if ((options.outHeight > MAXIMUM_IMAGE_RESOLUTION || options.outWidth > MAXIMUM_IMAGE_RESOLUTION)) {
-                Log.v(TAG, "Image to big, rescaling");
+                float factor = Math.min((float)MAXIMUM_IMAGE_RESOLUTION / (float)options.outHeight, (float)MAXIMUM_IMAGE_RESOLUTION / (float)options.outWidth);
+
                 options.inJustDecodeBounds = false;
                 Bitmap bm = BitmapFactory.decodeByteArray(response.image, 0, response.image.length, options);
                 ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
-                Bitmap.createScaledBitmap(bm, MAXIMUM_IMAGE_RESOLUTION, MAXIMUM_IMAGE_RESOLUTION, true).compress(Bitmap.CompressFormat.JPEG, IMAGE_COMPRESSION_SETTING, byteStream);
-                if(byteStream.size() <= MAXIMUM_IMAGE_SIZE) {
-                    mDBManager.insertArtistImage(mContext, response.artist, byteStream.toByteArray());
-                }
+                Bitmap.createScaledBitmap(bm, (int)(options.outWidth * factor), (int)(options.outHeight * factor), true).compress(Bitmap.CompressFormat.JPEG, IMAGE_COMPRESSION_SETTING, byteStream);
+
+                mDBManager.insertArtistImage(mContext, response.artist, byteStream.toByteArray());
             } else {
                 if(response.image.length <= MAXIMUM_IMAGE_SIZE) {
                     mDBManager.insertArtistImage(mContext, response.artist, response.image);
@@ -862,20 +868,20 @@ public class ArtworkManager implements ArtistFetchError, AlbumFetchError {
                 return response.album;
             }
 
-            Log.v(TAG, "Inserting image for album: " + response.album.getName());
             // Rescale them if to big
             BitmapFactory.Options options = new BitmapFactory.Options();
             options.inJustDecodeBounds = true;
             BitmapFactory.decodeByteArray(response.image, 0, response.image.length, options);
             if ((options.outHeight > MAXIMUM_IMAGE_RESOLUTION || options.outWidth > MAXIMUM_IMAGE_RESOLUTION)) {
-                Log.v(TAG, "Image to big, rescaling");
+                // Calculate rescaling ratio
+                float factor = Math.min((float)MAXIMUM_IMAGE_RESOLUTION / (float)options.outHeight, (float)MAXIMUM_IMAGE_RESOLUTION / (float)options.outWidth);
+
                 options.inJustDecodeBounds = false;
                 Bitmap bm = BitmapFactory.decodeByteArray(response.image, 0, response.image.length, options);
                 ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
-                Bitmap.createScaledBitmap(bm, MAXIMUM_IMAGE_RESOLUTION, MAXIMUM_IMAGE_RESOLUTION, true).compress(Bitmap.CompressFormat.JPEG, IMAGE_COMPRESSION_SETTING, byteStream);
-                if(byteStream.size() <= MAXIMUM_IMAGE_SIZE) {
-                    mDBManager.insertAlbumImage(mContext, response.album, byteStream.toByteArray());
-                }
+                Bitmap.createScaledBitmap(bm, (int)(options.outWidth * factor), (int)(options.outHeight * factor), true).compress(Bitmap.CompressFormat.JPEG, IMAGE_COMPRESSION_SETTING, byteStream);
+
+                mDBManager.insertAlbumImage(mContext, response.album, byteStream.toByteArray());
             } else {
                 if(response.image.length <= MAXIMUM_IMAGE_SIZE) {
                     mDBManager.insertAlbumImage(mContext, response.album, response.image);
@@ -925,21 +931,19 @@ public class ArtworkManager implements ArtistFetchError, AlbumFetchError {
             fakeAlbum.setMBID(response.track.getTrackAlbumMBID());
 
 
-            Log.v(TAG, "Inserting image for track: " + response.track.getTrackAlbum());
+
             // Rescale them if to big
             BitmapFactory.Options options = new BitmapFactory.Options();
             options.inJustDecodeBounds = true;
             BitmapFactory.decodeByteArray(response.image, 0, response.image.length, options);
             if ((options.outHeight > MAXIMUM_IMAGE_RESOLUTION || options.outWidth > MAXIMUM_IMAGE_RESOLUTION)) {
-                Log.v(TAG, "Image to big, rescaling");
+                float factor = Math.min((float)MAXIMUM_IMAGE_RESOLUTION / (float)options.outHeight, (float)MAXIMUM_IMAGE_RESOLUTION / (float)options.outWidth);
                 options.inJustDecodeBounds = false;
                 Bitmap bm = BitmapFactory.decodeByteArray(response.image, 0, response.image.length, options);
                 ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
-                Bitmap scaledBitmap = Bitmap.createScaledBitmap(bm, MAXIMUM_IMAGE_RESOLUTION, MAXIMUM_IMAGE_RESOLUTION, true);
-                scaledBitmap.compress(Bitmap.CompressFormat.JPEG, IMAGE_COMPRESSION_SETTING, byteStream);
-                if(byteStream.size() <= MAXIMUM_IMAGE_SIZE) {
-                    mDBManager.insertAlbumImage(mContext, fakeAlbum, byteStream.toByteArray());
-                }
+                Bitmap.createScaledBitmap(bm, (int)(options.outWidth * factor), (int)(options.outHeight * factor), true).compress(Bitmap.CompressFormat.JPEG, IMAGE_COMPRESSION_SETTING, byteStream);
+
+                mDBManager.insertAlbumImage(mContext, fakeAlbum, byteStream.toByteArray());
             } else {
                 mDBManager.insertAlbumImage(mContext, fakeAlbum, response.image);
             }
@@ -1146,7 +1150,15 @@ public class ArtworkManager implements ArtistFetchError, AlbumFetchError {
 
             // Check if image already there
             try {
-                mDBManager.getAlbumImage(mContext, album);
+                if (album.getMBID().isEmpty()) {
+                    // Check if ID is available (should be the case). If not use the album name for
+                    // lookup.
+                    // FIXME use artistname also
+                    mDBManager.getAlbumImage(mContext, album.getName());
+                } else {
+                    // If id is available use it.
+                    mDBManager.getAlbumImage(mContext, album);
+                }
                 // If this does not throw the exception it already has an image.
             } catch (ImageNotFoundException e) {
                 fetchAlbumImage(album);
