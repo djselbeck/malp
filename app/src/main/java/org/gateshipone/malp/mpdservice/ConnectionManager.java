@@ -84,7 +84,7 @@ public class ConnectionManager extends MPDConnectionStateChangeHandler {
 
     private int mUseCounter;
 
-    private MPDServerProfile mServerProfile;
+    private MPDServerProfile mServerProfile = new MPDServerProfile();
 
     private Context mContext;
 
@@ -336,11 +336,19 @@ public class ConnectionManager extends MPDConnectionStateChangeHandler {
 
 
     public String getProfileName() {
-        return mServerProfile.getProfileName();
+        if (mServerProfile != null) {
+            return mServerProfile.getProfileName();
+        } else {
+            return "";
+        }
     }
 
     public boolean getStreamingEnabled() {
-        return mServerProfile.getStreamingEnabled();
+        if (mServerProfile != null) {
+            return mServerProfile.getStreamingEnabled();
+        } else {
+            return false;
+        }
     }
 
 }

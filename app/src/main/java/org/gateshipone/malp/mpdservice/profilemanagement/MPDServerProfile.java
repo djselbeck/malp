@@ -63,6 +63,11 @@ public class MPDServerProfile implements MPDGenericItem, Parcelable {
 
     private long mCreated;
 
+    public MPDServerProfile() {
+        mProfileName = "";
+        mHostname = "";
+    }
+
     public MPDServerProfile(String profileName, boolean autoConnect) {
         mProfileName = profileName;
         mAutoconnect = autoConnect;

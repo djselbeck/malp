@@ -56,6 +56,7 @@ import org.gateshipone.malp.application.utils.ThemeUtils;
 import org.gateshipone.malp.mpdservice.handlers.serverhandler.MPDCommandHandler;
 import org.gateshipone.malp.mpdservice.handlers.serverhandler.MPDQueryHandler;
 import org.gateshipone.malp.mpdservice.mpdprotocol.mpdobjects.MPDAlbum;
+import org.gateshipone.malp.mpdservice.mpdprotocol.mpdobjects.MPDPlaylist;
 import org.gateshipone.malp.mpdservice.mpdprotocol.mpdobjects.MPDTrack;
 import org.gateshipone.malp.mpdservice.mpdprotocol.mpdobjects.MPDFileEntry;
 
@@ -399,9 +400,9 @@ public class AlbumTracksFragment extends GenericMPDFragment<List<MPDFileEntry>> 
 
 
     private void enqueueTrack(int index) {
-        MPDTrack track = (MPDTrack) mFileAdapter.getItem(index);
+        MPDFileEntry entry = (MPDFileEntry) mFileAdapter.getItem(index);
 
-        MPDQueryHandler.addPath(track.getPath());
+        MPDQueryHandler.addPath(entry.getPath());
     }
 
     private void play(int index) {
