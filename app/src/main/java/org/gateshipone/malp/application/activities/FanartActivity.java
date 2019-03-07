@@ -278,9 +278,16 @@ public class FanartActivity extends GenericActivity implements FanartManager.OnF
     }
 
     @Override
-    public void fanartCacheChanged(final MPDTrack track, final int count) {
-        if (count == 1) {
+    public void fanartInitialCacheCount(final int count) {
+        if (count > 0) {
             mNextFanart = 0;
+            updateFanartViews();
+        }
+    }
+
+    @Override
+    public void fanartCacheCountChanged(final int count) {
+        if (count == 1) {
             updateFanartViews();
         }
 

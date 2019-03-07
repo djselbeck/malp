@@ -39,7 +39,9 @@ import java.io.File;
 public class FanartManager implements FanartProvider.FanartFetchError {
 
     public interface OnFanartCacheChangeListener {
-        void fanartCacheChanged(final MPDTrack track, final int count);
+        void fanartInitialCacheCount(final int count);
+
+        void fanartCacheCountChanged(final int count);
     }
 
     private static FanartManager mInstance;
@@ -137,8 +139,7 @@ public class FanartManager implements FanartProvider.FanartFetchError {
     }
 
     private void loadFanartImages(final MPDTrack track, final OnFanartCacheChangeListener fanartCacheChangeListener) {
-        // initial return the cache count
-        fanartCacheChangeListener.fanartCacheChanged(track, mFanartCache.getFanartCount(track.getTrackArtistMBID()));
+        fanartCacheChangeListener.fanartInitialCacheCount(mFanartCache.getFanartCount(track.getTrackArtistMBID()));
 
         FanartTVProvider.getInstance(mContext).getArtistFanartURLs(track.getTrackArtistMBID(),
                 artistURLs -> {
@@ -159,7 +160,7 @@ public class FanartManager implements FanartProvider.FanartFetchError {
                     //TODO scale the image
                     mFanartCache.addFanart(track.getTrackArtistMBID(), String.valueOf(response.hashCode()), response.image);
 
-                    fanartCacheChangeListener.fanartCacheChanged(track, mFanartCache.getFanartCount(track.getTrackArtistMBID()));
+                    fanartCacheChangeListener.fanartCacheCountChanged(mFanartCache.getFanartCount(track.getTrackArtistMBID()));
                 },
                 error -> {
                     // TODO add error handling
