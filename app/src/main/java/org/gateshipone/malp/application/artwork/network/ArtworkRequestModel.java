@@ -23,6 +23,7 @@
 package org.gateshipone.malp.application.artwork.network;
 
 import android.net.Uri;
+
 import org.gateshipone.malp.application.utils.FormatHelper;
 import org.gateshipone.malp.mpdservice.mpdprotocol.mpdobjects.MPDAlbum;
 import org.gateshipone.malp.mpdservice.mpdprotocol.mpdobjects.MPDArtist;

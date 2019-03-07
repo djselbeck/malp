@@ -24,6 +24,7 @@ package org.gateshipone.malp.application.artwork.network.artprovider;
 
 
 import com.android.volley.Response;
+
 import org.gateshipone.malp.application.artwork.network.responses.FanartFetchError;
 import org.gateshipone.malp.application.artwork.network.responses.FanartResponse;
 import org.gateshipone.malp.mpdservice.mpdprotocol.mpdobjects.MPDTrack;

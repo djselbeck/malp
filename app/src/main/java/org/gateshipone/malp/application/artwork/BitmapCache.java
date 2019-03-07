@@ -24,11 +24,13 @@ package org.gateshipone.malp.application.artwork;
 
 import android.graphics.Bitmap;
 import android.util.Log;
-import androidx.annotation.NonNull;
-import androidx.collection.LruCache;
+
 import org.gateshipone.malp.mpdservice.mpdprotocol.mpdobjects.MPDAlbum;
 import org.gateshipone.malp.mpdservice.mpdprotocol.mpdobjects.MPDArtist;
 import org.gateshipone.malp.mpdservice.mpdprotocol.mpdobjects.MPDTrack;
+
+import androidx.annotation.NonNull;
+import androidx.collection.LruCache;
 
 /**
  * Simple LRU-based caching for album & artist images. This could reduce CPU usage

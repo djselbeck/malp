@@ -23,10 +23,12 @@ package org.gateshipone.malp.application.artwork.network.artprovider;
 
 import android.content.Context;
 import android.util.Log;
+
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+
 import org.gateshipone.malp.application.artwork.network.ArtworkRequestModel;
 import org.gateshipone.malp.application.artwork.network.MALPRequestQueue;
 import org.gateshipone.malp.application.artwork.network.requests.MALPByteRequest;

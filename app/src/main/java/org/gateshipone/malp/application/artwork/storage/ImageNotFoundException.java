@@ -22,5 +22,5 @@
 
 package org.gateshipone.malp.application.artwork.storage;
 
-public class ImageNotFoundException extends Exception{
+public class ImageNotFoundException extends Exception {
 }

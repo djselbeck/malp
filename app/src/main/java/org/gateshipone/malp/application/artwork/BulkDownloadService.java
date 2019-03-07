@@ -23,18 +23,26 @@
 package org.gateshipone.malp.application.artwork;
 
 
-import android.app.*;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
-import android.os.*;
+import android.os.Build;
+import android.os.Bundle;
+import android.os.IBinder;
+import android.os.Looper;
+import android.os.PowerManager;
 import android.util.Log;
-import androidx.annotation.Nullable;
-import androidx.core.app.NotificationCompat;
+
 import com.android.volley.NetworkResponse;
 import com.android.volley.VolleyError;
+
 import org.gateshipone.malp.R;
 import org.gateshipone.malp.application.artwork.network.ArtworkRequestModel;
 import org.gateshipone.malp.application.artwork.network.InsertImageTask;
@@ -63,6 +71,9 @@ import java.lang.ref.WeakReference;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+
+import androidx.annotation.Nullable;
+import androidx.core.app.NotificationCompat;
 
 public class BulkDownloadService extends Service implements InsertImageTask.ImageSavedCallback, ArtProvider.ArtFetchError {
     private static final String TAG = BulkDownloadService.class.getSimpleName();

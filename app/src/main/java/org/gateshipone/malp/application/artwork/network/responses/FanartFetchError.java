@@ -27,5 +27,6 @@ import org.gateshipone.malp.mpdservice.mpdprotocol.mpdobjects.MPDTrack;
 
 public interface FanartFetchError {
     void imageListFetchError();
+
     void fanartFetchError(MPDTrack track);
 }

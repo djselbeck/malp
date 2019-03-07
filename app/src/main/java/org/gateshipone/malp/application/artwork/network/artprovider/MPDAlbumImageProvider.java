@@ -24,9 +24,11 @@ package org.gateshipone.malp.application.artwork.network.artprovider;
 
 import android.content.Context;
 import android.os.Looper;
+
 import com.android.volley.NetworkResponse;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+
 import org.gateshipone.malp.application.artwork.network.ArtworkRequestModel;
 import org.gateshipone.malp.application.artwork.network.responses.ImageResponse;
 import org.gateshipone.malp.mpdservice.handlers.responsehandler.MPDResponseAlbumArt;

@@ -23,8 +23,10 @@
 package org.gateshipone.malp.application.artwork.network.artprovider;
 
 import android.content.Context;
+
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+
 import org.gateshipone.malp.application.artwork.network.ArtworkRequestModel;
 import org.gateshipone.malp.application.artwork.network.responses.ImageResponse;
 import org.json.JSONException;

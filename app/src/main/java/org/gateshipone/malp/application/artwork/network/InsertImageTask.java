@@ -27,6 +27,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
+
 import org.gateshipone.malp.application.artwork.network.responses.ImageResponse;
 import org.gateshipone.malp.application.artwork.storage.ArtworkDatabaseManager;
 import org.gateshipone.malp.mpdservice.mpdprotocol.mpdobjects.MPDAlbum;

@@ -39,7 +39,7 @@ public class FanartImageRequest extends MALPRequest<FanartResponse> {
     public FanartImageRequest(String url, MPDTrack track, Response.Listener<FanartResponse> listener, Response.ErrorListener errorListener) {
         super(Request.Method.GET, url, errorListener);
 
-        mListener= listener;
+        mListener = listener;
         mURL = url;
         mTrack = track;
     }
@@ -50,7 +50,7 @@ public class FanartImageRequest extends MALPRequest<FanartResponse> {
         fanart.url = mURL;
         fanart.image = response.data;
         fanart.track = mTrack;
-        return Response.success(fanart,null);
+        return Response.success(fanart, null);
     }
 
     @Override

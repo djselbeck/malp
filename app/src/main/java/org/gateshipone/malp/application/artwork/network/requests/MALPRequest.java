@@ -25,6 +25,7 @@ package org.gateshipone.malp.application.artwork.network.requests;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
+
 import org.gateshipone.malp.BuildConfig;
 
 import java.util.HashMap;

@@ -65,12 +65,12 @@ public class MALPRequestQueue extends RequestQueue implements RequestQueue.Reque
     }
 
     public synchronized static MALPRequestQueue getInstance(Context context) {
-        if ( null == mInstance ) {
+        if (null == mInstance) {
             Network network = new BasicNetwork(new HurlStack());
             // 10MB disk cache
             Cache cache = new DiskBasedCache(context.getCacheDir(), 1024 * 1024 * 10);
 
-            mInstance = new MALPRequestQueue(cache,network);
+            mInstance = new MALPRequestQueue(cache, network);
             mInstance.start();
         }
         return mInstance;
@@ -79,11 +79,11 @@ public class MALPRequestQueue extends RequestQueue implements RequestQueue.Reque
 
     @Override
     public <T> Request<T> add(Request<T> request) {
-        if ( null == request ) {
+        if (null == request) {
             return null;
         }
         // Add a request to the internal queue
-        synchronized (mLimitingRequestQueue ) {
+        synchronized (mLimitingRequestQueue) {
             mLimitingRequestQueue.add(request);
             if (null == mLimiterTimer) {
                 // Timer currently not running
@@ -107,7 +107,7 @@ public class MALPRequestQueue extends RequestQueue implements RequestQueue.Reque
     private class LimiterTask extends TimerTask {
         @Override
         public void run() {
-            synchronized (mLimitingRequestQueue ) {
+            synchronized (mLimitingRequestQueue) {
                 Request request = mLimitingRequestQueue.poll();
                 if (null != request) {
                     // Forward the request to the volley request queue
@@ -125,6 +125,7 @@ public class MALPRequestQueue extends RequestQueue implements RequestQueue.Reque
 
     /**
      * Cancels all requests in this queue for which the given filter applies.
+     *
      * @param filter The filtering function to use
      */
     public void cancelAll(RequestFilter filter) {

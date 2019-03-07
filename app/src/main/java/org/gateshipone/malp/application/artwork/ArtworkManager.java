@@ -22,19 +22,30 @@
 
 package org.gateshipone.malp.application.artwork;
 
-import android.content.*;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.net.ConnectivityManager;
 import android.os.Looper;
 import android.preference.PreferenceManager;
 import android.util.Log;
+
 import com.android.volley.NetworkResponse;
 import com.android.volley.VolleyError;
+
 import org.gateshipone.malp.R;
 import org.gateshipone.malp.application.artwork.network.ArtworkRequestModel;
 import org.gateshipone.malp.application.artwork.network.InsertImageTask;
 import org.gateshipone.malp.application.artwork.network.MALPRequestQueue;
-import org.gateshipone.malp.application.artwork.network.artprovider.*;
+import org.gateshipone.malp.application.artwork.network.artprovider.ArtProvider;
+import org.gateshipone.malp.application.artwork.network.artprovider.FanartTVProvider;
+import org.gateshipone.malp.application.artwork.network.artprovider.HTTPAlbumImageProvider;
+import org.gateshipone.malp.application.artwork.network.artprovider.LastFMProvider;
+import org.gateshipone.malp.application.artwork.network.artprovider.MPDAlbumImageProvider;
+import org.gateshipone.malp.application.artwork.network.artprovider.MusicBrainzProvider;
 import org.gateshipone.malp.application.artwork.network.responses.ImageResponse;
 import org.gateshipone.malp.application.artwork.storage.ArtworkDatabaseManager;
 import org.gateshipone.malp.application.artwork.storage.ImageNotFoundException;

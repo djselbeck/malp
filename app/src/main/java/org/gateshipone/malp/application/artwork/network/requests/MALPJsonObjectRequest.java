@@ -24,6 +24,7 @@ package org.gateshipone.malp.application.artwork.network.requests;
 
 import com.android.volley.Response;
 import com.android.volley.toolbox.JsonObjectRequest;
+
 import org.json.JSONObject;
 
 import java.util.HashMap;

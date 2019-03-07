@@ -22,11 +22,13 @@
 
 package org.gateshipone.malp.application.artwork.network.requests;
 
-import androidx.annotation.Nullable;
 import com.android.volley.NetworkResponse;
 import com.android.volley.Response;
+
 import org.gateshipone.malp.application.artwork.network.ArtworkRequestModel;
 import org.gateshipone.malp.application.artwork.network.responses.ImageResponse;
+
+import androidx.annotation.Nullable;
 
 public class MALPByteRequest extends MALPRequest<ImageResponse> {
 

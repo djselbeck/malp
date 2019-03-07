@@ -26,10 +26,17 @@ package org.gateshipone.malp.application.artwork.network.artprovider;
 import android.content.Context;
 import android.net.Uri;
 import android.util.Log;
-import com.android.volley.*;
+
+import com.android.volley.Cache;
+import com.android.volley.Network;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
 import com.android.volley.toolbox.BasicNetwork;
 import com.android.volley.toolbox.DiskBasedCache;
 import com.android.volley.toolbox.HurlStack;
+
 import org.gateshipone.malp.application.artwork.network.ArtworkRequestModel;
 import org.gateshipone.malp.application.artwork.network.requests.MALPByteRequest;
 import org.gateshipone.malp.application.artwork.network.responses.ImageResponse;
