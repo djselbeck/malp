@@ -143,8 +143,7 @@ public class FanartActivity extends GenericActivity implements FanartManager.OnF
 
         mSwitcher.setOnClickListener(v -> {
             cancelSwitching();
-            mSwitchTimer = new Timer();
-            mSwitchTimer.schedule(new ViewSwitchTask(), FANART_SWITCH_TIME, FANART_SWITCH_TIME);
+            startSwitching();
             updateFanartViews();
         });
 
@@ -190,8 +189,7 @@ public class FanartActivity extends GenericActivity implements FanartManager.OnF
 
         MPDStateMonitoringHandler.getHandler().registerStatusListener(mStateListener);
         cancelSwitching();
-        mSwitchTimer = new Timer();
-        mSwitchTimer.schedule(new ViewSwitchTask(), FANART_SWITCH_TIME, FANART_SWITCH_TIME);
+        startSwitching();
 
         mTrackTitle.setSelected(true);
         mTrackArtist.setSelected(true);
@@ -240,6 +238,7 @@ public class FanartActivity extends GenericActivity implements FanartManager.OnF
         super.onSaveInstanceState(savedInstanceState);
     }
 
+    @Override
     public void onRestoreInstanceState(Bundle savedInstanceState) {
         // Always call the superclass so it can restore the view hierarchy
         super.onRestoreInstanceState(savedInstanceState);
@@ -248,6 +247,8 @@ public class FanartActivity extends GenericActivity implements FanartManager.OnF
         mCurrentFanart = savedInstanceState.getInt(STATE_ARTWORK_POINTER);
         mNextFanart = savedInstanceState.getInt(STATE_ARTWORK_POINTER_NEXT);
         mLastTrack = savedInstanceState.getParcelable(STATE_LAST_TRACK);
+
+        restoreFanartView();
     }
 
     @Override
@@ -269,6 +270,11 @@ public class FanartActivity extends GenericActivity implements FanartManager.OnF
         }
     }
 
+    /**
+     * Updates the system control with a new MPD status.
+     *
+     * @param status The current MPD status.
+     */
     private void updateMPDStatus(MPDCurrentStatus status) {
         MPDCurrentStatus.MPD_PLAYBACK_STATE state = status.getPlaybackState();
 
@@ -320,14 +326,15 @@ public class FanartActivity extends GenericActivity implements FanartManager.OnF
         final String title = track.getVisibleTitle();
         final String artistName = track.getTrackAlbumArtist().isEmpty() ? track.getTrackArtist() : track.getTrackAlbumArtist();
 
+        mTrackTitle.setText(title);
+        mTrackAlbum.setText(artistName);
+        mTrackArtist.setText(artistName);
+
         String lastTrackArtistName = null;
         if (mLastTrack != null) {
             lastTrackArtistName = mLastTrack.getTrackAlbumArtist().isEmpty() ? mLastTrack.getTrackArtist() : mLastTrack.getTrackAlbumArtist();
         }
 
-        mTrackTitle.setText(title);
-        mTrackAlbum.setText(artistName);
-        mTrackArtist.setText(artistName);
         if (!artistName.equals(lastTrackArtistName)) {
             // only cancel fanart requests
             MALPRequestQueue.getInstance(getApplicationContext()).cancelAll(request -> request instanceof FanartImageRequest);
@@ -335,10 +342,10 @@ public class FanartActivity extends GenericActivity implements FanartManager.OnF
             cancelSwitching();
             mFanartView0.setImageBitmap(null);
             mFanartView1.setImageBitmap(null);
-            mNextFanart = 0;
 
-            // FIXME refresh artwork shown
+            mNextFanart = 0;
             mCurrentFanart = -1;
+
             mLastTrack = track;
 
             // Initiate the actual Fanart fetching
@@ -373,11 +380,15 @@ public class FanartActivity extends GenericActivity implements FanartManager.OnF
         }
     }
 
-    // This snippet hides the system bars.
+    /**
+     * This snippet hides the system bars.
+     * <p>
+     * Set the IMMERSIVE flag.
+     * Set the content to appear under the system bars so that the content
+     * doesn't resize when the system bars hide and show.
+     */
     private void hideSystemUI() {
-        // Set the IMMERSIVE flag.
-        // Set the content to appear under the system bars so that the content
-        // doesn't resize when the system bars hide and show.
+
         mDecorView.setSystemUiVisibility(
                 View.SYSTEM_UI_FLAG_LAYOUT_STABLE
                         | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
@@ -385,6 +396,27 @@ public class FanartActivity extends GenericActivity implements FanartManager.OnF
                         | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION // hide nav bar
                         | View.SYSTEM_UI_FLAG_FULLSCREEN // hide status bar
                         | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+    }
+
+    /**
+     * Method to restore the current image after an orientation change.
+     */
+    private void restoreFanartView() {
+        // Check if a track is available, cancel otherwise
+        if (mLastTrack == null || mLastTrack.getTrackArtistMBID().isEmpty()) {
+            return;
+        }
+
+        final String mbid = mLastTrack.getTrackArtistMBID();
+
+        final Bitmap image = mFanartManager.getFanartImage(mbid, mCurrentFanart);
+        if (image != null) {
+            if (mSwitcher.getDisplayedChild() == 0) {
+                mFanartView0.setImageBitmap(image);
+            } else {
+                mFanartView1.setImageBitmap(image);
+            }
+        }
     }
 
     /**
@@ -432,9 +464,16 @@ public class FanartActivity extends GenericActivity implements FanartManager.OnF
         }
 
         if (mSwitchTimer == null) {
-            mSwitchTimer = new Timer();
-            mSwitchTimer.schedule(new ViewSwitchTask(), FANART_SWITCH_TIME, FANART_SWITCH_TIME);
+            startSwitching();
         }
+    }
+
+    /**
+     * Starts the view switching task that alternates between images.
+     */
+    private void startSwitching() {
+        mSwitchTimer = new Timer();
+        mSwitchTimer.schedule(new ViewSwitchTask(), FANART_SWITCH_TIME, FANART_SWITCH_TIME);
     }
 
     /**
