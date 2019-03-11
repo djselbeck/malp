@@ -70,7 +70,6 @@ public class FanartActivity extends GenericActivity implements FanartManager.OnF
 
     private MPDTrack mLastTrack;
 
-
     private ServerStatusListener mStateListener = null;
 
     private ViewSwitcher mSwitcher;
@@ -79,15 +78,10 @@ public class FanartActivity extends GenericActivity implements FanartManager.OnF
     private int mNextFanart;
     private int mCurrentFanart;
 
-    private LinearLayout mInfoLayout;
-
     private ImageView mFanartView0;
     private ImageView mFanartView1;
 
-    private ImageButton mNextButton;
-    private ImageButton mPreviousButton;
     private ImageButton mPlayPauseButton;
-    private ImageButton mStopButton;
 
     /**
      * Seekbar used for seeking and informing the user of the current playback position.
@@ -103,13 +97,8 @@ public class FanartActivity extends GenericActivity implements FanartManager.OnF
 
     private TextView mVolumeText;
 
-    private ImageButton mVolumeMinus;
-    private ImageButton mVolumePlus;
-
     private VolumeButtonLongClickListener mPlusListener;
     private VolumeButtonLongClickListener mMinusListener;
-
-    private LinearLayout mHeaderTextLayout;
 
     private LinearLayout mVolumeSeekbarLayout;
     private LinearLayout mVolumeButtonLayout;
@@ -125,10 +114,7 @@ public class FanartActivity extends GenericActivity implements FanartManager.OnF
         super.onCreate(savedInstanceState);
         mDecorView = getWindow().getDecorView();
 
-
         setContentView(R.layout.activity_artist_fanart);
-
-        mInfoLayout = findViewById(R.id.information_layout);
 
         mTrackTitle = findViewById(R.id.textview_track_title);
         mTrackAlbum = findViewById(R.id.textview_track_album);
@@ -139,30 +125,21 @@ public class FanartActivity extends GenericActivity implements FanartManager.OnF
         mFanartView0 = findViewById(R.id.fanart_view_0);
         mFanartView1 = findViewById(R.id.fanart_view_1);
 
+        final ImageButton previousButton = findViewById(R.id.button_previous_track);
+        previousButton.setOnClickListener(v -> MPDCommandHandler.previousSong());
 
-        mPreviousButton = findViewById(R.id.button_previous_track);
-        mNextButton = findViewById(R.id.button_next_track);
-        mStopButton = findViewById(R.id.button_stop);
+        final ImageButton nextButton = findViewById(R.id.button_next_track);
+        nextButton.setOnClickListener(v -> MPDCommandHandler.nextSong());
+
+        final ImageButton stopButton = findViewById(R.id.button_stop);
+        stopButton.setOnClickListener(view -> MPDCommandHandler.stop());
+
         mPlayPauseButton = findViewById(R.id.button_playpause);
-
-
-        mPreviousButton.setOnClickListener(v -> MPDCommandHandler.previousSong());
-
-        mNextButton.setOnClickListener(v -> MPDCommandHandler.nextSong());
-
-        mStopButton.setOnClickListener(view -> MPDCommandHandler.stop());
-
         mPlayPauseButton.setOnClickListener(view -> MPDCommandHandler.togglePause());
-
 
         if (null == mStateListener) {
             mStateListener = new ServerStatusListener();
         }
-
-        // TODO remove me?
-        mInfoLayout.setOnClickListener(view -> {
-
-        });
 
         mSwitcher.setOnClickListener(v -> {
             cancelSwitching();
@@ -187,23 +164,19 @@ public class FanartActivity extends GenericActivity implements FanartManager.OnF
 
         mVolumeText = findViewById(R.id.volume_button_text);
 
-        mVolumeMinus = findViewById(R.id.volume_button_minus);
-
-        mVolumeMinus.setOnClickListener(v -> MPDCommandHandler.decreaseVolume(mVolumeStepSize));
-
-        mVolumePlus = findViewById(R.id.volume_button_plus);
-        mVolumePlus.setOnClickListener(v -> MPDCommandHandler.increaseVolume(mVolumeStepSize));
-
         /* Create two listeners that start a repeating timer task to repeat the volume plus/minus action */
         mPlusListener = new VolumeButtonLongClickListener(VolumeButtonLongClickListener.LISTENER_ACTION.VOLUME_UP, mVolumeStepSize);
         mMinusListener = new VolumeButtonLongClickListener(VolumeButtonLongClickListener.LISTENER_ACTION.VOLUME_DOWN, mVolumeStepSize);
 
-        /* Set the listener to the plus/minus button */
-        mVolumeMinus.setOnLongClickListener(mMinusListener);
-        mVolumeMinus.setOnTouchListener(mMinusListener);
+        final ImageButton volumeMinus = findViewById(R.id.volume_button_minus);
+        volumeMinus.setOnClickListener(v -> MPDCommandHandler.decreaseVolume(mVolumeStepSize));
+        volumeMinus.setOnLongClickListener(mMinusListener);
+        volumeMinus.setOnTouchListener(mPlusListener);
 
-        mVolumePlus.setOnLongClickListener(mPlusListener);
-        mVolumePlus.setOnTouchListener(mPlusListener);
+        final ImageButton volumePlus = findViewById(R.id.volume_button_plus);
+        volumePlus.setOnClickListener(v -> MPDCommandHandler.increaseVolume(mVolumeStepSize));
+        volumePlus.setOnLongClickListener(mPlusListener);
+        volumePlus.setOnTouchListener(mPlusListener);
 
         mVolumeSeekbarLayout = findViewById(R.id.volume_seekbar_layout);
         mVolumeButtonLayout = findViewById(R.id.volume_button_layout);
@@ -344,14 +317,18 @@ public class FanartActivity extends GenericActivity implements FanartManager.OnF
      * @param track New {@link MPDTrack} that is playing
      */
     private void updateMPDCurrentTrack(final MPDTrack track) {
-        String title;
+        final String title = track.getVisibleTitle();
+        final String artistName = track.getTrackAlbumArtist().isEmpty() ? track.getTrackArtist() : track.getTrackAlbumArtist();
 
-        title = track.getVisibleTitle();
+        String lastTrackArtistName = null;
+        if (mLastTrack != null) {
+            lastTrackArtistName = mLastTrack.getTrackAlbumArtist().isEmpty() ? mLastTrack.getTrackArtist() : mLastTrack.getTrackAlbumArtist();
+        }
 
         mTrackTitle.setText(title);
-        mTrackAlbum.setText(track.getTrackAlbum());
-        mTrackArtist.setText(track.getTrackArtist());
-        if (null == mLastTrack || !track.getTrackArtist().equals(mLastTrack.getTrackArtist())) {
+        mTrackAlbum.setText(artistName);
+        mTrackArtist.setText(artistName);
+        if (!artistName.equals(lastTrackArtistName)) {
             // only cancel fanart requests
             MALPRequestQueue.getInstance(getApplicationContext()).cancelAll(request -> request instanceof FanartImageRequest);
 
@@ -409,17 +386,6 @@ public class FanartActivity extends GenericActivity implements FanartManager.OnF
                         | View.SYSTEM_UI_FLAG_FULLSCREEN // hide status bar
                         | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
     }
-
-    // This snippet shows the system bars. It does this by removing all the flags
-// except for the ones that make the content appear under the system bars.
-    // TODO remove me?
-    private void showSystemUI() {
-        mDecorView.setSystemUiVisibility(
-                View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                        | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                        | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
-    }
-
 
     /**
      * Shows the next image if available. Blank if not.
@@ -579,15 +545,15 @@ public class FanartActivity extends GenericActivity implements FanartManager.OnF
      */
     private void setVolumeControlSetting() {
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
-        String volumeControlView = sharedPref.getString(this.getString(R.string.pref_volume_controls_key), this.getString(R.string.pref_volume_control_view_default));
+        String volumeControlView = sharedPref.getString(getString(R.string.pref_volume_controls_key), getString(R.string.pref_volume_control_view_default));
 
-        if (volumeControlView.equals(this.getString(R.string.pref_volume_control_view_off_key))) {
+        if (volumeControlView.equals(getString(R.string.pref_volume_control_view_off_key))) {
             mVolumeSeekbarLayout.setVisibility(View.GONE);
             mVolumeButtonLayout.setVisibility(View.GONE);
-        } else if (volumeControlView.equals(this.getString(R.string.pref_volume_control_view_seekbar_key))) {
+        } else if (volumeControlView.equals(getString(R.string.pref_volume_control_view_seekbar_key))) {
             mVolumeSeekbarLayout.setVisibility(View.VISIBLE);
             mVolumeButtonLayout.setVisibility(View.GONE);
-        } else if (volumeControlView.equals(this.getString(R.string.pref_volume_control_view_buttons_key))) {
+        } else if (volumeControlView.equals(getString(R.string.pref_volume_control_view_buttons_key))) {
             mVolumeSeekbarLayout.setVisibility(View.GONE);
             mVolumeButtonLayout.setVisibility(View.VISIBLE);
         }

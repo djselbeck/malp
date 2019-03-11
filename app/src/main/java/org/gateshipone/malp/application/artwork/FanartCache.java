@@ -107,8 +107,8 @@ public class FanartCache {
      * Adds a new fanart. This should check if old entries can be removed.
      * After the count reaches MAX_ARTISTS_CACHED it should remove the LRU entries
      *
-     * @param mbid
-     * @param image
+     * @param mbid  The musicbrainz id related to the image.
+     * @param image The image to store as a byte array.
      */
     synchronized void addFanart(String mbid, String name, byte[] image) {
         int newIndex = getFanartCount(mbid);

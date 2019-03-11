@@ -44,14 +44,32 @@ public class FanartManager implements FanartProvider.FanartFetchError {
         void fanartCacheCountChanged(final int count);
     }
 
+    /**
+     * Private static singleton instance that can be used by other classes via the
+     * getInstance method.
+     */
     private static FanartManager mInstance;
 
+    /**
+     * Private {@link Context} used for all kinds of things like Broadcasts.
+     * It is using the ApplicationContext so it should be safe against
+     * memory leaks.
+     */
     private final Context mContext;
 
+    /**
+     * Flag if the artist provider is not disabled in the settings.
+     */
     private boolean mUseFanartProvider;
 
+    /**
+     * Flag if the usage is restricted to wifi only.
+     */
     private boolean mWifiOnly;
 
+    /**
+     * The cache for the fanart images.
+     */
     private FanartCache mFanartCache;
 
     private FanartManager(final Context context) {
@@ -74,27 +92,12 @@ public class FanartManager implements FanartProvider.FanartFetchError {
     }
 
     /**
-     * TODO is this method necessary
+     * Returns fanart image number index from the fanart cache for the given MBID.
+     *
+     * @param mbid  The musicbrainz id for the fanart lookup.
+     * @param index The index of the fanart image. If the index exceeds the stored images the image will be null.
+     * @return A bitmap of the requested image or null if it was not found in the cache.
      */
-    public void setWifiOnly(boolean wifiOnly) {
-        mWifiOnly = wifiOnly;
-    }
-
-    /**
-     * TODO is this method necessary
-     */
-    public void setArtistProvider(String artistProvider) {
-        mUseFanartProvider = !artistProvider.equals(mContext.getString(R.string.provider_off));
-    }
-
-    /**
-     * TODO is this method necessary
-     */
-    public void initialize(String artistProvider, boolean wifiOnly) {
-        mUseFanartProvider = !artistProvider.equals(mContext.getString(R.string.provider_off));
-        mWifiOnly = wifiOnly;
-    }
-
     public Bitmap getFanartImage(final String mbid, final int index) {
         final File file = mFanartCache.getFanart(mbid, index);
 
@@ -104,12 +107,24 @@ public class FanartManager implements FanartProvider.FanartFetchError {
         return BitmapFactory.decodeFile(file.getPath());
     }
 
+    /**
+     * Returns the current count of stored fanart images in the cache for the given MBID.
+     *
+     * @param mbid The musicbrainz id for the fanart lookup.
+     * @return The number of stored fanart images in the cache for the given MBID.
+     */
     public int getFanartCount(final String mbid) {
         return mFanartCache.getFanartCount(mbid);
     }
 
     /**
-     * TODO add callbacks
+     * This method will trigger the fanart sync for the given {@link MPDTrack}.
+     * <p>
+     * If the track has no valid album musicbrainz id this will be resolved first.
+     * The provider will be always the {@link FanartTVProvider} instance.
+     *
+     * @param track                     The current {@link MPDTrack} for which fanart should be provided.
+     * @param fanartCacheChangeListener Callback if a new fanart was added to the cache.
      */
     public void syncFanart(final MPDTrack track, final OnFanartCacheChangeListener fanartCacheChangeListener) {
         if (!mUseFanartProvider && !NetworkUtils.isDownloadAllowed(mContext, mWifiOnly)) {
@@ -128,16 +143,34 @@ public class FanartManager implements FanartProvider.FanartFetchError {
         }
     }
 
+    /**
+     * Callback if an image fetch error occured.
+     */
     @Override
     public void imageListFetchError() {
-        // TODO add error handling
+        // for now error handling is not necessary
+        // TODO maybe add logging
     }
 
+    /**
+     * Callback if an image fetch error occured.
+     *
+     * @param track The {@link MPDTrack} for which the error occured.
+     */
     @Override
     public void fanartFetchError(MPDTrack track) {
-        // TODO add error handling
+        // for now error handling is not necessary
+        // TODO maybe add logging
     }
 
+    /**
+     * This method will download all fanart images for the given {@link MPDTrack} that is not already cached.
+     * <p>
+     * The provider will be always the {@link FanartTVProvider} instance.
+     *
+     * @param track                     The current {@link MPDTrack} for which fanart should be provided.
+     * @param fanartCacheChangeListener Callback if a new fanart was added to the cache.
+     */
     private void loadFanartImages(final MPDTrack track, final OnFanartCacheChangeListener fanartCacheChangeListener) {
         fanartCacheChangeListener.fanartInitialCacheCount(mFanartCache.getFanartCount(track.getTrackArtistMBID()));
 
@@ -154,16 +187,25 @@ public class FanartManager implements FanartProvider.FanartFetchError {
                 }, this);
     }
 
+    /**
+     * This method will trigger the actual download of a fanart image.
+     * <p>
+     * The provider will be always the {@link FanartTVProvider} instance.
+     *
+     * @param track                     The current {@link MPDTrack} for which fanart should be provided.
+     * @param imageURL                  The current url for the fanart.
+     * @param fanartCacheChangeListener Callback if a new fanart was added to the cache.
+     */
     private void loadSingleFanartImage(final MPDTrack track, final String imageURL, final OnFanartCacheChangeListener fanartCacheChangeListener) {
         FanartTVProvider.getInstance(mContext).getFanartImage(track, imageURL,
                 response -> {
-                    //TODO scale the image
                     mFanartCache.addFanart(track.getTrackArtistMBID(), String.valueOf(response.hashCode()), response.image);
 
                     fanartCacheChangeListener.fanartCacheCountChanged(mFanartCache.getFanartCount(track.getTrackArtistMBID()));
                 },
                 error -> {
-                    // TODO add error handling
+                    // for now error handling is not necessary
+                    // TODO maybe add logging
                 });
     }
 }

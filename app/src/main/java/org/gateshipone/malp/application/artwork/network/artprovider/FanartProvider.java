@@ -30,6 +30,9 @@ import org.gateshipone.malp.mpdservice.mpdprotocol.mpdobjects.MPDTrack;
 
 import java.util.List;
 
+/**
+ * Interface to extend an {@link ArtProvider} instance to be used in the {@link org.gateshipone.malp.application.artwork.FanartManager}.
+ */
 public interface FanartProvider {
 
     interface FanartFetchError {
