@@ -27,6 +27,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.util.Log;
+
 import org.gateshipone.malp.R;
 import org.gateshipone.malp.application.artwork.network.artprovider.HTTPAlbumImageProvider;
 import org.gateshipone.malp.application.artwork.network.artprovider.MPDAlbumImageProvider;
@@ -219,14 +220,9 @@ public class ConnectionManager extends MPDConnectionStateChangeHandler {
             HTTPAlbumImageProvider.getInstance(mContext).setRegex(mServerProfile.getHTTPRegex());
         }
 
-        if (mServerProfile.getMPDCoverEnabled()) {
-            // Check if current server can deliver artwork over MPD protocol
-            if (!MPDInterface.mInstance.getServerCapabilities().hasAlbumArt()) {
-                MPDAlbumImageProvider.getInstance().setActive(false);
-            }
-        }
-
-        MPDAlbumImageProvider.getInstance().setActive(mServerProfile.getMPDCoverEnabled());
+        // Check if current server can deliver artwork over MPD protocol
+        final boolean mpdCoverEnabled = mServerProfile.getMPDCoverEnabled() && MPDInterface.mInstance.getServerCapabilities().hasAlbumArt();
+        MPDAlbumImageProvider.getInstance().setActive(mpdCoverEnabled);
     }
 
     public synchronized void setAutoconnect(boolean enabled) {
