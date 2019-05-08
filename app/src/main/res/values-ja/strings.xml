@@ -184,18 +184,6 @@
     <string name="preference_theme_item_red">赤</string>
     <string name="preference_theme_item_oled_dark">OLED ダーク</string>
 
-    <string-array name="preference_odyssey_styles">
-        <item>@string/preference_theme_item_indigo</item>
-        <item>@string/preference_theme_item_orange</item>
-        <item>@string/preference_theme_item_deep_orange</item>
-        <item>@string/preference_theme_item_blue</item>
-        <item>@string/preference_theme_item_dark_grey</item>
-        <item>@string/preference_theme_item_brown</item>
-        <item>@string/preference_theme_item_light_green</item>
-        <item>@string/preference_theme_item_red</item>
-        <item>@string/preference_theme_item_oled_dark</item>
-    </string-array>
-
     <string name="preference_dark_theme_title">ダークテーマ</string>
     <string name="preference_dark_theme_message">ダークテーマを使用する</string>
 
@@ -203,29 +191,12 @@
     <string name="preference_default_view_message">デフォルトビューを選択</string>
     <string name="preference_default_view_summary">アプリケーションのデフォルトビューを選択します。</string>
 
-    <string name="preference_default_view_my_music_artists">アーティスト</string>
-    <string name="preference_default_view_my_music_albums">アルバム</string>
-    <string name="preference_default_view_my_music_playlists">プレイリスト</string>
-    <string name="preference_default_view_my_music_files">ファイル</string>
-
-    <string-array name="preference_default_views">
-        <item>@string/preference_default_view_my_music_artists</item>
-        <item>@string/preference_default_view_my_music_albums</item>
-        <item>@string/preference_default_view_my_music_playlists</item>
-        <item>@string/preference_default_view_my_music_files</item>
-    </string-array>
-
     <string name="preference_library_view_title">ライブラリービューを選択</string>
     <string name="preference_library_view_message">ライブラリービューを選択</string>
     <string name="preference_library_view_summary">アルバムとアーティストで使用するビューの種類を選択します</string>
 
     <string name="preference_library_view_list">リスト</string>
     <string name="preference_library_view_grid">グリッド</string>
-
-    <string-array name="preference_library_view">
-        <item>@string/preference_library_view_list</item>
-        <item>@string/preference_library_view_grid</item>
-    </string-array>
 
     <string name="preference_use_album_artists_title">アルバムアーティストタグを使用する</string>
 
@@ -236,12 +207,6 @@
     <string name="preference_volume_control_off">オフ</string>
     <string name="preference_volume_control_seekbar">スライダー</string>
     <string name="preference_volume_control_buttons">ボタン</string>
-
-    <string-array name="preference_volume_control">
-        <item>@string/preference_volume_control_off</item>
-        <item>@string/preference_volume_control_seekbar</item>
-        <item>@string/preference_volume_control_buttons</item>
-    </string-array>
 
     <string name="preference_generic_hardware_keys_title">ハードウェアボタンを使用する</string>
     <string name="preference_generic_hardware_keys_text">デバイスのハードウェアボタンを使用して再生をコントロールします。</string>
@@ -256,21 +221,9 @@
 
     <string name="provider_off">オフ</string>
 
-    <string-array name="preference_artwork_album_provider_entries">
-        <item>@string/provider_off</item>
-        <item>@string/musicbrainz</item>
-        <item>@string/last_fm</item>
-    </string-array>
-
     <string name="preference_artwork_artist_provider_title">アーティスト画像プロバイダー</string>
     <string name="preference_artwork_artist_provider_summary">アーティストカバー画像のプロバイダーを選択します。</string>
     <string name="preference_artwork_artist_provider_message">アーティストカバー画像のプロバイダーを選択します。</string>
-
-    <string-array name="preference_artwork_artist_provider_entries">
-        <item>@string/provider_off</item>
-        <item>@string/last_fm</item>
-        <item>@string/fanart_tv</item>
-    </string-array>
 
     <string name="preference_artwork_clear_artist">アーティスト画像をクリア</string>
     <string name="preference_artwork_clear_artist_summary">アーティストの保存した画像をすべて除去します。</string>
@@ -293,14 +246,6 @@
     <string name="search_choice_artist">アーティスト</string>
     <string name="search_choice_file">ファイル</string>
     <string name="search_choice_everything">すべて</string>
-
-    <string-array name="server_search_choices">
-        <item>@string/search_choice_track</item>
-        <item>@string/search_choice_album</item>
-        <item>@string/search_choice_artist</item>
-        <item>@string/search_choice_file</item>
-        <item>@string/search_choice_everything</item>
-    </string-array>
 
     <string name="welcome_dialog_title">プロフィールが見つかりません</string>
     <string name="welcome_dialog_text">このアプリケーションは MPD のリモートコントロールです。 MPD をご存じない場合、このアプリケーションはおそらく役に立たないでしょう :).\n\nこのアプリケーションを使用するには、右上の追加ボタンで新しいプロフィールを追加してください。\n\n同じインターフェイスに基づく音楽プレーヤーをお好みの場合、Odyssey (https://gitlab.com/gateship-one/odyssey) をお試しください。</string>

@@ -88,10 +88,6 @@
     <string name="song_playlist_no">Playlist-Nr.:</string>
     <string name="song_track_no">Lied-Nr.:</string>
     <string name="preference_default_view_message">Standardanzeige wählen</string>
-    <string name="preference_default_view_my_music_albums">Alben</string>
-    <string name="preference_default_view_my_music_artists">Interpreten</string>
-    <string name="preference_default_view_my_music_files">Dateien</string>
-    <string name="preference_default_view_my_music_playlists">Wiedergabelisten</string>
     <string name="preference_default_view_summary">Wählen Sie eine Standardanzeige für diese Anwendung.</string>
     <string name="preference_default_view_title">Standardanzeige</string>
     <string name="preference_launch_about">Über</string>

@@ -184,11 +184,6 @@
     <string name="preference_theme_item_light_green">Vert clair</string>
     <string name="preference_theme_item_red">Rouge</string>
     <string name="preference_theme_item_oled_dark">Noir OLED</string>
-    <string-array name="preference_odyssey_styles">
-        <item>@string/preference_theme_item_indigo</item>
-        <item>@string/preference_theme_item_orange</item>
-        <item>@string/preference_theme_item_deep_orange</item>
-    </string-array>
     <string name="preference_album_sort_order_title">Ordre de tri des albums de l\'artiste</string>
     <string name="preference_album_sort_order_message">Trier par</string>
     <string name="preference_album_sort_order_summary">Sélectionner la méthode de tri pour les albums de l\'artiste</string>
@@ -205,10 +200,6 @@
     <string name="preference_default_view_title">Vue par défaut</string>
     <string name="preference_default_view_message">Choisir la vue par défaut</string>
     <string name="preference_default_view_summary">Choisir la vue par défaut pour l\'application.</string>
-    <string name="preference_default_view_my_music_artists">Artistes</string>
-    <string name="preference_default_view_my_music_albums">Albums</string>
-    <string name="preference_default_view_my_music_playlists">Playlists</string>
-    <string name="preference_default_view_my_music_files">Fichiers</string>
     <string name="preference_library_view_title">Choisir l\'affichage de la bibliothèque</string>
     <string name="preference_library_view_message">Choisir l\'affichage de la bibliothèque</string>
     <string name="preference_library_view_summary">Choisir le type de vue utilisé pour les albums et les artistes</string>

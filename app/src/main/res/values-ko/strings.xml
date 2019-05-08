@@ -187,7 +187,7 @@
     <string name="server_statistic_updateing_database">서버가 데이터베이스를 업데이트하는 동안 기다려 주셔요!</string>
 
     <!-- Snackbar text -->
-    <string name="snackbar_error_format">오류 %d/%d: %s</string>
+    <string name="snackbar_mpd_server_error_format">오류 %d/%d: %s</string>
     <string name="snackbar_mpd_connection_error_format">오류: %s</string>
 
     <!-- Sharing text -->
@@ -253,10 +253,6 @@
     <string name="preference_default_view_message">기본 보기를 고릅니다</string>
     <string name="preference_default_view_summary">앱의 기본 보기를 고릅니다.</string>
 
-    <string name="preference_default_view_my_music_artists">연주자</string>
-    <string name="preference_default_view_my_music_albums">음반</string>
-    <string name="preference_default_view_my_music_playlists">연주목록</string>
-    <string name="preference_default_view_my_music_files">파일</string>
     <string name="preference_library_view_title">라이브러리 보기</string>
     <string name="preference_library_view_message">라이브러리 보기 고르기</string>
     <string name="preference_library_view_summary">음반과 연주자 보기에 사용될 형식을 고릅니다</string>

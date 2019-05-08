@@ -41,4 +41,66 @@
         <item>@string/contributor_translator_korean</item>
         <item>@string/contributor_translator_hungarian</item>
     </string-array>
+
+    <string-array name="preference_odyssey_styles">
+        <item>@string/preference_theme_item_indigo</item>
+        <item>@string/preference_theme_item_orange</item>
+        <item>@string/preference_theme_item_deep_orange</item>
+        <item>@string/preference_theme_item_blue</item>
+        <item>@string/preference_theme_item_dark_grey</item>
+        <item>@string/preference_theme_item_brown</item>
+        <item>@string/preference_theme_item_light_green</item>
+        <item>@string/preference_theme_item_red</item>
+        <item>@string/preference_theme_item_oled_dark</item>
+    </string-array>
+
+    <string-array name="preference_album_sort_orders">
+        <item>@string/preference_album_sort_order_name</item>
+        <item>@string/preference_album_sort_order_year</item>
+    </string-array>
+
+    <string-array name="preference_default_views">
+        <item>@string/menu_artists</item>
+        <item>@string/menu_albums</item>
+        <item>@string/menu_playlists</item>
+        <item>@string/menu_files</item>
+    </string-array>
+
+    <string-array name="preference_library_view">
+        <item>@string/preference_library_view_list</item>
+        <item>@string/preference_library_view_grid</item>
+    </string-array>
+
+    <string-array name="preference_library_click">
+        <item>@string/preference_library_click_action_details</item>
+        <item>@string/preference_library_click_action_add</item>
+        <item>@string/preference_library_click_action_play</item>
+        <item>@string/preference_library_click_action_play_next</item>
+    </string-array>
+
+    <string-array name="preference_volume_control">
+        <item>@string/preference_volume_control_off</item>
+        <item>@string/preference_volume_control_seekbar</item>
+        <item>@string/preference_volume_control_buttons</item>
+    </string-array>
+
+    <string-array name="preference_artwork_album_provider_entries">
+        <item>@string/provider_off</item>
+        <item>@string/musicbrainz</item>
+        <item>@string/last_fm</item>
+    </string-array>
+
+    <string-array name="preference_artwork_artist_provider_entries">
+        <item>@string/provider_off</item>
+        <item>@string/last_fm</item>
+        <item>@string/fanart_tv</item>
+    </string-array>
+
+    <string-array name="server_search_choices">
+        <item>@string/search_choice_track</item>
+        <item>@string/search_choice_album</item>
+        <item>@string/search_choice_artist</item>
+        <item>@string/search_choice_file</item>
+        <item>@string/search_choice_everything</item>
+    </string-array>
 </resources>

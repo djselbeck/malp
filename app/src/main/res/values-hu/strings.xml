@@ -233,29 +233,12 @@
     <string name="preference_theme_item_red">Piros</string>
     <string name="preference_theme_item_oled_dark">OLED sötét</string>
 
-    <string-array name="preference_odyssey_styles">
-        <item>@string/preference_theme_item_indigo</item>
-        <item>@string/preference_theme_item_orange</item>
-        <item>@string/preference_theme_item_deep_orange</item>
-        <item>@string/preference_theme_item_blue</item>
-        <item>@string/preference_theme_item_dark_grey</item>
-        <item>@string/preference_theme_item_brown</item>
-        <item>@string/preference_theme_item_light_green</item>
-        <item>@string/preference_theme_item_red</item>
-        <item>@string/preference_theme_item_oled_dark</item>
-    </string-array>
-
     <string name="preference_album_sort_order_title">Előadó nézet rendezési elve</string>
     <string name="preference_album_sort_order_message">Rendezési elv</string>
     <string name="preference_album_sort_order_summary">Válasszon egyet az előadó albumjainak rendezéséhez.</string>
 
     <string name="preference_album_sort_order_name">Név</string>
     <string name="preference_album_sort_order_year">Év</string>
-
-    <string-array name="preference_album_sort_orders">
-        <item>@string/preference_album_sort_order_name</item>
-        <item>@string/preference_album_sort_order_year</item>
-    </string-array>
 
     <string name="preference_dark_theme_title">Sötét téma</string>
     <string name="preference_dark_theme_message">Sötét téma használata</string>
@@ -270,29 +253,12 @@
     <string name="preference_default_view_message">Alapértelmezett nézet kiválasztása</string>
     <string name="preference_default_view_summary">Válassza ki az alapértelmezett nézetét az alkalmazásnak.</string>
 
-    <string name="preference_default_view_my_music_artists">Előadók</string>
-    <string name="preference_default_view_my_music_albums">Albumok</string>
-    <string name="preference_default_view_my_music_playlists">Lejátszási listák</string>
-    <string name="preference_default_view_my_music_files">Fájlok</string>
-
-    <string-array name="preference_default_views">
-        <item>@string/preference_default_view_my_music_artists</item>
-        <item>@string/preference_default_view_my_music_albums</item>
-        <item>@string/preference_default_view_my_music_playlists</item>
-        <item>@string/preference_default_view_my_music_files</item>
-    </string-array>
-
     <string name="preference_library_view_title">Könyvtár nézet kiválasztása</string>
     <string name="preference_library_view_message">Könyvtár nézet kiválasztása</string>
     <string name="preference_library_view_summary">Nézet kiválasztása, ami az albumoknál és előadóknál lesz használva</string>
 
     <string name="preference_library_view_list">Lista</string>
     <string name="preference_library_view_grid">Háló</string>
-
-    <string-array name="preference_library_view">
-        <item>@string/preference_library_view_list</item>
-        <item>@string/preference_library_view_grid</item>
-    </string-array>
 
     <string name="preference_use_album_artists_title">AlbumArtist címke használata</string>
     <string name="preference_use_album_artists_text">AlbumArtist címke használata az előadó listához(Ez lassabb és néha hibás megjelenéshez vezethet</string>
@@ -307,14 +273,6 @@
     <string name="preference_library_click_action_summary">Válasszon egy műveletet a könyvtárban lévő fájlokhoz</string>
     <string name="preference_library_click_action_message">Válasszon egy alapértelmezett műveletet a fájlokon való kattintáshoz</string>
 
-    <string-array name="preference_library_click">
-        <item>@string/preference_library_click_action_details</item>
-        <item>@string/preference_library_click_action_add</item>
-        <item>@string/preference_library_click_action_play</item>
-        <item>@string/preference_library_click_action_play_next</item>
-    </string-array>
-
-
     <string name="preference_volume_control_title">Válassza ki a hangerőszabályzás módját</string>
     <string name="preference_volume_control_message">Válassza ki a hangerőszabályzás módját</string>
     <string name="preference_volume_control_summary">Válassza ki a nézetet, ami a lejátszás hangerejének szabályzására szolgál</string>
@@ -322,12 +280,6 @@
     <string name="preference_volume_control_off">Ki</string>
     <string name="preference_volume_control_seekbar">Csúszák</string>
     <string name="preference_volume_control_buttons">Gombok</string>
-
-    <string-array name="preference_volume_control">
-        <item>@string/preference_volume_control_off</item>
-        <item>@string/preference_volume_control_seekbar</item>
-        <item>@string/preference_volume_control_buttons</item>
-    </string-array>
 
     <string name="preference_generic_keep_display_on_title">Képernyő bekapcsolva tartása</string>
     <string name="preference_generic_keep_display_on_text">A képernyő bekapcsolva marad, amíg az alkalmazás az előtérben van.</string>
@@ -362,21 +314,9 @@
 
     <string name="provider_off">Ki</string>
 
-    <string-array name="preference_artwork_album_provider_entries">
-        <item>@string/provider_off</item>
-        <item>@string/musicbrainz</item>
-        <item>@string/last_fm</item>
-    </string-array>
-
     <string name="preference_artwork_artist_provider_title">Előadó képszolgáltató</string>
     <string name="preference_artwork_artist_provider_summary">Válasszon egy szolgáltatót az előadó képekhez.</string>
     <string name="preference_artwork_artist_provider_message">Válasszon egy szolgáltatót az előadó képekhez.</string>
-
-    <string-array name="preference_artwork_artist_provider_entries">
-        <item>@string/provider_off</item>
-        <item>@string/last_fm</item>
-        <item>@string/fanart_tv</item>
-    </string-array>
 
     <string name="preference_artwork_clear_artist">Előadó képek törlése</string>
     <string name="preference_artwork_clear_artist_summary">Eltávolítja az összes előadó képét.</string>
@@ -404,14 +344,6 @@
     <string name="search_choice_artist">Előadó</string>
     <string name="search_choice_file">Fájl</string>
     <string name="search_choice_everything">Összes</string>
-
-    <string-array name="server_search_choices">s
-        <item>@string/search_choice_track</item>
-        <item>@string/search_choice_album</item>
-        <item>@string/search_choice_artist</item>
-        <item>@string/search_choice_file</item>
-        <item>@string/search_choice_everything</item>
-    </string-array>
 
     <string name="welcome_dialog_title">Nem találhatóak profilok</string>
     <string name="welcome_dialog_text">Ez az alkalmazás egy MPD távvezérlő. Ha nem tudod mi az MPD, akkor valószínűleg ez az alkalmazás felesleges számodra, bocsánat :).\n\nAz alkalmazás használatához adjon hozzá egy új profilt a jobb fenti hozzáadás gombbal.\nEz az alkalmazás nem feltétlen működik Mopidy-al, mivel ez egy MPD kliens, nem nyújtunk támogatást Mopidy-al kapcsolatban.\n\nHa szeretne egy zenelejátszót ugyanezzel a felülettel, próbálja ki az Odyssey-t (https://gitlab.com/gateship-one/odyssey).</string>

@@ -208,11 +208,6 @@
     <string name="preference_default_view_message">Seleccionar la vista por default</string>
     <string name="preference_default_view_summary">Seleccionar la vista por default de la aplicación.</string>
 
-    <string name="preference_default_view_my_music_artists">Artistas</string>
-    <string name="preference_default_view_my_music_albums">Discos</string>
-    <string name="preference_default_view_my_music_playlists">Listas</string>
-    <string name="preference_default_view_my_music_files">Archivos</string>
-
     <string name="preference_library_view_title">Seleccione vista de biblioteca</string>
     <string name="preference_library_view_message">Seleccione vista de biblioteca</string>
     <string name="preference_library_view_summary">Seleccione el tipo de vista a usar para discos y artistas</string>
