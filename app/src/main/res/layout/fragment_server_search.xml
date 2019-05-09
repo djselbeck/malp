@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~  Copyright (C) 2019 Team Gateship-One
   ~  (Hendrik Borghorst & Frederik Luetkes)
   ~
@@ -22,25 +21,25 @@
   -->
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
-    android:elevation="48dp"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:elevation="48dp"
+    android:orientation="vertical">
 
     <SearchView
+        android:id="@+id/search_text"
         android:layout_width="match_parent"
         android:layout_height="@dimen/search_fragment_view_height"
-        android:id="@+id/search_text"
-        android:iconifiedByDefault="false"
-        android:layout_gravity="center_horizontal" />
+        android:layout_gravity="center_horizontal"
+
+        android:iconifiedByDefault="false" />
 
     <Spinner
+        android:id="@+id/search_criteria"
         android:layout_width="match_parent"
         android:layout_height="@dimen/search_fragment_view_height"
         android:paddingTop="@dimen/material_content_spacing"
-        android:paddingBottom="@dimen/material_content_spacing"
-        android:id="@+id/search_criteria" />
+        android:paddingBottom="@dimen/material_content_spacing" />
 
     <!-- Separator line -->
     <View
@@ -48,6 +47,6 @@
         android:layout_height="1dp"
         android:background="?android:textColorSecondary" />
 
-    <include layout="@layout/listview_layout_refreshable"/>
+    <include layout="@layout/listview_layout_refreshable" />
 
 </LinearLayout>

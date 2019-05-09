@@ -28,6 +28,7 @@ import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+
 import androidx.annotation.NonNull;
 import androidx.loader.content.Loader;
 import androidx.core.graphics.drawable.DrawableCompat;
@@ -56,6 +57,7 @@ import org.gateshipone.malp.application.callbacks.FABFragmentCallback;
 import org.gateshipone.malp.application.loaders.SearchResultLoader;
 import org.gateshipone.malp.application.utils.PreferenceHelper;
 import org.gateshipone.malp.application.utils.ThemeUtils;
+import org.gateshipone.malp.application.views.NowPlayingView;
 import org.gateshipone.malp.mpdservice.handlers.serverhandler.MPDQueryHandler;
 import org.gateshipone.malp.mpdservice.mpdprotocol.MPDCommands;
 import org.gateshipone.malp.mpdservice.mpdprotocol.mpdobjects.MPDAlbum;
@@ -74,11 +76,6 @@ public class SearchFragment extends GenericMPDFragment<List<MPDFileEntry>> imple
      * Main ListView of this fragment
      */
     private ListView mListView;
-
-    /**
-     * Name of the playlist to load
-     */
-    private String mPath;
 
     private FABFragmentCallback mFABCallback = null;
 
@@ -131,7 +128,6 @@ public class SearchFragment extends GenericMPDFragment<List<MPDFileEntry>> imple
         mSearchView.setOnQueryTextListener(new SearchViewQueryListener());
         mSearchView.setOnFocusChangeListener(this);
 
-
         // get swipe layout
         mSwipeRefreshLayout = rootView.findViewById(R.id.refresh_layout);
         // set swipe colors
@@ -155,7 +151,7 @@ public class SearchFragment extends GenericMPDFragment<List<MPDFileEntry>> imple
      * Called when the fragment is first attached to its context.
      */
     @Override
-    public void onAttach(Context context) {
+    public void onAttach(@NonNull Context context) {
         super.onAttach(context);
 
         // This makes sure that the container activity has implemented
@@ -201,13 +197,14 @@ public class SearchFragment extends GenericMPDFragment<List<MPDFileEntry>> imple
         }
     }
 
+    @NonNull
     @Override
     public Loader<List<MPDFileEntry>> onCreateLoader(int id, Bundle args) {
         return new SearchResultLoader(getActivity(), mSearchText, mSearchType);
     }
 
     @Override
-    public void onLoadFinished(Loader<List<MPDFileEntry>> loader, List<MPDFileEntry> data) {
+    public void onLoadFinished(@NonNull Loader<List<MPDFileEntry>> loader, List<MPDFileEntry> data) {
         super.onLoadFinished(loader, data);
         mFileAdapter.swapModel(data);
         if (null != data && !data.isEmpty()) {
@@ -227,7 +224,7 @@ public class SearchFragment extends GenericMPDFragment<List<MPDFileEntry>> imple
      * Create the context menu.
      */
     @Override
-    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+    public void onCreateContextMenu(@NonNull ContextMenu menu, @NonNull View v, ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
         MenuInflater inflater = getActivity().getMenuInflater();
         inflater.inflate(R.menu.context_menu_search_track, menu);
@@ -236,11 +233,7 @@ public class SearchFragment extends GenericMPDFragment<List<MPDFileEntry>> imple
     @Override
     public void onPause() {
         super.onPause();
-        InputMethodManager imm = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-        View view = getView();
-        if (null != view) {
-            imm.hideSoftInputFromWindow(getView().getWindowToken(), 0);
-        }
+        closeKeyboard();
     }
 
     /**
@@ -250,12 +243,12 @@ public class SearchFragment extends GenericMPDFragment<List<MPDFileEntry>> imple
      * @return True if the hook was consumed here.
      */
     @Override
-    public boolean onContextItemSelected(MenuItem item) {
+    public boolean onContextItemSelected(@NonNull MenuItem item) {
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
 
         int position;
         if (info == null) {
-            if (mContextMenuPosition == -1 ) {
+            if (mContextMenuPosition == -1) {
                 return super.onContextItemSelected(item);
             }
             position = mContextMenuPosition;
@@ -279,7 +272,7 @@ public class SearchFragment extends GenericMPDFragment<List<MPDFileEntry>> imple
             case R.id.action_song_play_next:
                 MPDQueryHandler.playSongNext(track.getPath());
                 return true;
-            case R.id.action_add_to_saved_playlist:{
+            case R.id.action_add_to_saved_playlist: {
                 // open dialog in order to save the current playlist as a playlist in the mediastore
                 ChoosePlaylistDialog choosePlaylistDialog = new ChoosePlaylistDialog();
                 Bundle args = new Bundle();
@@ -288,7 +281,7 @@ public class SearchFragment extends GenericMPDFragment<List<MPDFileEntry>> imple
                 choosePlaylistDialog.setArguments(args);
                 choosePlaylistDialog.show(((AppCompatActivity) getContext()).getSupportFragmentManager(), "ChoosePlaylistDialog");
                 return true;
-             }
+            }
             case R.id.action_show_details: {
                 // Open song details dialog
                 SongDetailsDialog songDetailsDialog = new SongDetailsDialog();
@@ -305,10 +298,10 @@ public class SearchFragment extends GenericMPDFragment<List<MPDFileEntry>> imple
                 MPDQueryHandler.playArtistAlbum(track.getTrackAlbum(), "", track.getTrackAlbumMBID());
                 return true;
             case R.id.action_add_artist:
-                MPDQueryHandler.addArtist(track.getTrackArtist(),mAlbumSortOrder);
+                MPDQueryHandler.addArtist(track.getTrackArtist(), mAlbumSortOrder);
                 return true;
             case R.id.action_play_artist:
-                MPDQueryHandler.playArtist(track.getTrackArtist(),mAlbumSortOrder);
+                MPDQueryHandler.playArtist(track.getTrackArtist(), mAlbumSortOrder);
                 return true;
             case R.id.menu_group_album:
             case R.id.menu_group_artist:
@@ -327,7 +320,7 @@ public class SearchFragment extends GenericMPDFragment<List<MPDFileEntry>> imple
      * @param menuInflater The inflater to instantiate the layout.
      */
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater menuInflater) {
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater menuInflater) {
         // Inflate the menu; this adds items to the action bar if it is present.
         menuInflater.inflate(R.menu.fragment_menu_search_tracks, menu);
 
@@ -349,13 +342,12 @@ public class SearchFragment extends GenericMPDFragment<List<MPDFileEntry>> imple
      * @return True if the hook was consumed here.
      */
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.action_add_search_result:
-                if(!mSearchText.isEmpty()) {
-                    MPDQueryHandler.searchAddFiles(mSearchText, mSearchType);
-                }
-                return true;
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == R.id.action_add_search_result) {
+            if (!mSearchText.isEmpty()) {
+                MPDQueryHandler.searchAddFiles(mSearchText, mSearchType);
+            }
+            return true;
         }
 
         return super.onOptionsItemSelected(item);
@@ -371,26 +363,26 @@ public class SearchFragment extends GenericMPDFragment<List<MPDFileEntry>> imple
                 args.putParcelable(SongDetailsDialog.EXTRA_FILE, (MPDTrack) mFileAdapter.getItem(position));
                 songDetailsDialog.setArguments(args);
                 songDetailsDialog.show(((AppCompatActivity) getContext()).getSupportFragmentManager(), "SongDetails");
-                return;
             }
-            case ACTION_ADD_SONG:{
+            break;
+            case ACTION_ADD_SONG: {
                 MPDTrack track = (MPDTrack) mFileAdapter.getItem(position);
 
                 MPDQueryHandler.addPath(track.getPath());
-                return;
             }
+            break;
             case ACTION_PLAY_SONG: {
                 MPDTrack track = (MPDTrack) mFileAdapter.getItem(position);
 
                 MPDQueryHandler.playSong(track.getPath());
-                return;
             }
+            break;
             case ACTION_PLAY_SONG_NEXT: {
                 MPDTrack track = (MPDTrack) mFileAdapter.getItem(position);
 
                 MPDQueryHandler.playSongNext(track.getPath());
-                return;
             }
+            break;
         }
     }
 
@@ -403,9 +395,18 @@ public class SearchFragment extends GenericMPDFragment<List<MPDFileEntry>> imple
     @Override
     public void onFocusChange(View v, boolean hasFocus) {
         if (v.equals(mSearchView) && !hasFocus) {
-            InputMethodManager imm = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-            imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+            closeKeyboard();
         }
+    }
+
+    private void closeKeyboard() {
+        final InputMethodManager imm = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(mSearchView.getWindowToken(), 0);
+    }
+
+    private void openKeyboard() {
+        final InputMethodManager inputMethodManager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+        inputMethodManager.toggleSoftInput(0, InputMethodManager.SHOW_IMPLICIT);
     }
 
     private class FABOnClickListener implements View.OnClickListener {
@@ -448,12 +449,14 @@ public class SearchFragment extends GenericMPDFragment<List<MPDFileEntry>> imple
             // Write settings values
             prefEditor.apply();
 
-            mSearchView.setActivated(true);
-            mSearchView.requestFocus();
-
-            // Open the keyboard again
-            InputMethodManager inputMethodManager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-            inputMethodManager.toggleSoftInput(0, InputMethodManager.SHOW_IMPLICIT);
+            if (mFABCallback.getNowPlayingDragStatus() == NowPlayingView.NowPlayingDragStatusReceiver.DRAG_STATUS.DRAGGED_DOWN) {
+                mSearchView.requestFocus();
+                // Open the keyboard again
+                openKeyboard();
+            } else {
+                // close keyboard if NPV is shown
+                closeKeyboard();
+            }
         }
 
         @Override

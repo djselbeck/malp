@@ -26,10 +26,14 @@ package org.gateshipone.malp.application.callbacks;
 import android.graphics.Bitmap;
 import android.view.View;
 
+import org.gateshipone.malp.application.views.NowPlayingView;
+
 public interface FABFragmentCallback {
     void setupFAB(boolean active, View.OnClickListener listener);
 
     void setupToolbar(String title, boolean scrollingEnabled, boolean drawerIndicatorEnabled, boolean showImage);
 
     void setupToolbarImage(Bitmap bm);
+
+    NowPlayingView.NowPlayingDragStatusReceiver.DRAG_STATUS getNowPlayingDragStatus();
 }

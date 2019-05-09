@@ -33,6 +33,7 @@ import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AlertDialog;
@@ -43,11 +44,13 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
+
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
+
 import org.gateshipone.malp.R;
 import org.gateshipone.malp.application.adapters.CurrentPlaylistAdapter;
 import org.gateshipone.malp.application.callbacks.AddPathToPlaylist;
@@ -272,24 +275,21 @@ public class MainActivity extends GenericActivity
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
-
         FragmentManager fragmentManager = getSupportFragmentManager();
 
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                if (fragmentManager.getBackStackEntryCount() > 0) {
-                    onBackPressed();
-                } else {
-                    // back stack empty so enable navigation drawer
+        if (item.getItemId() == android.R.id.home) {
+            if (fragmentManager.getBackStackEntryCount() > 0) {
+                onBackPressed();
+            } else {
+                // back stack empty so enable navigation drawer
 
-                    mDrawerToggle.setDrawerIndicatorEnabled(true);
+                mDrawerToggle.setDrawerIndicatorEnabled(true);
 
-                    if (mDrawerToggle.onOptionsItemSelected(item)) {
-                        return true;
-                    }
+                if (mDrawerToggle.onOptionsItemSelected(item)) {
+                    return true;
                 }
+            }
         }
-
 
         return super.onOptionsItemSelected(item);
     }
@@ -556,7 +556,7 @@ public class MainActivity extends GenericActivity
         }
     }
 
-    protected void onSaveInstanceState(Bundle savedInstanceState) {
+    protected void onSaveInstanceState(@NonNull Bundle savedInstanceState) {
         super.onSaveInstanceState(savedInstanceState);
 
         // save drag status of the nowplayingview
@@ -693,10 +693,7 @@ public class MainActivity extends GenericActivity
         // Create fragment and give it an argument for the selected article
         EditProfileFragment newFragment = new EditProfileFragment();
         Bundle args = new Bundle();
-        if (null != profile) {
-            args.putParcelable(EditProfileFragment.EXTRA_PROFILE, profile);
-        }
-
+        args.putParcelable(EditProfileFragment.EXTRA_PROFILE, profile);
 
         newFragment.setArguments(args);
 
@@ -816,6 +813,12 @@ public class MainActivity extends GenericActivity
         }
     }
 
+    @Override
+    public DRAG_STATUS getNowPlayingDragStatus() {
+        return mNowPlayingDragStatus;
+    }
+
+    @Override
     public void setupToolbarImage(Bitmap bm) {
         ImageView collapsingImage = findViewById(R.id.collapsing_image);
         if (collapsingImage != null) {
