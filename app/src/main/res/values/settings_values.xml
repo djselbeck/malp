@@ -96,6 +96,7 @@
     <string name="pref_view_my_music_albums_key" translatable="false">my_music_albums</string>
     <string name="pref_view_playlists_key" translatable="false">playlists</string>
     <string name="pref_view_files_key" translatable="false">files</string>
+    <string name="pref_view_search_key" translatable="false">search</string>
     <string name="pref_view_default" translatable="false">@string/pref_view_my_music_albums_key</string>
 
     <string-array name="preference_default_view_values" translatable="false">
@@ -103,6 +104,7 @@
         <item>@string/pref_view_my_music_albums_key</item>
         <item>@string/pref_view_playlists_key</item>
         <item>@string/pref_view_files_key</item>
+        <item>@string/pref_view_search_key</item>
     </string-array>
 
 

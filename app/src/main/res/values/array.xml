@@ -64,6 +64,7 @@
         <item>@string/menu_albums</item>
         <item>@string/menu_playlists</item>
         <item>@string/menu_files</item>
+        <item>@string/menu_search</item>
     </string-array>
 
     <string-array name="preference_library_view">

@@ -218,6 +218,10 @@ public class MainActivity extends GenericActivity
                     fragment = new SettingsFragment();
                     fragmentTag = SettingsFragment.TAG;
                     break;
+                case R.id.nav_search:
+                    fragment = new SearchFragment();
+                    fragmentTag = SearchFragment.TAG;
+                    break;
                 case R.id.nav_library:
                 default:
                     fragment = new MyMusicTabsFragment();
@@ -954,6 +958,8 @@ public class MainActivity extends GenericActivity
             navId = R.id.nav_saved_playlists;
         } else if (defaultView.equals(getString(R.string.pref_view_files_key))) {
             navId = R.id.nav_files;
+        } else if (defaultView.equals(getString(R.string.pref_view_search_key))) {
+            navId = R.id.nav_search;
         }
 
         return navId;
