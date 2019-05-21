@@ -1,3 +1,13 @@
+### Version 1.2.2 Tag: release-XX (XXXX-XX-XX)
+* add hungarian translation (Thanks to Dániel Flórián)
+* migrate to AndroidX
+* improve artwork retrival
+* remove Last.fm as artist image provider
+* fix last updated timestamp in statistics view
+* fix several backnavigation issues
+* add search view as default view ([#163](https://gitlab.com/gateship-one/malp/issues/163))
+* fix aspect ratio of images ([#161](https://gitlab.com/gateship-one/malp/issues/161))
+
 ### Version 1.2.1 Tag: release-28 (2018-11-05)
  * Hotfix: Workaround for MPD 0.21 (and 0.20.22) protocol breakage. This will reenable MALP with reduced functionality for MPD >=0.21 until a new better solution for album retrieval is found
    * see [MPD bugreport](https://github.com/MusicPlayerDaemon/MPD/issues/408)
