@@ -313,11 +313,7 @@ public class ArtworkManager implements ArtProvider.ArtFetchError, InsertImageTas
 
         final ArtworkRequestModel requestModel = new ArtworkRequestModel(artist);
 
-        if (mArtistProvider.equals(mContext.getString(R.string.pref_artwork_provider_lastfm_key))) {
-            LastFMProvider.getInstance(mContext).fetchImage(requestModel, mContext,
-                    response -> new InsertImageTask(mContext, imageSavedCallback).execute(response),
-                    errorCallback);
-        } else if (mArtistProvider.equals(mContext.getString(R.string.pref_artwork_provider_fanarttv_key))) {
+        if (mArtistProvider.equals(mContext.getString(R.string.pref_artwork_provider_fanarttv_key))) {
             FanartTVProvider.getInstance(mContext).fetchImage(requestModel, mContext,
                     response -> new InsertImageTask(mContext, imageSavedCallback).execute(response),
                     errorCallback);
