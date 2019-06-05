@@ -1,4 +1,4 @@
-### Version 1.2.2 Tag: release-XX (XXXX-XX-XX)
+### Version 1.2.2 Tag: release-29 (2019-06-05)
 * add hungarian translation (Thanks to Dániel Flórián)
 * migrate to AndroidX
 * improve artwork retrival
