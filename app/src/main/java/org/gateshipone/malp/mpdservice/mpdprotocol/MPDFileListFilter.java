@@ -32,23 +32,23 @@ import java.util.List;
 public class MPDFileListFilter {
 
     public static void filterAlbumArtistTracks(List<MPDFileEntry> list, String albumArtist) {
-        filterMPDTrack(list, track -> albumArtist.toLowerCase().equals(track.getTrackAlbumArtist().toLowerCase())
-                || albumArtist.toLowerCase().equals(track.getTrackArtist().toLowerCase()));
+        filterMPDTrack(list, track -> albumArtist.equalsIgnoreCase(track.getTrackAlbumArtist())
+                || albumArtist.equalsIgnoreCase(track.getTrackArtist()));
     }
 
     public static void filterAlbumMBID(List<MPDFileEntry> list, String albumMBID) {
-        filterMPDTrack(list, track -> albumMBID.toLowerCase().equals(track.getTrackAlbumMBID().toLowerCase()));
+        filterMPDTrack(list, track -> albumMBID.equalsIgnoreCase(track.getTrackAlbumMBID()));
     }
 
     public static void filterAlbumMBIDandAlbumArtist(List<MPDFileEntry> list, String albumMBID, String albumArtist) {
         filterMPDTrack(list, track ->
                 // Check if MBID matches (or is empty in both cases (tag missing))
-                (albumMBID.toLowerCase().equals(track.getTrackAlbumMBID().toLowerCase()))
+                (albumMBID.equalsIgnoreCase(track.getTrackAlbumMBID()))
                         // Check if artist tag matches
-                        && ((!albumArtist.isEmpty() && !track.getTrackArtist().isEmpty() && track.getTrackArtist().toLowerCase().equals(albumArtist.toLowerCase()))
+                        && ((!albumArtist.isEmpty() && !track.getTrackArtist().isEmpty() && track.getTrackArtist().equalsIgnoreCase(albumArtist))
                         ||
                         // OR if albumartist tag matches
-                        (!albumArtist.isEmpty() && !track.getTrackAlbumArtist().isEmpty() && track.getTrackAlbumArtist().toLowerCase().equals(albumArtist.toLowerCase())))
+                        (!albumArtist.isEmpty() && !track.getTrackAlbumArtist().isEmpty() && track.getTrackAlbumArtist().equalsIgnoreCase(albumArtist)))
         );
     }
 
@@ -57,10 +57,10 @@ public class MPDFileListFilter {
                 // Check if MBID matches (or is empty in both cases (tag missing))
                 (albumMBID.toLowerCase().equals(track.getTrackAlbumMBID().toLowerCase()))
                         // Check if artist tag matches
-                        && ((!albumArtist.isEmpty() && !track.getTrackArtistSort().isEmpty() && track.getTrackArtistSort().toLowerCase().equals(albumArtist.toLowerCase()))
+                        && ((!albumArtist.isEmpty() && !track.getTrackArtistSort().isEmpty() && track.getTrackArtistSort().equalsIgnoreCase(albumArtist))
                         ||
                         // OR if albumartist tag matches
-                        (!albumArtist.isEmpty() && !track.getTrackAlbumArtistSort().isEmpty() && track.getTrackAlbumArtistSort().toLowerCase().equals(albumArtist.toLowerCase())))
+                        (!albumArtist.isEmpty() && !track.getTrackAlbumArtistSort().isEmpty() && track.getTrackAlbumArtistSort().equalsIgnoreCase(albumArtist)))
         );
     }
 
