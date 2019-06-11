@@ -55,7 +55,7 @@ public class MPDFileListFilter {
     public static void filterAlbumMBIDandAlbumArtistSort(List<MPDFileEntry> list, String albumMBID, String albumArtist) {
         filterMPDTrack(list, track ->
                 // Check if MBID matches (or is empty in both cases (tag missing))
-                (albumMBID.toLowerCase().equals(track.getTrackAlbumMBID().toLowerCase()))
+                (albumMBID.equalsIgnoreCase(track.getTrackAlbumMBID()))
                         // Check if artist tag matches
                         && ((!albumArtist.isEmpty() && !track.getTrackArtistSort().isEmpty() && track.getTrackArtistSort().equalsIgnoreCase(albumArtist))
                         ||
