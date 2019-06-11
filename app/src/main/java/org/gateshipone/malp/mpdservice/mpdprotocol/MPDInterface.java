@@ -23,8 +23,6 @@
 package org.gateshipone.malp.mpdservice.mpdprotocol;
 
 
-import androidx.annotation.Nullable;
-
 import org.gateshipone.malp.mpdservice.handlers.MPDConnectionStateChangeHandler;
 import org.gateshipone.malp.mpdservice.handlers.MPDIdleChangeHandler;
 import org.gateshipone.malp.mpdservice.mpdprotocol.mpdobjects.MPDAlbum;
@@ -198,7 +196,7 @@ public class MPDInterface {
         MPDCapabilities capabilities = mConnection.getServerCapabilities();
 
         // Check if tag is supported
-        if (!capabilities.hasTagArtistSort() || !capabilities.hasListFiltering() ) {
+        if (!capabilities.hasTagArtistSort() || !capabilities.hasListFiltering()) {
             return getArtistAlbums(artistName);
         }
 
@@ -257,7 +255,7 @@ public class MPDInterface {
     public synchronized List<MPDArtist> getArtistsSort() throws MPDException {
         MPDCapabilities capabilities = mConnection.getServerCapabilities();
         // Check if tag is supported
-        if (!capabilities.hasTagArtistSort() ) {
+        if (!capabilities.hasTagArtistSort()) {
             return getArtists();
         }
 
@@ -408,7 +406,7 @@ public class MPDInterface {
             mConnection.sendMPDCommand(MPDCommands.MPD_COMMAND_REQUEST_ALBUM_TRACKS(albumName));
 
             result = MPDResponseParser.parseMPDTracks(mConnection);
-            if(!mbid.isEmpty()) {
+            if (!mbid.isEmpty()) {
                 MPDFileListFilter.filterAlbumMBID(result, mbid);
             }
         }
@@ -454,7 +452,8 @@ public class MPDInterface {
     public List<MPDFileEntry> getArtistSortAlbumTracks(String albumName, String artistName, String mbid) throws MPDException {
         MPDCapabilities capabilities = getServerCapabilities();
         // Check if tag is supported
-        if (!capabilities.hasTagAlbumArtistSort() || !capabilities.hasTagArtistSort()) {
+        if ((mbid.isEmpty() && artistName.isEmpty()) ||
+                !capabilities.hasTagAlbumArtistSort() || !capabilities.hasTagArtistSort()) {
             return getArtistAlbumTracks(albumName, artistName, mbid);
         }
 
@@ -686,7 +685,7 @@ public class MPDInterface {
      * @param seconds Position in seconds to which a seek is requested to.
      */
     public synchronized void seekSeconds(int seconds) throws MPDException {
-        if(mConnection.getServerCapabilities().hasSeekCurrent()) {
+        if (mConnection.getServerCapabilities().hasSeekCurrent()) {
             mConnection.sendSimpleMPDCommand(MPDCommands.MPD_COMMAND_SEEK_CURRENT_SECONDS(seconds));
         } else {
             MPDCurrentStatus status;
@@ -997,7 +996,7 @@ public class MPDInterface {
         mConnection.sendSimpleMPDCommand(MPDCommands.MPD_COMMAND_UPDATE_DATABASE(path));
     }
 
-    public synchronized byte[] getAlbumArt(String path)  {
+    public synchronized byte[] getAlbumArt(String path) {
         if (!mConnection.getServerCapabilities().hasAlbumArt()) {
             return null;
         }
