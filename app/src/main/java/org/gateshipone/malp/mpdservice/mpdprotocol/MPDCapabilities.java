@@ -54,6 +54,8 @@ public class MPDCapabilities {
 
     private boolean mMopidyDetected;
 
+    private boolean mMPDBug408Active;
+
     private boolean mTagAlbumArtist;
     private boolean mTagArtistSort;
     private boolean mTagAlbumArtistSort;
@@ -92,15 +94,18 @@ public class MPDCapabilities {
             mHasToggleOutput = true;
         }
 
-        if (mMinorVersion >= 19 || mMajorVersion >= 1) {
+        /* FIXME Disable grouping completely for MPD versions >0.21 until the new behavior of list grouping
+         can be parsed. */
+        if ((mMinorVersion >= 19 && mMajorVersion == 0) && (mMinorVersion <= 20)) {
             mHasListGroup = true;
             mHasListFiltering = true;
+        } else if ((mMinorVersion >= 21 && mMajorVersion == 0) || mMajorVersion >= 1) {
+            mMPDBug408Active = true;
         }
 
         if (mMinorVersion >= 21 || mMajorVersion > 0) {
             mHasAlbumArt = true;
         }
-
 
 
         if (null != commands) {
@@ -212,7 +217,8 @@ public class MPDCapabilities {
                 + "List filtering: " + mHasListFiltering + '\n'
                 + "Fast ranged currentplaylist delete: " + mHasCurrentPlaylistRemoveRange + '\n'
                 + "MPD based album artwork: " + mHasAlbumArt + '\n'
-                + (mMopidyDetected ? "\nMopidy detected, consider using the real MPD server (www.musicpd.org)!\nOr you've been hit by MPD bug #408" : "");
+                + (mMopidyDetected ? "Mopidy detected, consider using the real MPD server (www.musicpd.org)!\n" : "" )
+                + (mMPDBug408Active ? "Temporarily limited protocol usage active because of MPD bug #408 and arbitrary protocol changes\n" : "");
     }
 
     public void enableMopidyWorkaround() {

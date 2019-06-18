@@ -1,3 +1,6 @@
+### Version 1.2.3 Tag: release-30 (2019-06-18)
+* Disable list grouping for all MPD versions >0.21.0 until M.A.L.P. can use list grouping with the changed behavior again
+
 ### Version 1.2.2 Tag: release-29 (2019-06-05)
 * add hungarian translation (Thanks to Dániel Flórián)
 * migrate to AndroidX
