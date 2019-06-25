@@ -445,6 +445,7 @@
     <string name="contributor_translator_spanish">Spanish Translation</string>
     <string name="contributor_translator_korean">Korean Translation</string>
     <string name="contributor_translator_hungarian">Hungarian Translation</string>
+    <string name="contributor_translator_swedish">Swedish Translation</string>
 
     <!-- Thirdparty Licenses dialog -->
     <string name="thirdparty_licenses_dialog_title">Third Party Licenses</string>
