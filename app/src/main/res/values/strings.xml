@@ -257,7 +257,7 @@
 
     <string name="preference_show_artist_image_title">Show artist image</string>
     <string name="preference_show_artist_image_text">Alternate between the album cover and an image of the artist in the
-        view for the currently playing song</string>#
+        view for the currently playing song</string>
 
     <string name="preference_npv_show_playlist_title">Start with playlist view</string>
     <string name="preference_npv_show_playlist_text">Show the playlist if M.A.L.P. is opened via widget or notification
