@@ -275,4 +275,7 @@
     <string name="action_add_url_playlist">Playlist-URL hinzufügen</string>
     <string name="downloader_notification_initialize">Initialisiere Download</string>
     <string name="contributor_translator_hungarian">Ungarische Übersetzung</string>
+    <string name="contributor_translator_swedish">Schwedische Übersetzung</string>
+    <string name="fragment_profile_use_mpd_covers">Nutze MPD-Cover falls verfügbar</string>
+    <string name="fragment_profile_use_mpd_covers_text">Nutze MPD-Cover falls verfügbar</string>
 </resources>
