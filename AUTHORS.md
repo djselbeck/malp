@@ -7,6 +7,7 @@
  - Víctor García - Spanish translation
  - Minho Park - Korean translation
  - Dániel Flórián - Hungarian translation
+ - Sebastian Rasmussen - Swedish translation
 
  and more, see: [Contributors](https://gitlab.com/gateship-one/malp/graphs/master)
 
