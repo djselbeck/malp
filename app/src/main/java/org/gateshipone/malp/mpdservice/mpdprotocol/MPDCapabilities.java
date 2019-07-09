@@ -38,6 +38,7 @@ public class MPDCapabilities {
 
     private int mMajorVersion;
     private int mMinorVersion;
+    private int mPatchVersion;
 
     private boolean mHasIdle;
     private boolean mHasRangedCurrentPlaylist;
@@ -55,6 +56,7 @@ public class MPDCapabilities {
     private boolean mMopidyDetected;
 
     private boolean mMPDBug408Active;
+    private boolean mMultipleListGroupFixed;
 
     private boolean mTagAlbumArtist;
     private boolean mTagArtistSort;
@@ -72,6 +74,7 @@ public class MPDCapabilities {
         if (versions.length == 3) {
             mMajorVersion = Integer.valueOf(versions[0]);
             mMinorVersion = Integer.valueOf(versions[1]);
+            mPatchVersion = Integer.valueOf(versions[2]);
         }
 
         // Only MPD servers greater version 0.14 have ranged playlist fetching, this allows fallback
@@ -94,13 +97,20 @@ public class MPDCapabilities {
             mHasToggleOutput = true;
         }
 
-        /* FIXME Disable grouping completely for MPD versions >0.21 until the new behavior of list grouping
-         can be parsed. */
-        if ((mMinorVersion >= 19 && mMajorVersion == 0) && (mMinorVersion <= 20)) {
+        if (mMinorVersion >= 19 && mMajorVersion == 0 && mMinorVersion <= 20) {
+            // MPD 0.19 - 0.20 (only buggy for last MPD 0.20.x release, can be detected by mopidy workaround)
             mHasListGroup = true;
             mHasListFiltering = true;
-        } else if ((mMinorVersion >= 21 && mMajorVersion == 0) || mMajorVersion >= 1) {
+        } else if (mMinorVersion == 21 && mMajorVersion == 0 && mPatchVersion < 11 ) {
+            // Buggy for all MPD version from 0.21.0 to 0.21.10
             mMPDBug408Active = true;
+            mHasListGroup = false;
+            mHasListFiltering = false;
+        } else if ((mMinorVersion >= 21 && mMajorVersion == 0 && mPatchVersion >= 11) || mMajorVersion > 0) {
+            // Fixed versions >= MPD 0.21.11
+            mMultipleListGroupFixed = true;
+            mHasListGroup = true;
+            mHasListFiltering = true;
         }
 
         if (mMinorVersion >= 21 || mMajorVersion > 0) {
@@ -205,7 +215,7 @@ public class MPDCapabilities {
     }
 
     public String getServerFeatures() {
-        return "MPD protocol version: " + mMajorVersion + '.' + mMinorVersion + '\n'
+        return "MPD protocol version: " + mMajorVersion + '.' + mMinorVersion + '.' + mPatchVersion + '\n'
                 + "TAGS:" + '\n'
                 + "MUSICBRAINZ: " + mHasMusicBrainzTags + '\n'
                 + "AlbumArtist: " + mTagAlbumArtist + '\n'
