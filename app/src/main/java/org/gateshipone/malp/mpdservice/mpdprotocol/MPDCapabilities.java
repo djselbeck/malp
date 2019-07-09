@@ -214,6 +214,10 @@ public class MPDCapabilities {
         return mHasAlbumArt;
     }
 
+    public boolean hasListGroupingFixed() {
+        return mMultipleListGroupFixed;
+    }
+
     public String getServerFeatures() {
         return "MPD protocol version: " + mMajorVersion + '.' + mMinorVersion + '.' + mPatchVersion + '\n'
                 + "TAGS:" + '\n'

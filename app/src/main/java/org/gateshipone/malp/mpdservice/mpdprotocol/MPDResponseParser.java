@@ -56,51 +56,103 @@ class MPDResponseParser {
         if (!connection.isConnected()) {
             return albumList;
         }
-        /* Parse the MPD response and create a list of MPD albums */
 
-        String albumName;
 
-        MPDAlbum tempAlbum = null;
+        /* Parse the MPD response and create a list of MPD albums (pre 0.21.11), broken grouping */
+        if (!connection.getServerCapabilities().hasListGroupingFixed()) {
+            String albumName;
 
-        String responseString = connection.readLine();
-        while (responseString != null && !responseString.startsWith("OK")) {
-            /* Check if the response is an album */
-            if (responseString.startsWith(MPDResponses.MPD_RESPONSE_ALBUM_NAME)) {
-                /* We found an album, add it to the list. */
-                if (null != tempAlbum) {
-                    albumList.add(tempAlbum);
+            MPDAlbum tempAlbum = null;
+
+            String responseString = connection.readLine();
+            while (responseString != null && !responseString.startsWith("OK")) {
+                /* Check if the response is an album */
+                if (responseString.startsWith(MPDResponses.MPD_RESPONSE_ALBUM_NAME)) {
+                    /* We found an album, add it to the list. */
+                    if (null != tempAlbum) {
+                        albumList.add(tempAlbum);
+                    }
+                    albumName = responseString.substring(MPDResponses.MPD_RESPONSE_ALBUM_NAME.length());
+                    tempAlbum = new MPDAlbum(albumName);
                 }
-                albumName = responseString.substring(MPDResponses.MPD_RESPONSE_ALBUM_NAME.length());
-                tempAlbum = new MPDAlbum(albumName);
-            }
-            if (tempAlbum != null) {
-                if (responseString.startsWith(MPDResponses.MPD_RESPONSE_ALBUM_MBID)) {
-                    tempAlbum.setMBID(responseString.substring(MPDResponses.MPD_RESPONSE_ALBUM_MBID.length()));
-                } else if (responseString.startsWith(MPDResponses.MPD_RESPONSE_ALBUMARTIST_NAME)) {
-                /* Check if the responseString is a album artist. */
-                    tempAlbum.setArtistName(responseString.substring(MPDResponses.MPD_RESPONSE_ALBUMARTIST_NAME.length()));
-                } else if (responseString.startsWith(MPDResponses.MPD_RESPONSE_ALBUMARTIST_SORT_NAME)) {
-                /* Check if the responseString is a album artist. */
-                    tempAlbum.setArtistSortName(responseString.substring(MPDResponses.MPD_RESPONSE_ALBUMARTIST_SORT_NAME.length()));
-                } else if (responseString.startsWith(MPDResponses.MPD_RESPONSE_DATE)) {
-                    // Try to parse Date
-                    String dateString = responseString.substring(MPDResponses.MPD_RESPONSE_DATE.length());
-                    SimpleDateFormat format = new SimpleDateFormat("yyyy");
-                    try {
-                        tempAlbum.setDate(format.parse(dateString));
-                    } catch (ParseException e) {
-                        Log.w(TAG, "Error parsing date: " + dateString);
+                if (tempAlbum != null) {
+                    if (responseString.startsWith(MPDResponses.MPD_RESPONSE_ALBUM_MBID)) {
+                        tempAlbum.setMBID(responseString.substring(MPDResponses.MPD_RESPONSE_ALBUM_MBID.length()));
+                    } else if (responseString.startsWith(MPDResponses.MPD_RESPONSE_ALBUMARTIST_NAME)) {
+                        /* Check if the responseString is a album artist. */
+                        tempAlbum.setArtistName(responseString.substring(MPDResponses.MPD_RESPONSE_ALBUMARTIST_NAME.length()));
+                    } else if (responseString.startsWith(MPDResponses.MPD_RESPONSE_ALBUMARTIST_SORT_NAME)) {
+                        /* Check if the responseString is a album artist. */
+                        tempAlbum.setArtistSortName(responseString.substring(MPDResponses.MPD_RESPONSE_ALBUMARTIST_SORT_NAME.length()));
+                    } else if (responseString.startsWith(MPDResponses.MPD_RESPONSE_DATE)) {
+                        // Try to parse Date
+                        String dateString = responseString.substring(MPDResponses.MPD_RESPONSE_DATE.length());
+                        SimpleDateFormat format = new SimpleDateFormat("yyyy");
+                        try {
+                            tempAlbum.setDate(format.parse(dateString));
+                        } catch (ParseException e) {
+                            Log.w(TAG, "Error parsing date: " + dateString);
+                        }
                     }
                 }
+                responseString = connection.readLine();
             }
-            responseString = connection.readLine();
-        }
 
         /* Because of the loop structure the last album has to be added because no
         "ALBUM:" is sent anymore.
          */
-        if (null != tempAlbum) {
-            albumList.add(tempAlbum);
+            if (null != tempAlbum) {
+                albumList.add(tempAlbum);
+            }
+        } else {
+            // New parser protocol path (0.21.11 and above) with correct list grouping
+            String albumMBID = "";
+            String albumDate = "";
+            String albumArtist = "";
+            String albumArtistSort = "";
+
+            String responseString = connection.readLine();
+            while (responseString != null && !responseString.startsWith("OK")) {
+                /* Check if the response is an album */
+                if (responseString.startsWith(MPDResponses.MPD_RESPONSE_ALBUM_NAME)) {
+                    String albumName = responseString.substring(MPDResponses.MPD_RESPONSE_ALBUM_NAME.length());
+                    MPDAlbum tempAlbum = new MPDAlbum(albumName);
+
+                    if (!albumArtist.isEmpty()) {
+                        tempAlbum.setArtistName(albumArtist);
+                    }
+                    if (!albumArtistSort.isEmpty()) {
+                        tempAlbum.setArtistSortName(albumArtistSort);
+                    }
+                    if (!albumMBID.isEmpty()) {
+                        tempAlbum.setMBID(albumMBID);
+                    }
+                    if (!albumDate.isEmpty()) {
+                        SimpleDateFormat format = new SimpleDateFormat("yyyy");
+                        try {
+                            tempAlbum.setDate(format.parse(albumDate));
+                        } catch (ParseException e) {
+                            Log.w(TAG, "Error parsing date: " + albumDate);
+                        }
+                    }
+
+                    albumList.add(tempAlbum);
+                }
+                if (responseString.startsWith(MPDResponses.MPD_RESPONSE_ALBUM_MBID)) {
+                    albumMBID = responseString.substring(MPDResponses.MPD_RESPONSE_ALBUM_MBID.length());
+                } else if (responseString.startsWith(MPDResponses.MPD_RESPONSE_ALBUMARTIST_NAME)) {
+                    /* Check if the responseString is a album artist. */
+                    albumArtist = responseString.substring(MPDResponses.MPD_RESPONSE_ALBUMARTIST_NAME.length());
+                } else if (responseString.startsWith(MPDResponses.MPD_RESPONSE_ALBUMARTIST_SORT_NAME)) {
+                    /* Check if the responseString is a album artist. */
+                    albumArtistSort = responseString.substring(MPDResponses.MPD_RESPONSE_ALBUMARTIST_SORT_NAME.length());
+                } else if (responseString.startsWith(MPDResponses.MPD_RESPONSE_DATE)) {
+                    // Try to parse Date
+                    albumDate = responseString.substring(MPDResponses.MPD_RESPONSE_DATE.length());
+
+                }
+                responseString = connection.readLine();
+            }
         }
 
         // Sort the albums for later sectioning.
