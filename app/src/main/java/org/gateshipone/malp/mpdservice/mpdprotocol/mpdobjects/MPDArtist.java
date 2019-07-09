@@ -85,6 +85,11 @@ public class MPDArtist implements MPDGenericItem, Comparable<MPDArtist>, Parcela
         pMBIDs.add(mbid);
     }
 
+    public void setMBIDs(@NonNull ArrayList<String> mbids) {
+        pMBIDs.clear();
+        pMBIDs.addAll(mbids);
+    }
+
 
     @Override
     @NonNull

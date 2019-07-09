@@ -39,6 +39,7 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -175,55 +176,96 @@ class MPDResponseParser {
         /* Parse MPD artist return values and create a list of MPDArtist objects */
         String response = connection.readLine();
 
-        /* Artist properties */
-        String artistName;
-        String artistMBID;
+        /* Parse the MPD response and create a list of MPD albums (pre 0.21.11), broken grouping */
+        if (!connection.getServerCapabilities().hasListGroupingFixed()) {
+            /* Artist properties */
+            String artistName;
+            String artistMBID;
 
-        MPDArtist tempArtist = null;
+            MPDArtist tempArtist = null;
 
-        while (response != null && !response.startsWith("OK")) {
+            while (response != null && !response.startsWith("OK")) {
+                // Handle new artist entry
+                if (response.startsWith(MPDResponses.MPD_RESPONSE_ARTIST_NAME)) {
+                    if (null != tempArtist) {
+                        artistList.add(tempArtist);
+                    }
+                    artistName = response.substring(MPDResponses.MPD_RESPONSE_ARTIST_NAME.length());
+                    tempArtist = new MPDArtist(artistName);
+                } else if (response.startsWith(MPDResponses.MPD_RESPONSE_ALBUMARTIST_NAME)) {
+                    if (null != tempArtist) {
+                        artistList.add(tempArtist);
+                    }
+                    artistName = response.substring(MPDResponses.MPD_RESPONSE_ALBUMARTIST_NAME.length());
+                    tempArtist = new MPDArtist(artistName);
+                } else if (response.startsWith(MPDResponses.MPD_RESPONSE_ARTIST_SORT_NAME)) {
+                    if (null != tempArtist) {
+                        artistList.add(tempArtist);
+                    }
+                    artistName = response.substring(MPDResponses.MPD_RESPONSE_ARTIST_SORT_NAME.length());
+                    tempArtist = new MPDArtist(artistName);
+                } else if (response.startsWith(MPDResponses.MPD_RESPONSE_ALBUMARTIST_SORT_NAME)) {
+                    if (null != tempArtist) {
+                        artistList.add(tempArtist);
+                    }
+                    artistName = response.substring(MPDResponses.MPD_RESPONSE_ALBUMARTIST_SORT_NAME.length());
+                    tempArtist = new MPDArtist(artistName);
+                }
 
-            // Handle new artist entry
-            if (response.startsWith(MPDResponses.MPD_RESPONSE_ARTIST_NAME)) {
-                if (null != tempArtist) {
-                    artistList.add(tempArtist);
+                // Handle artist properties
+                if (tempArtist != null) {
+                    if (response.startsWith(MPDResponses.MPD_RESPONSE_ARTIST_MBID)) {
+                        artistMBID = response.substring(MPDResponses.MPD_RESPONSE_ARTIST_MBID.length());
+                        tempArtist.addMBID(artistMBID);
+                    }
                 }
-                artistName = response.substring(MPDResponses.MPD_RESPONSE_ARTIST_NAME.length());
-                tempArtist = new MPDArtist(artistName);
-            } else if (response.startsWith(MPDResponses.MPD_RESPONSE_ALBUMARTIST_NAME)) {
-                if (null != tempArtist) {
-                    artistList.add(tempArtist);
-                }
-                artistName = response.substring(MPDResponses.MPD_RESPONSE_ALBUMARTIST_NAME.length());
-                tempArtist = new MPDArtist(artistName);
-            } else if (response.startsWith(MPDResponses.MPD_RESPONSE_ARTIST_SORT_NAME)) {
-                if (null != tempArtist) {
-                    artistList.add(tempArtist);
-                }
-                artistName = response.substring(MPDResponses.MPD_RESPONSE_ARTIST_SORT_NAME.length());
-                tempArtist = new MPDArtist(artistName);
-            } else if (response.startsWith(MPDResponses.MPD_RESPONSE_ALBUMARTIST_SORT_NAME)) {
-                if (null != tempArtist) {
-                    artistList.add(tempArtist);
-                }
-                artistName = response.substring(MPDResponses.MPD_RESPONSE_ALBUMARTIST_SORT_NAME.length());
-                tempArtist = new MPDArtist(artistName);
+                response = connection.readLine();
             }
 
-            // Handle artist properties
-            if (tempArtist != null) {
+
+            // Add last artist
+            if (null != tempArtist) {
+                artistList.add(tempArtist);
+            }
+        } else {
+            // New parser protocol path (0.21.11 and above) with correct list grouping
+            /* Artist properties */
+            ArrayList<String> mbids = new ArrayList<>();
+            String artistName;
+
+            while (response != null && !response.startsWith("OK")) {
+                // Handle new artist entry
+                if (response.startsWith(MPDResponses.MPD_RESPONSE_ARTIST_NAME)) {
+                    artistName = response.substring(MPDResponses.MPD_RESPONSE_ARTIST_NAME.length());
+                    MPDArtist tempArtist = new MPDArtist(artistName);
+                    tempArtist.setMBIDs(mbids);
+                    artistList.add(tempArtist);
+                } else if (response.startsWith(MPDResponses.MPD_RESPONSE_ALBUMARTIST_NAME)) {
+                    artistName = response.substring(MPDResponses.MPD_RESPONSE_ALBUMARTIST_NAME.length());
+                    MPDArtist tempArtist = new MPDArtist(artistName);
+                    tempArtist.setMBIDs(mbids);
+                    artistList.add(tempArtist);
+                } else if (response.startsWith(MPDResponses.MPD_RESPONSE_ARTIST_SORT_NAME)) {
+                    artistName = response.substring(MPDResponses.MPD_RESPONSE_ARTIST_SORT_NAME.length());
+                    MPDArtist tempArtist = new MPDArtist(artistName);
+                    tempArtist.setMBIDs(mbids);
+                    artistList.add(tempArtist);
+                } else if (response.startsWith(MPDResponses.MPD_RESPONSE_ALBUMARTIST_SORT_NAME)) {
+                    artistName = response.substring(MPDResponses.MPD_RESPONSE_ALBUMARTIST_SORT_NAME.length());
+                    MPDArtist tempArtist = new MPDArtist(artistName);
+                    tempArtist.setMBIDs(mbids);
+                    artistList.add(tempArtist);
+                }
+
+                // Handle artist properties
                 if (response.startsWith(MPDResponses.MPD_RESPONSE_ARTIST_MBID)) {
-                    artistMBID = response.substring(MPDResponses.MPD_RESPONSE_ARTIST_MBID.length());
-                    tempArtist.addMBID(artistMBID);
+                    mbids.clear();
+                    String mbid = response.substring(MPDResponses.MPD_RESPONSE_ARTIST_MBID.length());
+                    String[] mbidsSplit = mbid.split("/");
+                    mbids.addAll(Arrays.asList(mbidsSplit));
                 }
+                response = connection.readLine();
             }
-            response = connection.readLine();
-        }
-
-
-        // Add last artist
-        if (null != tempArtist) {
-            artistList.add(tempArtist);
         }
 
         // Sort the artists for later sectioning.
