@@ -248,7 +248,7 @@ public class ArtworkManager implements ArtProvider.ArtFetchError, InsertImageTas
     }
 
     public Bitmap getImage(final MPDTrack track, int width, int height, boolean skipCache) throws ImageNotFoundException {
-        if (null == track) {
+        if (null == track || track.getTrackAlbum().isEmpty()) {
             return null;
         }
 
@@ -273,7 +273,7 @@ public class ArtworkManager implements ArtProvider.ArtFetchError, InsertImageTas
     }
 
     public Bitmap getImage(final MPDAlbum album, int width, int height, boolean skipCache) throws ImageNotFoundException {
-        if (null == album) {
+        if (null == album || album.getName().isEmpty()) {
             return null;
         }
 
