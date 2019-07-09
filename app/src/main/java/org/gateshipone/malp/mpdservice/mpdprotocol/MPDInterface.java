@@ -430,7 +430,8 @@ public class MPDInterface {
 
             // Filter tracks with artistName
             result = MPDResponseParser.parseMPDTracks(mConnection);
-            if (!mbid.isEmpty() && !artistName.isEmpty()) {
+            // Filter if one of the arguments is non-empty
+            if (!mbid.isEmpty() || !artistName.isEmpty()) {
                 MPDFileListFilter.filterAlbumMBIDandAlbumArtist(result, mbid, artistName);
             }
         }
@@ -451,9 +452,8 @@ public class MPDInterface {
      */
     public List<MPDFileEntry> getArtistSortAlbumTracks(String albumName, String artistName, String mbid) throws MPDException {
         MPDCapabilities capabilities = getServerCapabilities();
-        // Check if tag is supported
-        if ((mbid.isEmpty() && artistName.isEmpty()) ||
-                !capabilities.hasTagAlbumArtistSort() || !capabilities.hasTagArtistSort()) {
+        // Check if tag is supported (if neither, fallback)
+        if (!capabilities.hasTagAlbumArtistSort() && !capabilities.hasTagArtistSort()) {
             return getArtistAlbumTracks(albumName, artistName, mbid);
         }
 
@@ -463,7 +463,10 @@ public class MPDInterface {
 
             // Filter tracks with artistName
             result = MPDResponseParser.parseMPDTracks(mConnection);
-            MPDFileListFilter.filterAlbumMBIDandAlbumArtistSort(result, mbid, artistName);
+            // Filter if one of the arguments is non-empty
+            if (!mbid.isEmpty() || !artistName.isEmpty()) {
+                MPDFileListFilter.filterAlbumMBIDandAlbumArtistSort(result, mbid, artistName);
+            }
         }
         // Sort with disc & track number
         MPDSortHelper.sortFileListNumeric(result);
