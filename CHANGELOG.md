@@ -1,5 +1,7 @@
 ### Version 1.2.4 Tag: release-31 (2019-xx-xx)
 * Reenable list grouping for MPD (0.21.11 and above) with new protocol parser (Album artist, MBID, etc support)
+* Fix wrong album cover shown if no song is played
+* Fix Fanart loading for fullscreen activity when no Musicbrainz IDs are set
 
 ### Version 1.2.3 Tag: release-30 (2019-06-18)
 * Disable list grouping for all MPD versions >0.21.0 until M.A.L.P. can use list grouping with the changed behavior again
