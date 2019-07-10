@@ -120,7 +120,7 @@ public class FanartManager implements FanartProvider.FanartFetchError {
     /**
      * This method will trigger the fanart sync for the given {@link MPDTrack}.
      * <p>
-     * If the track has no valid album musicbrainz id this will be resolved first.
+     * If the track has no valid artist musicbrainz id this will be resolved first.
      * The provider will be always the {@link FanartTVProvider} instance.
      *
      * @param track                     The current {@link MPDTrack} for which fanart should be provided.
@@ -131,10 +131,10 @@ public class FanartManager implements FanartProvider.FanartFetchError {
             return;
         }
 
-        if (track.getTrackAlbumMBID().isEmpty()) {
+        if (track.getTrackArtistMBID().isEmpty()) {
             // resolve mbid
             FanartTVProvider.getInstance(mContext).getTrackArtistMBID(track, trackMBID -> {
-                track.setTrackAlbumArtistMBID(trackMBID);
+                track.setTrackArtistMBID(trackMBID);
 
                 loadFanartImages(track, fanartCacheChangeListener);
             }, this);
