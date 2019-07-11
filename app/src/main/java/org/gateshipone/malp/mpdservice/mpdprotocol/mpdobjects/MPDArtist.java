@@ -27,6 +27,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import androidx.annotation.NonNull;
 
+import java.text.Collator;
 import java.util.ArrayList;
 
 public class MPDArtist implements MPDGenericItem, Comparable<MPDArtist>, Parcelable {
@@ -122,7 +123,9 @@ public class MPDArtist implements MPDGenericItem, Comparable<MPDArtist>, Parcela
             return 0;
         }
 
-        if (another.pArtistName.toLowerCase().equals(pArtistName.toLowerCase())) {
+        Collator collator = Collator.getInstance();
+        int compareResult = collator.compare(pArtistName,another.pArtistName);
+        if (compareResult == 0) {
             //Log.v(MPDArtist.class.getSimpleName(),"another mbids: " + another.pMBIDs.size() + "self mbids:" + pMBIDs.size());
             // Try to position artists with one mbid at the end
 
@@ -142,9 +145,9 @@ public class MPDArtist implements MPDGenericItem, Comparable<MPDArtist>, Parcela
                     return 0;
                 }
             }
+        } else {
+            return compareResult;
         }
-
-        return pArtistName.toLowerCase().compareTo(another.pArtistName.toLowerCase());
     }
 
     public synchronized void setFetching(boolean fetching) {

@@ -27,6 +27,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import androidx.annotation.NonNull;
 
+import java.text.Collator;
 import java.util.Comparator;
 import java.util.Date;
 
@@ -150,7 +151,9 @@ public class MPDAlbum implements MPDGenericItem, Comparable<MPDAlbum>, Parcelabl
         if (another.equals(this)) {
             return 0;
         }
-        return mName.toLowerCase().compareTo(another.mName.toLowerCase());
+
+        Collator collator = Collator.getInstance();
+        return collator.compare(mName,another.mName);
     }
 
     @Override
