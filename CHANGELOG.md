@@ -1,4 +1,4 @@
-### Version 1.2.4 Tag: release-31 (2019-xx-xx)
+### Version 1.2.4 Tag: release-31 (2019-07-14)
 * Reenable list grouping for MPD (0.21.11 and above) with new protocol parser (Album artist, MBID, etc support)
 * Fix wrong album cover shown if no song is played
 * Fix Fanart loading for fullscreen activity when no Musicbrainz IDs are set
