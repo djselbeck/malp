@@ -36,6 +36,7 @@ import org.gateshipone.malp.mpdservice.mpdprotocol.mpdobjects.MPDStatistics;
 import org.gateshipone.malp.mpdservice.mpdprotocol.mpdobjects.MPDTrack;
 
 import java.io.IOException;
+import java.text.Collator;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -261,8 +262,10 @@ class MPDResponseParser {
                 if (response.startsWith(MPDResponses.MPD_RESPONSE_ARTIST_MBID)) {
                     mbids.clear();
                     String mbid = response.substring(MPDResponses.MPD_RESPONSE_ARTIST_MBID.length());
-                    String[] mbidsSplit = mbid.split("/");
-                    mbids.addAll(Arrays.asList(mbidsSplit));
+                    if (!mbid.isEmpty()) {
+                        String[] mbidsSplit = mbid.split("/");
+                        mbids.addAll(Arrays.asList(mbidsSplit));
+                    }
                 }
                 response = connection.readLine();
             }
