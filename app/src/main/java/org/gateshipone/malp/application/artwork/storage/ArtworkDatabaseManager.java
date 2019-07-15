@@ -357,7 +357,7 @@ public class ArtworkDatabaseManager extends SQLiteOpenHelper {
     /**
      * Removes all lines from the artists table
      */
-    public synchronized void clearArtistImages(final Context context) {
+    private synchronized void clearArtistImages(final Context context) {
         if (BuildConfig.DEBUG) {
             checkMainThread();
         }
@@ -373,7 +373,7 @@ public class ArtworkDatabaseManager extends SQLiteOpenHelper {
     /**
      * Removes all lines from the albums table
      */
-    public synchronized void clearAlbumImages(final Context context) {
+    private synchronized void clearAlbumImages(final Context context) {
         if (BuildConfig.DEBUG) {
             checkMainThread();
         }
@@ -386,7 +386,7 @@ public class ArtworkDatabaseManager extends SQLiteOpenHelper {
         FileUtils.removeArtworkDirectory(context, DIRECTORY_ALBUM_IMAGES);
     }
 
-    public synchronized void clearBlockedArtistImages() {
+    private synchronized void clearBlockedArtistImages() {
         if (BuildConfig.DEBUG) {
             checkMainThread();
         }
@@ -400,7 +400,7 @@ public class ArtworkDatabaseManager extends SQLiteOpenHelper {
         database.close();
     }
 
-    public synchronized void clearBlockedAlbumImages() {
+    private synchronized void clearBlockedAlbumImages() {
         if (BuildConfig.DEBUG) {
             checkMainThread();
         }
@@ -498,13 +498,13 @@ public class ArtworkDatabaseManager extends SQLiteOpenHelper {
                         getInstance(mContext).clearBlockedArtistImages();
                         break;
                     case CLEAR_BLOCKED_ALBUMS:
-                        getInstance(mContext).clearBlockedArtistImages();
+                        getInstance(mContext).clearBlockedAlbumImages();
                         break;
                     case CLEAR_ARTIST_IMAGES:
                         getInstance(mContext).clearArtistImages(mContext);
                         break;
                     case CLEAR_ALBUM_IMAGES:
-                        getInstance(mContext).clearArtistImages(mContext);
+                        getInstance(mContext).clearAlbumImages(mContext);
                         break;
                     default:
                         break;
