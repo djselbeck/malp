@@ -291,12 +291,22 @@ public class SearchFragment extends GenericMPDFragment<List<MPDFileEntry>> imple
                 songDetailsDialog.show(((AppCompatActivity) getContext()).getSupportFragmentManager(), "SongDetails");
                 return true;
             }
-            case R.id.action_add_album:
-                MPDQueryHandler.addArtistAlbum(track.getTrackAlbum(), "", track.getTrackAlbumMBID());
+            case R.id.action_add_album: {
+                String artist = track.getTrackAlbumArtist();
+                if (artist.isEmpty()) {
+                    artist = track.getTrackArtist();
+                }
+                MPDQueryHandler.addArtistAlbum(track.getTrackAlbum(), artist, track.getTrackAlbumMBID());
                 return true;
-            case R.id.action_play_album:
-                MPDQueryHandler.playArtistAlbum(track.getTrackAlbum(), "", track.getTrackAlbumMBID());
+            }
+            case R.id.action_play_album: {
+                String artist = track.getTrackAlbumArtist();
+                if (artist.isEmpty()) {
+                    artist = track.getTrackArtist();
+                }
+                MPDQueryHandler.playArtistAlbum(track.getTrackAlbum(), artist, track.getTrackAlbumMBID());
                 return true;
+            }
             case R.id.action_add_artist:
                 MPDQueryHandler.addArtist(track.getTrackArtist(), mAlbumSortOrder);
                 return true;
