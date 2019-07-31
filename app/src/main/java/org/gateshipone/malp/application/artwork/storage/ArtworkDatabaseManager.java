@@ -22,7 +22,6 @@
 
 package org.gateshipone.malp.application.artwork.storage;
 
-import android.app.Application;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -69,7 +68,7 @@ public class ArtworkDatabaseManager extends SQLiteOpenHelper {
 
     private void checkMainThread() {
         if (Looper.getMainLooper() == Looper.myLooper()) {
-            Log.e(TAG,"Database called from UI thread!");
+            Log.e(TAG, "Database called from UI thread!");
             new Exception().printStackTrace();
         }
     }
@@ -416,12 +415,13 @@ public class ArtworkDatabaseManager extends SQLiteOpenHelper {
 
         if (requestCursor.moveToFirst()) {
             final String artworkFilename = requestCursor.getString(requestCursor.getColumnIndex(ArtistArtTable.COLUMN_IMAGE_FILE_PATH));
-            requestCursor.close();
             FileUtils.removeArtworkFile(context, artworkFilename, DIRECTORY_ARTIST_IMAGES);
         }
+
+        requestCursor.close();
     }
 
-    public  void removeAlbumImage(final Context context, final MPDAlbum album) {
+    public void removeAlbumImage(final Context context, final MPDAlbum album) {
         if (BuildConfig.DEBUG) {
             checkMainThread();
         }
@@ -446,9 +446,10 @@ public class ArtworkDatabaseManager extends SQLiteOpenHelper {
 
         if (requestCursor.moveToFirst()) {
             final String artworkFilename = requestCursor.getString(requestCursor.getColumnIndex(AlbumArtTable.COLUMN_IMAGE_FILE_PATH));
-            requestCursor.close();
             FileUtils.removeArtworkFile(context, artworkFilename, DIRECTORY_ALBUM_IMAGES);
         }
+
+        requestCursor.close();
     }
 
     private enum AsyncOperationType {
@@ -467,7 +468,7 @@ public class ArtworkDatabaseManager extends SQLiteOpenHelper {
 
         @Override
         protected Object doInBackground(AsyncOperationType... objects) {
-            if(objects.length > 0) {
+            if (objects.length > 0) {
                 switch (objects[0]) {
                     case CLEAR_BLOCKED_ARTISTS:
                         getInstance(mContext).clearBlockedArtistImages();
@@ -492,14 +493,17 @@ public class ArtworkDatabaseManager extends SQLiteOpenHelper {
             AsyncOperationType type = AsyncOperationType.CLEAR_BLOCKED_ARTISTS;
             new AsyncOperationTask(context).execute(type);
         }
+
         static public void clearBlockedAlbums(Context context) {
             AsyncOperationType type = AsyncOperationType.CLEAR_BLOCKED_ALBUMS;
             new AsyncOperationTask(context).execute(type);
         }
+
         static public void clearArtists(Context context) {
             AsyncOperationType type = AsyncOperationType.CLEAR_ARTIST_IMAGES;
             new AsyncOperationTask(context).execute(type);
         }
+
         static public void clearAlbums(Context context) {
             AsyncOperationType type = AsyncOperationType.CLEAR_ALBUM_IMAGES;
             new AsyncOperationTask(context).execute(type);
