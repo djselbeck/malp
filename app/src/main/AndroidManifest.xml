@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~  Copyright (C) 2019 Team Gateship-One
   ~  (Hendrik Borghorst & Frederik Luetkes)
   ~
@@ -30,14 +29,15 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
     <application
+        android:name=".application.MalpApplication"
         android:allowBackup="true"
+        android:fullBackupContent="@xml/backup_descriptor"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:largeHeap="true"
         android:supportsRtl="true"
-        android:usesCleartextTraffic="true"
         android:theme="@style/AppTheme.orange"
-        android:fullBackupContent="@xml/backup_descriptor">
+        android:usesCleartextTraffic="true">
         <activity
             android:name=".application.activities.SplashActivity"
             android:label="@string/app_name"
@@ -72,8 +72,7 @@
         <activity
             android:name=".application.activities.ContributorsActivity"
             android:label="Contributors"
-            android:parentActivityName=".application.activities.MainActivity">
-        </activity>
+            android:parentActivityName=".application.activities.MainActivity"></activity>
 
         <service
             android:name=".application.artwork.BulkDownloadService"
@@ -83,8 +82,9 @@
         <service
             android:name=".application.background.BackgroundService"
             android:exported="false"
-            android:stopWithTask="false"
-            android:process=":widgetService" />
+            android:process=":widgetService"
+            android:stopWithTask="false" />
+
         <receiver android:name=".application.background.RemoteControlReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.MEDIA_BUTTON" />
@@ -96,7 +96,7 @@
                 <action android:name="org.gateshipone.malp.action_new_artwork_ready" />
                 <action android:name="org.gateshipone.malp.widget.status_changed" />
                 <action android:name="org.gateshipone.malp.widget.track_changed" />
-                <action android:name="org.gateshipone.malp.widget.server_disconnected"/>
+                <action android:name="org.gateshipone.malp.widget.server_disconnected" />
             </intent-filter>
 
             <meta-data
