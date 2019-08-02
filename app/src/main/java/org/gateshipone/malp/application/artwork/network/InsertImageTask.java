@@ -132,7 +132,11 @@ public class InsertImageTask extends AsyncTask<ImageResponse, Object, ArtworkReq
                 fakeAlbum.setArtistName(artist);
                 fakeAlbum.setMBID(track.getTrackAlbumMBID());
                 if (DEBUG_ENABLED) {
-                    Log.v(TAG,"Received image: " + image.length + " bytes for track: " + track.getFilename() + "for artist: " + artist + " and album: " + fakeAlbum.getName());
+                    if (image != null) {
+                        Log.v(TAG, "Received image: " + image.length + " bytes for track: " + track.getFilename() + "for artist: " + artist + " and album: " + fakeAlbum.getName());
+                    } else {
+                        Log.v(TAG, "Received null image for track: " + track.getFilename() + "for artist: " + artist + " and album: " + fakeAlbum.getName());
+                    }
                 }
                 artworkDatabase.insertAlbumImage(mApplicationContext, fakeAlbum, image);
                 break;
