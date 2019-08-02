@@ -22,6 +22,10 @@
 
 package org.gateshipone.malp.mpdservice.mpdprotocol;
 
+import android.util.Log;
+
+import org.gateshipone.malp.BuildConfig;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -34,6 +38,11 @@ import java.io.PrintWriter;
  */
 public class MPDSocketInterface {
     private static final String TAG = MPDSocketInterface.class.getSimpleName();
+    /**
+     * Set this flag to enable debugging in this class. DISABLE before releasing
+     */
+    private static final boolean DEBUG_ENABLED = BuildConfig.DEBUG;
+
     /**
      * Buffered input stream to improve the performance
      */
@@ -85,6 +94,9 @@ public class MPDSocketInterface {
        // Log.v(TAG,"Buffer fill read " + readBytes + " bytes");
         mReadBufferWritePos = readBytes;
         mReadBufferReadPos = 0;
+        if (DEBUG_ENABLED) {
+            Log.v(TAG,"Received " +  readBytes + " bytes from server");
+        }
     }
 
     private int dataReady() {

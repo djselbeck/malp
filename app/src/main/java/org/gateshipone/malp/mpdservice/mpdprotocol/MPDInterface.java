@@ -23,6 +23,9 @@
 package org.gateshipone.malp.mpdservice.mpdprotocol;
 
 
+import android.util.Log;
+
+import org.gateshipone.malp.BuildConfig;
 import org.gateshipone.malp.mpdservice.handlers.MPDConnectionStateChangeHandler;
 import org.gateshipone.malp.mpdservice.handlers.MPDIdleChangeHandler;
 import org.gateshipone.malp.mpdservice.mpdprotocol.mpdobjects.MPDAlbum;
@@ -43,6 +46,11 @@ import java.util.Set;
 
 public class MPDInterface {
     private final String TAG = MPDInterface.class.getSimpleName();
+
+    /**
+     * Set this flag to enable debugging in this class. DISABLE before releasing
+     */
+    private static final boolean DEBUG_ENABLED = BuildConfig.DEBUG;
 
     private final MPDConnection mConnection;
 
@@ -1003,6 +1011,9 @@ public class MPDInterface {
         if (!mConnection.getServerCapabilities().hasAlbumArt()) {
             return null;
         }
+        if (DEBUG_ENABLED) {
+            Log.v(TAG,"Artwork for: " + path + " requested");
+        }
         int imageSize = 0;
         int dataToRead = -1;
 
@@ -1033,6 +1044,9 @@ public class MPDInterface {
                         imageData = new byte[imageSize];
                         dataToRead = imageSize;
                         firstRun = false;
+                        if (DEBUG_ENABLED) {
+                            Log.v(TAG,"Image available for path: " + path + " with size: " + imageSize);
+                        }
                     }
                 } else if (line.startsWith("binary")) {
                     // This means that after this line a binary chunk is incoming
@@ -1048,6 +1062,9 @@ public class MPDInterface {
                     // Copy chunk to final output array
                     System.arraycopy(readData, 0, imageData, (imageSize - dataToRead), chunkSize);
                     dataToRead -= chunkSize;
+                    if (DEBUG_ENABLED) {
+                        Log.v(TAG,"Data left to read: " + dataToRead);
+                    }
                 }
 
                 try {
@@ -1057,7 +1074,9 @@ public class MPDInterface {
                 }
             }
         }
-
+        if (DEBUG_ENABLED) {
+            Log.v(TAG,"Return " + imageData.length + " bytes of image data");
+        }
         return imageData;
     }
 }

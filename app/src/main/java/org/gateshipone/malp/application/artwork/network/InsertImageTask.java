@@ -27,7 +27,9 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
+import android.util.Log;
 
+import org.gateshipone.malp.BuildConfig;
 import org.gateshipone.malp.application.artwork.network.responses.ImageResponse;
 import org.gateshipone.malp.application.artwork.storage.ArtworkDatabaseManager;
 import org.gateshipone.malp.mpdservice.mpdprotocol.mpdobjects.MPDAlbum;
@@ -37,11 +39,15 @@ import org.gateshipone.malp.mpdservice.mpdprotocol.mpdobjects.MPDTrack;
 import java.io.ByteArrayOutputStream;
 
 public class InsertImageTask extends AsyncTask<ImageResponse, Object, ArtworkRequestModel> {
-
+    private static final String TAG = InsertImageTask.class.getSimpleName();
     public interface ImageSavedCallback {
         void onImageSaved(ArtworkRequestModel artworkRequestModel, Context context);
     }
 
+    /**
+     * Set this flag to enable debugging in this class. DISABLE before releasing
+     */
+    private static final boolean DEBUG_ENABLED = BuildConfig.DEBUG;
     /**
      * Maximmum size for either x or y of an image
      */
@@ -119,8 +125,15 @@ public class InsertImageTask extends AsyncTask<ImageResponse, Object, ArtworkReq
             case TRACK:
                 final MPDTrack track = (MPDTrack) model.getGenericModel();
                 MPDAlbum fakeAlbum = new MPDAlbum(track.getTrackAlbum());
-                fakeAlbum.setArtistName(track.getTrackAlbumArtist());
+                String artist = track.getTrackAlbumArtist();
+                if (artist.isEmpty()) {
+                    artist = track.getTrackArtist();
+                }
+                fakeAlbum.setArtistName(artist);
                 fakeAlbum.setMBID(track.getTrackAlbumMBID());
+                if (DEBUG_ENABLED) {
+                    Log.v(TAG,"Received image: " + image.length + " bytes for track: " + track.getFilename() + "for artist: " + artist + " and album: " + fakeAlbum.getName());
+                }
                 artworkDatabase.insertAlbumImage(mApplicationContext, fakeAlbum, image);
                 break;
         }

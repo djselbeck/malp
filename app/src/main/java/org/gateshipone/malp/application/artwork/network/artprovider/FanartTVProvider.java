@@ -134,6 +134,7 @@ public class FanartTVProvider extends ArtProvider implements FanartProvider {
     private void tryArtistMBID(final int mbidIndex, final ArtworkRequestModel model, final Context context,
                                final Response.Listener<ImageResponse> listener, final ArtFetchError errorListener) {
         final String mbid = model.getMBID(mbidIndex);
+        Log.v(TAG,"tryArtistMbid(" +  mbidIndex + ',' + mbid + ',' + model.getEncodedArtistName());
 
         // Check if recursive call ends here.
         if (mbid != null) {
@@ -144,7 +145,7 @@ public class FanartTVProvider extends ArtProvider implements FanartProvider {
                     thumbImages = response.getJSONArray("artistthumb");
 
                     final JSONObject firstThumbImage = thumbImages.getJSONObject(0);
-
+                    Log.v(TAG,"Try response: " + firstThumbImage.getString("url"));
                     getArtistImage(firstThumbImage.getString("url"), model, listener, error -> {
                         // If we have multiple artist mbids try the next one
                         tryArtistMBID(mbidIndex + 1, model, context, listener, errorListener);
@@ -255,6 +256,7 @@ public class FanartTVProvider extends ArtProvider implements FanartProvider {
      */
     @Override
     public void getTrackArtistMBID(final MPDTrack track, final Response.Listener<String> listener, final FanartFetchError errorListener) {
+        Log.v(TAG,"Get Trackartist MBID" + track.getTrackName());
         String artistName = track.getTrackAlbumArtist();
         if (artistName.isEmpty()) {
             artistName = track.getTrackArtist();

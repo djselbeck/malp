@@ -36,6 +36,7 @@ import android.util.Log;
 import com.android.volley.NetworkResponse;
 import com.android.volley.VolleyError;
 
+import org.gateshipone.malp.BuildConfig;
 import org.gateshipone.malp.R;
 import org.gateshipone.malp.application.artwork.network.ArtworkRequestModel;
 import org.gateshipone.malp.application.artwork.network.InsertImageTask;
@@ -60,6 +61,10 @@ import java.util.ArrayList;
 
 public class ArtworkManager implements ArtProvider.ArtFetchError, InsertImageTask.ImageSavedCallback {
     private static final String TAG = ArtworkManager.class.getSimpleName();
+    /**
+     * Set this flag to enable debugging in this class. DISABLE before releasing
+     */
+    private static final boolean DEBUG_ENABLED = BuildConfig.DEBUG;
 
     /**
      * Interface used for adapters to be notified about data set changes
@@ -251,11 +256,17 @@ public class ArtworkManager implements ArtProvider.ArtFetchError, InsertImageTas
         if (null == track || track.getTrackAlbum().isEmpty()) {
             return null;
         }
+        if (DEBUG_ENABLED) {
+            Log.v(TAG,"Artwork track request: " + track.getFilename() + " skipCache: " + skipCache);
+        }
 
         if (!skipCache) {
             // Try cache first
             Bitmap cacheBitmap = BitmapCache.getInstance().requestTrackBitmap(track);
             if (null != cacheBitmap && width <= cacheBitmap.getWidth() && height <= cacheBitmap.getWidth()) {
+                if (DEBUG_ENABLED) {
+                    Log.v(TAG,"Image found in cache");
+                }
                 return cacheBitmap;
             }
         }
@@ -264,6 +275,9 @@ public class ArtworkManager implements ArtProvider.ArtFetchError, InsertImageTas
 
         // Checks if the database has an image for the requested album
         if (null != image) {
+            if (DEBUG_ENABLED) {
+                Log.v(TAG,"Image found in database");
+            }
             // Create a bitmap from the data blob in the database
             Bitmap bm = BitmapUtils.decodeSampledBitmapFromFile(image, width, height);
             BitmapCache.getInstance().putTrackBitmap(track, bm);
@@ -376,7 +390,13 @@ public class ArtworkManager implements ArtProvider.ArtFetchError, InsertImageTas
                            final ArtProvider.ArtFetchError errorCallback) {
         final ArtworkRequestModel requestModel = new ArtworkRequestModel(track);
 
+        if (DEBUG_ENABLED) {
+            Log.v(TAG,"fetchImage for track: " + track.getFilename());
+        }
         if (MPDAlbumImageProvider.getInstance().getActive()) {
+            if (DEBUG_ENABLED) {
+                Log.v(TAG, "MPDAlbumImageProvider used");
+            }
             // Check if MPD cover transfer is activated
             MPDAlbumImageProvider.getInstance().fetchImage(requestModel, mContext,
                     response -> new InsertImageTask(mContext, imageSavedCallback).execute(response),
