@@ -119,7 +119,11 @@ public class InsertImageTask extends AsyncTask<ImageResponse, Object, ArtworkReq
             case TRACK:
                 final MPDTrack track = (MPDTrack) model.getGenericModel();
                 MPDAlbum fakeAlbum = new MPDAlbum(track.getTrackAlbum());
-                fakeAlbum.setArtistName(track.getTrackAlbumArtist());
+                String artist = track.getTrackAlbumArtist();
+                if (artist.isEmpty()) {
+                    artist = track.getTrackArtist();
+                }
+                fakeAlbum.setArtistName(artist);
                 fakeAlbum.setMBID(track.getTrackAlbumMBID());
                 artworkDatabase.insertAlbumImage(mApplicationContext, fakeAlbum, image);
                 break;
