@@ -309,7 +309,11 @@ public class ArtworkDatabaseManager extends SQLiteOpenHelper {
     public void insertAlbumImage(final Context context, final MPDAlbum album, final byte[] image) {
         if (BuildConfig.DEBUG) {
             checkMainThread();
-            Log.v(TAG, "Inserting album image with size: " + image.length + " for album: " + album.getName() + " - " + album.getArtistName());
+            if (image != null) {
+                Log.v(TAG, "Inserting album image with size: " + image.length + " for album: " + album.getName() + " - " + album.getArtistName());
+            } else {
+                Log.v(TAG, "Inserting NULL album image for album: " + album.getName() + " - " + album.getArtistName());
+            }
         }
         final String albumMBID = album.getMBID();
         final String albumName = album.getName();
